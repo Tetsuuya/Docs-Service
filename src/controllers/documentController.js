@@ -17,9 +17,18 @@ export const handleGenerateDocument = async (req, res) => {
       logger.warn('Unified Request Failed: Prompt is missing');
       return res.status(400).json({ error: 'Prompt is required' });
     }
-    
+
+    if (format === 'docx') {
+      const contentData = await generateDocumentContent(prompt);
+      const buffer = await buildDocxFile(contentData);
+      
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+      res.setHeader('Content-Disposition', 'attachment; filename="generated_document.docx"');
+      return res.send(buffer);
+    }
+
     return res.status(501).json({ 
-      message: 'Unified document generation endpoint skeleton',
+      message: `Unified generation endpoint skeleton for format: ${format}`,
       format,
       mode
     });
@@ -30,7 +39,7 @@ export const handleGenerateDocument = async (req, res) => {
 };
 
 /**
- * Dedicated DOCX endpoint handler
+ * Dedicated DOCX endpoint handler - Calls Gemini API & docxService builder
  */
 export const handleGenerateDocx = async (req, res) => {
   try {
@@ -42,7 +51,15 @@ export const handleGenerateDocx = async (req, res) => {
       return res.status(400).json({ error: 'Prompt is required' });
     }
 
-    const buffer = await buildDocxFile({ prompt });
+    // 1. Generate structured document JSON using Gemini 2.0 Flash Lite
+    const contentData = await generateDocumentContent(prompt);
+
+    // 2. Build styled Word document (.docx)
+    const buffer = await buildDocxFile(contentData);
+
+    // 3. Set headers for file download
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+    res.setHeader('Content-Disposition', 'attachment; filename="generated_document.docx"');
     return res.send(buffer);
   } catch (error) {
     logger.error('Error in handleGenerateDocx:', error.message);
@@ -56,13 +73,7 @@ export const handleGenerateDocx = async (req, res) => {
 export const handleGeneratePptx = async (req, res) => {
   try {
     const { prompt } = req.body;
-    logger.info(`PPTX Request Received -> Prompt: "${prompt}"`);
-
-    if (!prompt) {
-      logger.warn('PPTX Request Failed: Prompt is missing');
-      return res.status(400).json({ error: 'Prompt is required' });
-    }
-
+    if (!prompt) return res.status(400).json({ error: 'Prompt is required' });
     const buffer = await buildPptxFile({ prompt });
     return res.send(buffer);
   } catch (error) {
@@ -77,13 +88,7 @@ export const handleGeneratePptx = async (req, res) => {
 export const handleGenerateXlsx = async (req, res) => {
   try {
     const { prompt } = req.body;
-    logger.info(`XLSX Request Received -> Prompt: "${prompt}"`);
-
-    if (!prompt) {
-      logger.warn('XLSX Request Failed: Prompt is missing');
-      return res.status(400).json({ error: 'Prompt is required' });
-    }
-
+    if (!prompt) return res.status(400).json({ error: 'Prompt is required' });
     const buffer = await buildXlsxFile({ prompt });
     return res.send(buffer);
   } catch (error) {
@@ -98,13 +103,7 @@ export const handleGenerateXlsx = async (req, res) => {
 export const handleGeneratePdf = async (req, res) => {
   try {
     const { prompt } = req.body;
-    logger.info(`PDF Request Received -> Prompt: "${prompt}"`);
-
-    if (!prompt) {
-      logger.warn('PDF Request Failed: Prompt is missing');
-      return res.status(400).json({ error: 'Prompt is required' });
-    }
-
+    if (!prompt) return res.status(400).json({ error: 'Prompt is required' });
     const buffer = await convertToPdf({ prompt });
     return res.send(buffer);
   } catch (error) {
