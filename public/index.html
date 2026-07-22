@@ -91,6 +91,17 @@
     button:hover {
       background-color: #1d4ed8;
     }
+    button:disabled {
+      background-color: #94a3b8;
+      cursor: not-allowed;
+    }
+    .status-msg {
+      margin-top: 12px;
+      font-size: 13px;
+      color: #2563eb;
+      font-weight: 500;
+      display: none;
+    }
   </style>
 </head>
 <body>
@@ -125,9 +136,10 @@
       </select>
 
       <label for="promptInput">Prompt Request:</label>
-      <textarea id="promptInput" placeholder="e.g. Create a 3-page technical project proposal with budget tables..."></textarea>
+      <textarea id="promptInput" placeholder="e.g. Create an executive technical proposal with budget tables..."></textarea>
       
-      <button type="submit">Generate Document</button>
+      <button type="submit" id="submitBtn">Generate Document</button>
+      <div id="statusMsg" class="status-msg">⏳ Generating document via Gemini 2.0 Flash Lite... Please wait a few seconds.</div>
     </form>
   </div>
 
@@ -138,33 +150,31 @@
 
     document.getElementById("docForm").addEventListener("submit", async function(e) {
       e.preventDefault();
-      const prompt = document.getElementById("promptInput").value;
+      const prompt = document.getElementById("promptInput").value.trim();
       const format = document.getElementById("formatSelect").value;
       const mode = document.querySelector('input[name="mode"]:checked').value;
       
-      if (!prompt) return alert("Please enter a prompt");
+      if (!prompt) return alert("Please enter a prompt request!");
+
+      const submitBtn = document.getElementById("submitBtn");
+      const statusMsg = document.getElementById("statusMsg");
+
+      submitBtn.disabled = true;
+      submitBtn.innerText = "Generating Document...";
+      statusMsg.style.display = "block";
 
       try {
-        const formData = new FormData();
-        formData.append("prompt", prompt);
-        formData.append("format", format);
-        formData.append("mode", mode);
-
-        if (mode === "template") {
-          const fileInput = document.getElementById("templateFile");
-          if (fileInput.files.length > 0) {
-            formData.append("template", fileInput.files[0]);
-          }
-        }
-
         const response = await fetch("/api/generate", {
           method: "POST",
-          body: formData
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ prompt, format, mode })
         });
 
         if (!response.ok) {
           const err = await response.json();
-          return alert("Error: " + (err.error || "Failed to generate document"));
+          throw new Error(err.error || err.message || "Failed to generate document");
         }
 
         const blob = await response.blob();
@@ -175,9 +185,14 @@
         document.body.appendChild(a);
         a.click();
         a.remove();
+        window.URL.revokeObjectURL(url);
       } catch (err) {
         console.error(err);
-        alert("Failed to generate document");
+        alert("Error: " + err.message);
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerText = "Generate Document";
+        statusMsg.style.display = "none";
       }
     });
   </script>
