@@ -57,14 +57,41 @@ Docs-Service/
 
 ---
 
-## Phase 3: Word Document Generator Engine (`docx`)
+## Phase 3A: Word Document Engine (`docxService.js`) - Current Focus
 - **Goal:** Transform Gemini's JSON structure into a styled `.docx` Word file.
 - **Deliverables:**
   1. Implement **Running Header** (e.g., *"DOCS SERVICE | CONFIDENTIAL"*).
   2. Implement **Running Footer** with dynamic Page Numbers (*"Page X of Y"*).
   3. Implement **Styled Typography** (Title in 28pt bold, Heading 1 in Navy Blue `#1E3A8A`).
-  4. Implement **Styled Table** (Navy Blue `#1E3A8A` header row, white bold text, cell borders, shading).
-  5. Pack document into binary buffer and stream to client.
+  4. Implement **Styled Table** (Navy Blue `#1E3A8A` header row, white bold text, cell borders).
+  5. Stream binary buffer to client.
+
+---
+
+## Phase 3B: PowerPoint Presentation Engine (`pptxService.js`)
+- **Goal:** Build native PowerPoint slide decks from Gemini's JSON layout using `PptxGenJS`.
+- **Deliverables:**
+  1. Implement Master Slide Layouts (Title slide, 3-card layout, Split image/text).
+  2. Implement Brand Color Schemes & Theme Tokens.
+  3. Implement Native Editable Shapes, Text Boxes & Charts.
+
+---
+
+## Phase 3C: Excel Spreadsheet Engine (`xlsxService.js`)
+- **Goal:** Build structured spreadsheets with working formulas using `ExcelJS`.
+- **Deliverables:**
+  1. Implement Worksheet styling, grid formatting & bold headers.
+  2. Implement Excel Formulas (`=SUM()`, `=AVERAGE()`).
+  3. Implement Dynamic Data Tables & Chart generation.
+
+---
+
+## Phase 3D: PDF Conversion Engine (`pdfService.js`)
+- **Goal:** Convert generated `.pptx`, `.docx`, and `.xlsx` files into high-fidelity PDFs via `Gotenberg`.
+- **Deliverables:**
+  1. Connect to Dockerized `Gotenberg` LibreOffice API.
+  2. Convert office buffers to PDF stream.
+  3. Deliver `.pdf` files to client.
 
 ---
 
