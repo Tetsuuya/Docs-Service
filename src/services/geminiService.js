@@ -44,10 +44,11 @@ async function callGemini(promptText, isJson = true, maxTokens = 8192) {
 
 /**
  * Multi-Pass Document Generation Engine with:
- * 1. Clean Page Breaks per section in Word
- * 2. Universal Minimum Target Page-Count Scaling Rule (>= N pages, NEVER < N)
- * 3. Automatic Typo & Misspelling Correction
- * 4. Dynamic Domain-Aware Hex Theme Color Generation
+ * 1. Embedded Prompt tracking inside JSON AST
+ * 2. Clean Page Breaks per section in Word
+ * 3. Universal Minimum Target Page-Count Scaling Rule (>= N pages, NEVER < N)
+ * 4. Automatic Typo & Misspelling Correction
+ * 5. Dynamic Domain-Aware Hex Theme Color Generation
  */
 export const generateDocumentContent = async (userPrompt) => {
   if (!config.geminiApiKey || config.geminiApiKey === 'your_gemini_api_key_here') {
@@ -163,8 +164,9 @@ export const generateDocumentContent = async (userPrompt) => {
 
   logger.info(`Step 2 Complete -> Generated ${fullSections.length} rich sections.`);
 
-  // STEP 3: Assemble Full Document JSON
+  // STEP 3: Assemble Full Document JSON AST (Including userPrompt)
   const finalDocumentJSON = {
+    prompt: userPrompt, // 👈 Included directly inside the document AST!
     theme: outlinePlan.theme,
     title: outlinePlan.title,
     subtitle: outlinePlan.subtitle,

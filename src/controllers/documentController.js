@@ -3,6 +3,7 @@ import { buildDocxFile } from '../services/docxService.js';
 import { buildPptxFile } from '../services/pptxService.js';
 import { buildXlsxFile } from '../services/xlsxService.js';
 import { convertToPdf } from '../services/pdfService.js';
+import { saveDocumentJsonHistory, generateDocumentId } from '../utils/historyStorage.js';
 import { logger } from '../utils/logger.js';
 
 /**
@@ -19,11 +20,18 @@ export const handleGenerateDocument = async (req, res) => {
     }
 
     if (format === 'docx') {
+      const docId = generateDocumentId();
       const contentData = await generateDocumentContent(prompt);
+      contentData.id = docId;
+
+      // Save JSON AST to local history storage with unique ID
+      await saveDocumentJsonHistory(contentData, { id: docId, prompt, format, mode });
+
       const buffer = await buildDocxFile(contentData);
       
       res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
       res.setHeader('Content-Disposition', 'attachment; filename="generated_document.docx"');
+      res.setHeader('X-Document-Id', docId);
       return res.send(buffer);
     }
 
@@ -39,7 +47,7 @@ export const handleGenerateDocument = async (req, res) => {
 };
 
 /**
- * Dedicated DOCX endpoint handler - Calls Gemini API & docxService builder
+ * Dedicated DOCX endpoint handler - Calls Gemini API, saves JSON history & builds docx buffer
  */
 export const handleGenerateDocx = async (req, res) => {
   try {
@@ -51,15 +59,22 @@ export const handleGenerateDocx = async (req, res) => {
       return res.status(400).json({ error: 'Prompt is required' });
     }
 
+    const docId = generateDocumentId();
+
     // 1. Generate structured document JSON using Gemini 2.0 Flash Lite
     const contentData = await generateDocumentContent(prompt);
+    contentData.id = docId;
 
-    // 2. Build styled Word document (.docx)
+    // 2. Save JSON AST to local history storage with unique ID
+    await saveDocumentJsonHistory(contentData, { id: docId, prompt, format: 'docx', mode: 'scratch' });
+
+    // 3. Build styled Word document (.docx)
     const buffer = await buildDocxFile(contentData);
 
-    // 3. Set headers for file download
+    // 4. Set headers for file download
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
     res.setHeader('Content-Disposition', 'attachment; filename="generated_document.docx"');
+    res.setHeader('X-Document-Id', docId);
     return res.send(buffer);
   } catch (error) {
     logger.error('Error in handleGenerateDocx:', error.message);
