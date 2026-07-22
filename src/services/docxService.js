@@ -9,6 +9,7 @@ import {
   Header,
   Footer,
   PageNumber,
+  PageBreak,
   AlignmentType,
   BorderStyle,
   WidthType,
@@ -18,12 +19,14 @@ import {
 import { logger } from '../utils/logger.js';
 
 /**
- * Builds a styled, professional Microsoft Word (.docx) file from structured document JSON.
+ * Builds a styled Microsoft Word (.docx) file using Gemini's dynamic JSON color theme and layouts.
  * Features:
+ * - Page Break before every major section (idx > 0) so each section starts cleanly on a NEW PAGE!
+ * - Dynamic Theme Colors per document (Primary, Secondary, Accent, Light Background)
  * - Running Header & Footer (Page X of Y)
- * - Styled Typography (Title 28pt bold, Heading 1 #1E3A8A, Heading 2 #2563EB)
- * - Callout Highlight Boxes (Left border accent + light background)
- * - Styled Data Tables (Navy Header #1E3A8A, bold white text, alternating row shading #F8FAFC, light borders #E2E8F0)
+ * - Styled Typography & Heading Levels
+ * - Callout Highlight Boxes (Dynamic border accent + light background)
+ * - Styled Data Tables (Dynamic Header fill, bold white text, alternating row shading, light borders)
  */
 export const buildDocxFile = async (data) => {
   logger.info(`Building DOCX Document -> Title: "${data.title || 'Untitled Document'}"`);
@@ -35,15 +38,19 @@ export const buildDocxFile = async (data) => {
   const sections = data.sections || [];
   const tableData = data.table || null;
 
-  // Primary Theme Colors (Hex strings without # for docx)
-  const COLOR_NAVY = '1E3A8A';
-  const COLOR_BLUE = '2563EB';
+  // Dynamic Theme Colors from Gemini (Hex strings without #)
+  const theme = data.theme || {};
+  const COLOR_NAVY = theme.primaryColor || '1E3A8A';
+  const COLOR_BLUE = theme.secondaryColor || '2563EB';
+  const COLOR_ACCENT = theme.accentColor || '0284C7';
   const COLOR_DARK = '0F172A';
-  const COLOR_BODY = '334155';
+  const COLOR_BODY = theme.textColor || '334155';
   const COLOR_MUTED = '64748B';
-  const COLOR_LIGHT_BG = 'F8FAFC';
+  const COLOR_LIGHT_BG = theme.lightBgColor || 'F8FAFC';
   const COLOR_BORDER = 'CBD5E1';
   const COLOR_WHITE = 'FFFFFF';
+
+  logger.info(`Applying Dynamic Theme -> Primary: #${COLOR_NAVY}, Secondary: #${COLOR_BLUE}, LightBg: #${COLOR_LIGHT_BG}`);
 
   // 1. Build Document Children Array
   const children = [];
@@ -82,7 +89,7 @@ export const buildDocxFile = async (data) => {
     })
   );
 
-  // Horizontal Divider Line
+  // Horizontal Divider Line with Accent Color
   children.push(
     new Paragraph({
       border: {
@@ -92,8 +99,17 @@ export const buildDocxFile = async (data) => {
     })
   );
 
-  // --- Render Sections ---
+  // --- Render Sections with PAGE BREAK BEFORE EVERY NEW SECTION ---
   sections.forEach((sec, idx) => {
+    // Insert Page Break before every section after Section 1
+    if (idx > 0) {
+      children.push(
+        new Paragraph({
+          children: [new PageBreak()]
+        })
+      );
+    }
+
     if (sec.heading) {
       children.push(
         new Paragraph({
@@ -130,7 +146,7 @@ export const buildDocxFile = async (data) => {
       });
     }
 
-    // Callout / Highlight Box
+    // Callout / Highlight Box with Dynamic Accent Color & Background
     if (sec.calloutBox) {
       children.push(
         new Table({
@@ -173,8 +189,17 @@ export const buildDocxFile = async (data) => {
     }
   });
 
-  // --- Render Styled Table ---
+  // --- Render Styled Table (Starts on its own section or after content) ---
   if (tableData && Array.isArray(tableData.headers) && Array.isArray(tableData.rows)) {
+    // Add page break before table if sections exist
+    if (sections.length > 0) {
+      children.push(
+        new Paragraph({
+          children: [new PageBreak()]
+        })
+      );
+    }
+
     if (tableData.title) {
       children.push(
         new Paragraph({
@@ -195,7 +220,7 @@ export const buildDocxFile = async (data) => {
 
     const tableRows = [];
 
-    // Header Row
+    // Header Row with Dynamic Primary Color Fill
     const headerCells = tableData.headers.map((hText) => {
       return new TableCell({
         shading: { fill: COLOR_NAVY, type: ShadingType.CLEAR },
@@ -225,7 +250,7 @@ export const buildDocxFile = async (data) => {
 
     tableRows.push(new TableRow({ children: headerCells, tableHeader: true, cantSplit: true }));
 
-    // Data Rows
+    // Data Rows with Dynamic Alternating Row Shading
     tableData.rows.forEach((rowArray, rIdx) => {
       const isOdd = rIdx % 2 !== 0;
       const rowFill = isOdd ? COLOR_LIGHT_BG : COLOR_WHITE;
