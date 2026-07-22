@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Document Generator Service</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: #f8fafc;
+      color: #1e293b;
+      margin: 0;
+      padding: 50px 20px;
+      display: flex;
+      justify-content: center;
+    }
+    .card {
+      background: #ffffff;
+      max-width: 620px;
+      width: 100%;
+      padding: 32px;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+    h1 {
+      margin-top: 0;
+      font-size: 22px;
+      color: #0f172a;
+    }
+    p {
+      color: #64748b;
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: #475569;
+      margin-bottom: 6px;
+    }
+    .mode-group {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    .mode-option {
+      flex: 1;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 12px;
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .mode-option input {
+      margin: 0;
+    }
+    select, textarea, input[type="file"] {
+      width: 100%;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 14px;
+      font-family: inherit;
+      box-sizing: border-box;
+      margin-bottom: 16px;
+    }
+    textarea {
+      height: 100px;
+      resize: vertical;
+    }
+    select:focus, textarea:focus {
+      outline: none;
+      border-color: #2563eb;
+    }
+    button {
+      background-color: #2563eb;
+      color: #ffffff;
+      border: none;
+      padding: 12px 20px;
+      font-size: 14px;
+      font-weight: 500;
+      border-radius: 6px;
+      cursor: pointer;
+      width: 100%;
+    }
+    button:hover {
+      background-color: #1d4ed8;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>📄 AI Document Generator Service</h1>
+    <p>Select generation mode, format, and enter a prompt to generate formatted documents:</p>
+
+    <form id="docForm">
+      <label>Generation Mode:</label>
+      <div class="mode-group">
+        <label class="mode-option">
+          <input type="radio" name="mode" value="scratch" checked onclick="toggleTemplateUpload(false)">
+          From Scratch (AI Planned)
+        </label>
+        <label class="mode-option">
+          <input type="radio" name="mode" value="template" onclick="toggleTemplateUpload(true)">
+          Fill Existing Template
+        </label>
+      </div>
+
+      <div id="templateContainer" style="display: none;">
+        <label for="templateFile">Upload Brand Template (.docx / .pptx):</label>
+        <input type="file" id="templateFile" accept=".docx,.pptx,.xlsx">
+      </div>
+
+      <label for="formatSelect">Document Format:</label>
+      <select id="formatSelect">
+        <option value="docx" selected>Word Document (.docx)</option>
+        <option value="pptx">PowerPoint Presentation (.pptx)</option>
+        <option value="xlsx">Excel Spreadsheet (.xlsx)</option>
+        <option value="pdf">PDF Document (.pdf)</option>
+      </select>
+
+      <label for="promptInput">Prompt Request:</label>
+      <textarea id="promptInput" placeholder="e.g. Create a 3-page technical project proposal with budget tables..."></textarea>
+      
+      <button type="submit">Generate Document</button>
+    </form>
+  </div>
+
+  <script>
+    function toggleTemplateUpload(show) {
+      document.getElementById("templateContainer").style.display = show ? "block" : "none";
+    }
+
+    document.getElementById("docForm").addEventListener("submit", async function(e) {
+      e.preventDefault();
+      const prompt = document.getElementById("promptInput").value;
+      const format = document.getElementById("formatSelect").value;
+      const mode = document.querySelector('input[name="mode"]:checked').value;
+      
+      if (!prompt) return alert("Please enter a prompt");
+
+      try {
+        const formData = new FormData();
+        formData.append("prompt", prompt);
+        formData.append("format", format);
+        formData.append("mode", mode);
+
+        if (mode === "template") {
+          const fileInput = document.getElementById("templateFile");
+          if (fileInput.files.length > 0) {
+            formData.append("template", fileInput.files[0]);
+          }
+        }
+
+        const response = await fetch("/api/generate", {
+          method: "POST",
+          body: formData
+        });
+
+        if (!response.ok) {
+          const err = await response.json();
+          return alert("Error: " + (err.error || "Failed to generate document"));
+        }
+
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `generated_document.${format}`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+      } catch (err) {
+        console.error(err);
+        alert("Failed to generate document");
+      }
+    });
+  </script>
+</body>
+</html>
