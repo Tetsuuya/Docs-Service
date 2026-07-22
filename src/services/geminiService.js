@@ -6,23 +6,21 @@ import { logger } from '../utils/logger.js';
 const genAI = new GoogleGenerativeAI(config.geminiApiKey);
 
 /**
- * Service to interact with Gemini 2.0 Flash Lite for structured document content planning.
- * Enforces JSON output matching title, subtitle, sections, callout boxes, and formatted data tables.
+ * Service to interact with Gemini API for structured document content planning.
+ * Configured with working model string: gemini-flash-lite-latest
  */
 export const generateDocumentContent = async (userPrompt) => {
-  logger.info(`Calling Gemini API (${config.geminiModel}) for prompt: "${userPrompt}"`);
-
   if (!config.geminiApiKey || config.geminiApiKey === 'your_gemini_api_key_here') {
     throw new Error('GEMINI_API_KEY is not configured in .env file');
   }
 
-  // Use Gemini 2.0 Flash Lite model
-  const model = genAI.getGenerativeModel({
-    model: config.geminiModel,
-    generationConfig: {
-      responseMimeType: 'application/json'
-    }
-  });
+  // Model fallback candidate list matching boss's key configuration
+  const candidateModels = [
+    config.geminiModel,
+    'gemini-flash-lite-latest',
+    'gemini-2.0-flash-lite-preview-02-05',
+    'gemini-1.5-flash-latest'
+  ];
 
   const prompt = `
   You are an expert document designer and senior technical report writer.
@@ -62,15 +60,30 @@ export const generateDocumentContent = async (userPrompt) => {
   }
   `;
 
-  const result = await model.generateContent(prompt);
-  const responseText = result.response.text();
-  logger.info(`Gemini API Response Received (${responseText.length} chars)`);
+  let lastError = null;
 
-  try {
-    const documentJSON = JSON.parse(responseText);
-    return documentJSON;
-  } catch (parseErr) {
-    logger.error('Failed to parse Gemini JSON output:', parseErr.message);
-    throw new Error('Invalid JSON response returned by Gemini model');
+  for (const modelName of candidateModels) {
+    if (!modelName) continue;
+    try {
+      logger.info(`Attempting Gemini API call with model: "${modelName}"`);
+      const model = genAI.getGenerativeModel({
+        model: modelName,
+        generationConfig: {
+          responseMimeType: 'application/json'
+        }
+      });
+
+      const result = await model.generateContent(prompt);
+      const responseText = result.response.text();
+      logger.info(`Gemini API Response Received successfully from model "${modelName}" (${responseText.length} chars)`);
+
+      return JSON.parse(responseText);
+    } catch (err) {
+      logger.warn(`Model "${modelName}" failed: ${err.message}`);
+      lastError = err;
+    }
   }
+
+  logger.error('All candidate Gemini models failed');
+  throw lastError || new Error('Failed to generate document content with Gemini API');
 };
