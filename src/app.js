@@ -17,8 +17,13 @@ app.use(express.json());
 // Request Logging Middleware
 app.use(requestLogger);
 
-// Serve static frontend files from public folder
-app.use(express.static(path.join(__dirname, '../public')));
+// Serve static frontend files from public folder (disable serving index.html at root '/')
+app.use(express.static(path.join(__dirname, '../public'), { index: false }));
+
+// Serve frontend at /index and /index.html
+app.get(['/index', '/index.html'], (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/index.html'));
+});
 
 // API Routes
 app.use('/api', documentRoutes);
