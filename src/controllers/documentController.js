@@ -29,8 +29,13 @@ export const handleGenerateDocument = async (req, res) => {
 
       const buffer = await buildDocxFile(contentData);
       
+      const safeFilename = (contentData.title || 'generated_document')
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '_')
+        .replace(/^_+|_+$/g, '') || 'generated_document';
+
       res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
-      res.setHeader('Content-Disposition', 'attachment; filename="generated_document.docx"');
+      res.setHeader('Content-Disposition', `attachment; filename="${safeFilename}.docx"`);
       res.setHeader('X-Document-Id', docId);
       return res.send(buffer);
     }
@@ -71,9 +76,14 @@ export const handleGenerateDocx = async (req, res) => {
     // 3. Build styled Word document (.docx)
     const buffer = await buildDocxFile(contentData);
 
+    const safeFilename = (contentData.title || 'generated_document')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '_')
+      .replace(/^_+|_+$/g, '') || 'generated_document';
+
     // 4. Set headers for file download
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
-    res.setHeader('Content-Disposition', 'attachment; filename="generated_document.docx"');
+    res.setHeader('Content-Disposition', `attachment; filename="${safeFilename}.docx"`);
     res.setHeader('X-Document-Id', docId);
     return res.send(buffer);
   } catch (error) {

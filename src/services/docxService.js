@@ -14,19 +14,20 @@ import {
   BorderStyle,
   WidthType,
   ShadingType,
-  HeadingLevel
+  HeadingLevel,
+  ImageRun
 } from 'docx';
 import { logger } from '../utils/logger.js';
 
 /**
  * Builds a styled Microsoft Word (.docx) file using Gemini's dynamic JSON color theme and layouts.
  * Features:
- * - Page Break before every major section (idx > 0) so each section starts cleanly on a NEW PAGE!
+ * - Executive Cover Page (Title Banner, Embedded Badge Image, Metadata, PageBreak)
  * - Dynamic Theme Colors per document (Primary, Secondary, Accent, Light Background)
  * - Running Header & Footer (Page X of Y)
- * - Styled Typography & Heading Levels
+ * - Bulleted Lists & Styled Typography
  * - Callout Highlight Boxes (Dynamic border accent + light background)
- * - Styled Data Tables (Dynamic Header fill, bold white text, alternating row shading, light borders)
+ * - Styled Data Tables (Dynamic Header fill, bold white text, alternating row shading)
  */
 export const buildDocxFile = async (data) => {
   logger.info(`Building DOCX Document -> Title: "${data.title || 'Untitled Document'}"`);
@@ -37,6 +38,7 @@ export const buildDocxFile = async (data) => {
   const headerLabel = data.headerText || 'DOCS SERVICE | CONFIDENTIAL';
   const sections = data.sections || [];
   const tableData = data.table || null;
+  const imageBuffer = data.imageBuffer || null;
 
   // Dynamic Theme Colors from Gemini (Hex strings without #)
   const theme = data.theme || {};
@@ -55,66 +57,264 @@ export const buildDocxFile = async (data) => {
   // 1. Build Document Children Array
   const children = [];
 
-  // --- Document Title ---
+  // --- EXECUTIVE COVER PAGE ---
+  
+  const docTypeTag = (data.docTypeTag || 'DOCUMENT OVERVIEW').toUpperCase();
+
+  // Title Banner Box with Primary Color Shading Fill
   children.push(
-    new Paragraph({
-      alignment: AlignmentType.LEFT,
-      spacing: { before: 0, after: 120 },
-      children: [
-        new TextRun({
-          text: titleText,
-          bold: true,
-          size: 44, // 22pt
-          color: COLOR_DARK,
-          font: 'Calibri'
+    new Table({
+      width: { size: 100, type: WidthType.PERCENTAGE },
+      rows: [
+        new TableRow({
+          children: [
+            new TableCell({
+              shading: { fill: COLOR_NAVY, type: ShadingType.CLEAR },
+              margins: { top: 360, bottom: 360, left: 300, right: 300 },
+              borders: {
+                top: { style: BorderStyle.NONE },
+                bottom: { style: BorderStyle.NONE },
+                left: { style: BorderStyle.NONE },
+                right: { style: BorderStyle.NONE }
+              },
+              children: [
+                new Paragraph({
+                  alignment: AlignmentType.LEFT,
+                  spacing: { before: 0, after: 120 },
+                  children: [
+                    new TextRun({
+                      text: `🏷️ ${docTypeTag}`,
+                      bold: true,
+                      size: 18, // 9pt
+                      color: COLOR_ACCENT,
+                      font: 'Calibri'
+                    })
+                  ]
+                }),
+                new Paragraph({
+                  alignment: AlignmentType.LEFT,
+                  spacing: { before: 0, after: 120 },
+                  children: [
+                    new TextRun({
+                      text: titleText,
+                      bold: true,
+                      size: 40, // 20pt
+                      color: COLOR_WHITE,
+                      font: 'Calibri'
+                    })
+                  ]
+                }),
+                new Paragraph({
+                  alignment: AlignmentType.LEFT,
+                  spacing: { before: 0, after: 0 },
+                  children: [
+                    new TextRun({
+                      text: subtitleText,
+                      italics: true,
+                      size: 24, // 12pt
+                      color: COLOR_LIGHT_BG,
+                      font: 'Calibri'
+                    })
+                  ]
+                })
+              ]
+            })
+          ]
         })
       ]
     })
   );
 
-  // --- Document Subtitle ---
-  children.push(
-    new Paragraph({
-      alignment: AlignmentType.LEFT,
-      spacing: { before: 0, after: 360 },
-      children: [
-        new TextRun({
-          text: subtitleText,
-          italics: true,
-          size: 24, // 12pt
-          color: COLOR_MUTED,
-          font: 'Calibri'
-        })
-      ]
-    })
-  );
+  children.push(new Paragraph({ spacing: { after: 360 } }));
 
-  // Horizontal Divider Line with Accent Color
-  children.push(
-    new Paragraph({
-      border: {
-        bottom: { color: COLOR_BLUE, space: 1, style: BorderStyle.SINGLE, size: 12 }
-      },
-      spacing: { after: 360 }
-    })
-  );
-
-  // --- Render Sections with PAGE BREAK BEFORE EVERY NEW SECTION ---
-  sections.forEach((sec, idx) => {
-    // Insert Page Break before every section after Section 1
-    if (idx > 0) {
+  // Embedded Cover / Badge Image (if uploaded)
+  if (imageBuffer) {
+    try {
       children.push(
         new Paragraph({
-          children: [new PageBreak()]
+          alignment: AlignmentType.CENTER,
+          spacing: { before: 120, after: 360 },
+          children: [
+            new ImageRun({
+              data: imageBuffer,
+              transformation: {
+                width: 220,
+                height: 220
+              }
+            })
+          ]
         })
       );
+      logger.info('Successfully embedded uploaded image onto Cover Page!');
+    } catch (err) {
+      logger.warn(`Failed embedding image onto Cover Page: ${err.message}`);
     }
+  }
 
+  // Executive Overview Card Block
+  if (data.executiveOverview) {
+    children.push(
+      new Table({
+        width: { size: 100, type: WidthType.PERCENTAGE },
+        rows: [
+          new TableRow({
+            children: [
+              new TableCell({
+                shading: { fill: COLOR_LIGHT_BG, type: ShadingType.CLEAR },
+                margins: { top: 160, bottom: 160, left: 200, right: 200 },
+                borders: {
+                  top: { style: BorderStyle.SINGLE, size: 4, color: COLOR_BORDER },
+                  bottom: { style: BorderStyle.SINGLE, size: 4, color: COLOR_BORDER },
+                  left: { style: BorderStyle.SINGLE, size: 24, color: COLOR_NAVY },
+                  right: { style: BorderStyle.SINGLE, size: 4, color: COLOR_BORDER }
+                },
+                children: [
+                  new Paragraph({
+                    spacing: { before: 0, after: 60 },
+                    children: [
+                      new TextRun({ text: '📋 EXECUTIVE OVERVIEW', bold: true, size: 18, color: COLOR_NAVY, font: 'Calibri' })
+                    ]
+                  }),
+                  new Paragraph({
+                    spacing: { before: 0, after: 0, line: 240 },
+                    children: [
+                      new TextRun({ text: data.executiveOverview, size: 20, color: COLOR_BODY, font: 'Calibri' })
+                    ]
+                  })
+                ]
+              })
+            ]
+          })
+        ]
+      })
+    );
+    children.push(new Paragraph({ spacing: { after: 200 } }));
+  }
+
+  // Table of Contents Box
+  const tocHeadingsList = data.sectionHeadings || (data.pages ? data.pages.map(p => p.heading).filter(Boolean) : []);
+  if (tocHeadingsList.length > 0) {
+    const tocRows = [
+      new TableRow({
+        children: [
+          new TableCell({
+            shading: { fill: COLOR_NAVY, type: ShadingType.CLEAR },
+            margins: { top: 100, bottom: 100, left: 160, right: 160 },
+            borders: {
+              top: { style: BorderStyle.SINGLE, size: 4, color: COLOR_NAVY },
+              bottom: { style: BorderStyle.SINGLE, size: 4, color: COLOR_NAVY },
+              left: { style: BorderStyle.SINGLE, size: 4, color: COLOR_NAVY },
+              right: { style: BorderStyle.SINGLE, size: 4, color: COLOR_NAVY }
+            },
+            children: [
+              new Paragraph({
+                children: [
+                  new TextRun({ text: '📚 TABLE OF CONTENTS / DOCUMENT OUTLINE', bold: true, size: 18, color: COLOR_WHITE, font: 'Calibri' })
+                ]
+              })
+            ]
+          })
+        ]
+      })
+    ];
+
+    tocHeadingsList.forEach((hText, hIdx) => {
+      tocRows.push(
+        new TableRow({
+          children: [
+            new TableCell({
+              shading: { fill: hIdx % 2 === 0 ? COLOR_LIGHT_BG : COLOR_WHITE, type: ShadingType.CLEAR },
+              margins: { top: 80, bottom: 80, left: 160, right: 160 },
+              borders: {
+                top: { style: BorderStyle.SINGLE, size: 4, color: COLOR_BORDER },
+                bottom: { style: BorderStyle.SINGLE, size: 4, color: COLOR_BORDER },
+                left: { style: BorderStyle.SINGLE, size: 4, color: COLOR_BORDER },
+                right: { style: BorderStyle.SINGLE, size: 4, color: COLOR_BORDER }
+              },
+              children: [
+                new Paragraph({
+                  children: [
+                    new TextRun({ text: `Page ${hIdx + 2}: `, bold: true, size: 18, color: COLOR_NAVY, font: 'Calibri' }),
+                    new TextRun({ text: hText, size: 18, color: COLOR_BODY, font: 'Calibri' })
+                  ]
+                })
+              ]
+            })
+          ]
+        })
+      );
+    });
+
+    children.push(
+      new Table({
+        width: { size: 100, type: WidthType.PERCENTAGE },
+        rows: tocRows
+      })
+    );
+    children.push(new Paragraph({ spacing: { after: 200 } }));
+  }
+
+  // Metadata Card Block (Date, Author, Status)
+  children.push(
+    new Table({
+      width: { size: 100, type: WidthType.PERCENTAGE },
+      rows: [
+        new TableRow({
+          children: [
+            new TableCell({
+              shading: { fill: COLOR_LIGHT_BG, type: ShadingType.CLEAR },
+              margins: { top: 160, bottom: 160, left: 200, right: 200 },
+              borders: {
+                top: { style: BorderStyle.SINGLE, size: 4, color: COLOR_BORDER },
+                bottom: { style: BorderStyle.SINGLE, size: 4, color: COLOR_BORDER },
+                left: { style: BorderStyle.SINGLE, size: 24, color: COLOR_BLUE },
+                right: { style: BorderStyle.SINGLE, size: 4, color: COLOR_BORDER }
+              },
+              children: [
+                new Paragraph({
+                  spacing: { before: 0, after: 40 },
+                  children: [
+                    new TextRun({ text: 'PUBLICATION METADATA', bold: true, size: 18, color: COLOR_NAVY, font: 'Calibri' })
+                  ]
+                }),
+                new Paragraph({
+                  spacing: { before: 0, after: 20 },
+                  children: [
+                    new TextRun({ text: 'Author / Engine: ', bold: true, size: 18, color: COLOR_MUTED, font: 'Calibri' }),
+                    new TextRun({ text: 'Docs Service AI Publishing Engine', size: 18, color: COLOR_BODY, font: 'Calibri' })
+                  ]
+                }),
+                new Paragraph({
+                  spacing: { before: 0, after: 0 },
+                  children: [
+                    new TextRun({ text: 'Generated Date: ', bold: true, size: 18, color: COLOR_MUTED, font: 'Calibri' }),
+                    new TextRun({ text: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }), size: 18, color: COLOR_BODY, font: 'Calibri' })
+                  ]
+                })
+              ]
+            })
+          ]
+        })
+      ]
+    })
+  );
+
+  // Cover Page Break -> Section 1 starts cleanly on Page 2
+  children.push(
+    new Paragraph({
+      children: [new PageBreak()]
+    })
+  );
+
+  // --- Render Page-Structured Content (Calibrated Page-by-Page Layout) ---
+  const pagesList = (data.pages && Array.isArray(data.pages) && data.pages.length > 0) ? data.pages : (data.sections || []);
+
+  pagesList.forEach((sec, idx) => {
     if (sec.heading) {
       children.push(
         new Paragraph({
           heading: HeadingLevel.HEADING_1,
-          spacing: { before: 280, after: 140 },
+          spacing: { before: 200, after: 140 },
           children: [
             new TextRun({
               text: sec.heading,
@@ -132,7 +332,7 @@ export const buildDocxFile = async (data) => {
       sec.paragraphs.forEach((pText) => {
         children.push(
           new Paragraph({
-            spacing: { before: 0, after: 160, line: 276 },
+            spacing: { before: 0, after: 140, line: 260 },
             children: [
               new TextRun({
                 text: pText,
@@ -144,6 +344,26 @@ export const buildDocxFile = async (data) => {
           })
         );
       });
+    }
+
+    if (Array.isArray(sec.bulletList) && sec.bulletList.length > 0) {
+      sec.bulletList.forEach((bText) => {
+        children.push(
+          new Paragraph({
+            bullet: { level: 0 },
+            spacing: { before: 0, after: 100, line: 240 },
+            children: [
+              new TextRun({
+                text: bText,
+                size: 22, // 11pt
+                color: COLOR_BODY,
+                font: 'Calibri'
+              })
+            ]
+          })
+        );
+      });
+      children.push(new Paragraph({ spacing: { after: 100 } }));
     }
 
     // Callout / Highlight Box with Dynamic Accent Color & Background
@@ -162,10 +382,10 @@ export const buildDocxFile = async (data) => {
                     right: { style: BorderStyle.NONE },
                     left: { style: BorderStyle.SINGLE, size: 24, color: COLOR_NAVY }
                   },
-                  margins: { top: 140, bottom: 140, left: 200, right: 200 },
+                  margins: { top: 120, bottom: 120, left: 180, right: 180 },
                   children: [
                     new Paragraph({
-                      spacing: { before: 0, after: 0, line: 260 },
+                      spacing: { before: 0, after: 0, line: 240 },
                       children: [
                         new TextRun({
                           text: `💡 NOTE: ${sec.calloutBox}`,
@@ -183,22 +403,20 @@ export const buildDocxFile = async (data) => {
           ]
         })
       );
-
-      // Spacing after callout box
-      children.push(new Paragraph({ spacing: { after: 240 } }));
     }
-  });
 
-  // --- Render Styled Table (Starts on its own section or after content) ---
-  if (tableData && Array.isArray(tableData.headers) && Array.isArray(tableData.rows)) {
-    // Add page break before table if sections exist
-    if (sections.length > 0) {
+    // Insert Page Break after each page item (so next page starts on a new page cleanly)
+    if (idx < pagesList.length - 1) {
       children.push(
         new Paragraph({
           children: [new PageBreak()]
         })
       );
     }
+  });
+
+  // --- Render Styled Table ---
+  if (tableData && Array.isArray(tableData.headers) && Array.isArray(tableData.rows)) {
 
     if (tableData.title) {
       children.push(

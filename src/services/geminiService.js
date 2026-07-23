@@ -62,6 +62,8 @@ export const generateDocumentContent = async (userPrompt, file = null) => {
 
   let inlineDataPart = null;
   let fileTextContext = '';
+  let uploadedImageBuffer = null;
+  let uploadedImageMimeType = null;
 
   if (file && fs.existsSync(file.path)) {
     try {
@@ -74,6 +76,10 @@ export const generateDocumentContent = async (userPrompt, file = null) => {
             mimeType: mimeType
           }
         };
+        if (mimeType.startsWith('image/')) {
+          uploadedImageBuffer = fileBuffer;
+          uploadedImageMimeType = mimeType;
+        }
         logger.info(`Attached Multimodal Inline File -> Type: ${mimeType}, Size: ${fileBuffer.length} bytes`);
       } else {
         fileTextContext = fs.readFileSync(file.path, 'utf8');
@@ -107,10 +113,12 @@ export const generateDocumentContent = async (userPrompt, file = null) => {
   1. MINIMUM TARGET PAGE RULE: The user has requested a document requiring AT LEAST ${minSectionsTarget} PAGES. In Microsoft Word, EVERY major section will be formatted cleanly onto its OWN DEDICATED NEW PAGE! Therefore, you MUST plan AT LEAST ${minSectionsTarget} (or more) distinct, major section headings to guarantee the generated document meets or exceeds ${minSectionsTarget} full pages (NEVER generate fewer than ${minSectionsTarget} sections).
   2. TYPO & MISSPELLING CORRECTION: Automatically fix all spelling, grammar, and typos in the user's prompt (e.g. "algorthim" -> "Algorithm", "scract" -> "Scratch").
   3. DOMAIN-AWARE THEME & DESIGN EXTRACTION: Automatically infer the domain or extract visual colors from any attached screenshot/image, and invent/replicate an appropriate, harmonized 6-character Hex color palette (primaryColor, secondaryColor, accentColor, lightBgColor, textColor).
-  4. CONTEXT INTEGRATION: Ingest and incorporate key data points, facts, and insights from the attached context file into the title, outline headings, and summary table.
+  4. ACCURATE TITLE & BADGE OCR: If an attached screenshot or PDF contains prominent title or badge text (e.g. "CCNA: Introduction to Networks", "AWS Certified Solutions Architect", "Q3 Financial Audit"), set that EXACT text string as the "title" property. Do not use generic titles like "Document Report" when clear title text exists in the image.
+  5. UNIVERSAL CLASSIFICATION TAG: Invent an uppercase classification tag for the "docTypeTag" field matching the domain (e.g. "VERIFIED COURSE SUMMARY", "EXECUTIVE FINANCIAL AUDIT", "ENTERPRISE ARCHITECTURE PROPOSAL").
+  6. CONTEXT INTEGRATION: Ingest and incorporate key data points, facts, and insights from the attached context file into the title, outline headings, and summary table.
 
   Tasks:
-  1. Create a high-level Document Title, Subtitle, and Running Header text (using perfect spelling).
+  1. Create a high-level Document Title, Subtitle, docTypeTag, and Running Header text (using perfect spelling and exact badge text if present).
   2. Generate a Table of Contents containing AT LEAST ${minSectionsTarget} DISTINCT MAJOR SECTION HEADINGS covering every aspect of "${userPrompt}" thoroughly.
   3. Generate a relevant summary data table with headers and rows based on prompt and context.
 
@@ -123,8 +131,10 @@ export const generateDocumentContent = async (userPrompt, file = null) => {
       "lightBgColor": "F8FAFC",
       "textColor": "334155"
     },
-    "title": "Document Title with Perfect Spelling",
-    "subtitle": "Document Subtitle",
+    "docTypeTag": "VERIFIED COURSE SUMMARY",
+    "title": "Exact Title or Badge Text with Perfect Spelling",
+    "subtitle": "Comprehensive Technical & Strategic Guide",
+    "executiveOverview": "A high-level executive overview providing strategic context and scope for this document.",
     "headerText": "DOCS SERVICE | COMPREHENSIVE DOCUMENTATION",
     "sectionHeadings": [
       "1. Section Heading One",
@@ -169,9 +179,10 @@ export const generateDocumentContent = async (userPrompt, file = null) => {
       Overall Document Request: "${userPrompt}"
       ${fileTextContext ? `\nReference Context Material:\n"""\n${fileTextContext.substring(0, 4000)}\n"""\n` : ''}
 
-      Task: Write extensive, highly detailed, multi-paragraph content for this section with 100% perfect spelling and grammar.
+      Task: Write clear, highly detailed content for this section with 100% perfect spelling and grammar.
       Requirements:
-      - Write AT LEAST 3 to 5 long, thorough paragraphs (4-6 sentences per paragraph) covering this section topic exhaustively.
+      - Write AT LEAST 2 to 3 clear, thorough paragraphs (3-5 sentences per paragraph) covering this section topic.
+      - Provide a "bulletList" array of 3 to 5 key objectives, technical specifications, or takeaways for this section.
       - Provide a strategic Callout Box highlight summarizing key takeaways or critical notes for this section.
 
       Return ONLY JSON matching:
@@ -179,8 +190,12 @@ export const generateDocumentContent = async (userPrompt, file = null) => {
         "heading": "${heading}",
         "paragraphs": [
           "Detailed paragraph 1...",
-          "Detailed paragraph 2...",
-          "Detailed paragraph 3..."
+          "Detailed paragraph 2..."
+        ],
+        "bulletList": [
+          "Key Objective / Command / Spec 1",
+          "Key Objective / Command / Spec 2",
+          "Key Objective / Command / Spec 3"
         ],
         "calloutBox": "Key strategic takeaway or formula/note for this section"
       }
@@ -195,6 +210,7 @@ export const generateDocumentContent = async (userPrompt, file = null) => {
         return {
           heading,
           paragraphs: [`Comprehensive details and deep technical breakdown regarding ${heading} for request "${userPrompt}".`],
+          bulletList: [`Core specification for ${heading}`, `Implementation metric for ${heading}`],
           calloutBox: `Key strategic takeaway for ${heading}.`
         };
       }
@@ -203,15 +219,21 @@ export const generateDocumentContent = async (userPrompt, file = null) => {
 
   logger.info(`Step 2 Complete -> Generated ${fullSections.length} rich sections.`);
 
-  // STEP 3: Assemble Full Document JSON AST (Including userPrompt)
+  // STEP 3: Assemble Full Document JSON AST (Including userPrompt and pages array)
   const finalDocumentJSON = {
     prompt: userPrompt,
     theme: outlinePlan.theme,
+    docTypeTag: outlinePlan.docTypeTag || 'DOCUMENT OVERVIEW',
     title: outlinePlan.title,
     subtitle: outlinePlan.subtitle,
+    executiveOverview: outlinePlan.executiveOverview || `This document outlines comprehensive technical analysis and strategic roadmap details regarding ${outlinePlan.title}.`,
+    sectionHeadings: sectionHeadings,
     headerText: outlinePlan.headerText,
+    pages: fullSections,
     sections: fullSections,
-    table: outlinePlan.table
+    table: outlinePlan.table,
+    imageBuffer: uploadedImageBuffer,
+    imageMimeType: uploadedImageMimeType
   };
 
   logger.info(`Multi-Pass Document Generation Complete -> Total Sections: ${fullSections.length}`);

@@ -11,7 +11,7 @@ const __dirname = path.dirname(__filename);
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({ exposedHeaders: ['Content-Disposition', 'X-Document-Id'] }));
 app.use(express.json());
 
 // Request Logging Middleware
