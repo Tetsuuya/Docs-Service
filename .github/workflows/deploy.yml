@@ -38,4 +38,5 @@ jobs:
             az containerapp update \
               --name docs-service-api \
               --resource-group web-scrapper-rg \
-              --image acrdocsservice.azurecr.io/docs-service:${{ github.sha }}
+              --image acrdocsservice.azurecr.io/docs-service:${{ github.sha }} \
+              --set-env-vars BUILD_VERSION="${{ github.sha }}"

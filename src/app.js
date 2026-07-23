@@ -25,6 +25,17 @@ app.get(['/index', '/index.html'], (req, res) => {
   res.sendFile(path.join(__dirname, '../public/index.html'));
 });
 
+// Health and Version status endpoint
+app.get(['/health', '/api/version'], (req, res) => {
+  const version = process.env.BUILD_VERSION || process.env.COMMIT_SHA || 'v1.0.1-release';
+  res.json({
+    status: 'ok',
+    service: 'Docs-Service',
+    version,
+    timestamp: new Date().toISOString()
+  });
+});
+
 // API Routes
 app.use('/api', documentRoutes);
 
