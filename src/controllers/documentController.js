@@ -21,7 +21,7 @@ export const handleGenerateDocument = async (req, res) => {
 
     if (format === 'docx') {
       const docId = generateDocumentId();
-      const contentData = await generateDocumentContent(prompt);
+      const contentData = await generateDocumentContent(prompt, req.file);
       contentData.id = docId;
 
       // Save JSON AST to local history storage with unique ID
@@ -61,8 +61,8 @@ export const handleGenerateDocx = async (req, res) => {
 
     const docId = generateDocumentId();
 
-    // 1. Generate structured document JSON using Gemini 2.0 Flash Lite
-    const contentData = await generateDocumentContent(prompt);
+    // 1. Generate structured document JSON using Gemini 2.0 Flash Lite with optional file context
+    const contentData = await generateDocumentContent(prompt, req.file);
     contentData.id = docId;
 
     // 2. Save JSON AST to local history storage with unique ID

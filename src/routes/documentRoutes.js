@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import multer from 'multer';
 import { 
   handleGenerateDocument, 
   handleGenerateDocx, 
@@ -8,19 +9,20 @@ import {
 } from '../controllers/documentController.js';
 
 const router = Router();
+const upload = multer({ dest: 'temp/uploads/' });
 
 // Health check endpoint
 router.get('/health', (req, res) => {
   res.json({ status: 'ok', service: 'Docs-Service', timestamp: new Date() });
 });
 
-// Main unified generation endpoint
-router.post('/generate', handleGenerateDocument);
+// Main unified generation endpoint with optional context/design file upload
+router.post('/generate', upload.single('contextFile'), handleGenerateDocument);
 
 // Dedicated format sub-routes (Sub-server microservice endpoints)
-router.post('/generate/docx', handleGenerateDocx);
-router.post('/generate/pptx', handleGeneratePptx);
-router.post('/generate/xlsx', handleGenerateXlsx);
-router.post('/generate/pdf', handleGeneratePdf);
+router.post('/generate/docx', upload.single('contextFile'), handleGenerateDocx);
+router.post('/generate/pptx', upload.single('contextFile'), handleGeneratePptx);
+router.post('/generate/xlsx', upload.single('contextFile'), handleGenerateXlsx);
+router.post('/generate/pdf', upload.single('contextFile'), handleGeneratePdf);
 
 export default router;

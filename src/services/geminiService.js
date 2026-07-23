@@ -1,3 +1,4 @@
+import fs from 'fs';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { config } from '../config/env.js';
 import { logger } from '../utils/logger.js';
@@ -15,8 +16,9 @@ const candidateModels = [
 
 /**
  * Helper to call Gemini model with candidate fallback
+ * Accepts string OR array of content parts (strings & inlineData objects)
  */
-async function callGemini(promptText, isJson = true, maxTokens = 8192) {
+async function callGemini(promptInput, isJson = true, maxTokens = 8192) {
   let lastError = null;
 
   for (const modelName of candidateModels) {
@@ -31,7 +33,7 @@ async function callGemini(promptText, isJson = true, maxTokens = 8192) {
         }
       });
 
-      const result = await model.generateContent(promptText);
+      const result = await model.generateContent(promptInput);
       const responseText = result.response.text();
       return isJson ? JSON.parse(responseText) : responseText;
     } catch (err) {
@@ -44,18 +46,49 @@ async function callGemini(promptText, isJson = true, maxTokens = 8192) {
 
 /**
  * Multi-Pass Document Generation Engine with:
- * 1. Embedded Prompt tracking inside JSON AST
- * 2. Clean Page Breaks per section in Word
- * 3. Universal Minimum Target Page-Count Scaling Rule (>= N pages, NEVER < N)
- * 4. Automatic Typo & Misspelling Correction
- * 5. Dynamic Domain-Aware Hex Theme Color Generation
+ * 1. Multimodal File & Design Context Extraction (Images, PDFs, TXT, CSV)
+ * 2. Embedded Prompt tracking inside JSON AST
+ * 3. Clean Page Breaks per section in Word
+ * 4. Universal Minimum Target Page-Count Scaling Rule (>= N pages, NEVER < N)
+ * 5. Automatic Typo & Misspelling Correction
+ * 6. Dynamic Domain-Aware Hex Theme Color Generation
  */
-export const generateDocumentContent = async (userPrompt) => {
+export const generateDocumentContent = async (userPrompt, file = null) => {
   if (!config.geminiApiKey || config.geminiApiKey === 'your_gemini_api_key_here') {
     throw new Error('GEMINI_API_KEY is not configured in .env file');
   }
 
-  logger.info(`Starting Multi-Pass Document Generation for prompt: "${userPrompt}"`);
+  logger.info(`Starting Multi-Pass Document Generation for prompt: "${userPrompt}" ${file ? `with file: ${file.originalname}` : ''}`);
+
+  let inlineDataPart = null;
+  let fileTextContext = '';
+
+  if (file && fs.existsSync(file.path)) {
+    try {
+      const mimeType = file.mimetype || '';
+      if (mimeType.startsWith('image/') || mimeType === 'application/pdf') {
+        const fileBuffer = fs.readFileSync(file.path);
+        inlineDataPart = {
+          inlineData: {
+            data: fileBuffer.toString('base64'),
+            mimeType: mimeType
+          }
+        };
+        logger.info(`Attached Multimodal Inline File -> Type: ${mimeType}, Size: ${fileBuffer.length} bytes`);
+      } else {
+        fileTextContext = fs.readFileSync(file.path, 'utf8');
+        logger.info(`Extracted Text Context File -> Length: ${fileTextContext.length} chars`);
+      }
+    } catch (err) {
+      logger.warn(`Failed reading uploaded file context: ${err.message}`);
+    } finally {
+      try {
+        if (fs.existsSync(file.path)) fs.unlinkSync(file.path);
+      } catch (e) {
+        // ignore
+      }
+    }
+  }
 
   // Extract requested target page count from user prompt (e.g., "5 pages", "10 page reviewer")
   const pageMatch = userPrompt.match(/\b(\d+)\s*(?:-| )?page/i);
@@ -65,19 +98,21 @@ export const generateDocumentContent = async (userPrompt) => {
   logger.info(`Target Page Count Detected: ${requestedPages} -> Planning at least ${minSectionsTarget} major sections/pages.`);
 
   // STEP 1: Plan Outline, Theme, and Table with Target Page-Count Scaling
-  const plannerPrompt = `
+  let plannerPrompt = `
   You are an elite master document architect.
   Analyze the user's prompt request: "${userPrompt}"
+  ${fileTextContext ? `\n\nATTACHED REFERENCE CONTEXT FILE CONTENT:\n"""\n${fileTextContext.substring(0, 10000)}\n"""\n` : ''}
 
   UNIVERSAL SCALING & QUALITY RULES:
   1. MINIMUM TARGET PAGE RULE: The user has requested a document requiring AT LEAST ${minSectionsTarget} PAGES. In Microsoft Word, EVERY major section will be formatted cleanly onto its OWN DEDICATED NEW PAGE! Therefore, you MUST plan AT LEAST ${minSectionsTarget} (or more) distinct, major section headings to guarantee the generated document meets or exceeds ${minSectionsTarget} full pages (NEVER generate fewer than ${minSectionsTarget} sections).
   2. TYPO & MISSPELLING CORRECTION: Automatically fix all spelling, grammar, and typos in the user's prompt (e.g. "algorthim" -> "Algorithm", "scract" -> "Scratch").
-  3. DOMAIN-AWARE THEME: Automatically infer the domain and invent an appropriate, harmonized 6-character Hex color palette (primaryColor, secondaryColor, accentColor, lightBgColor, textColor).
+  3. DOMAIN-AWARE THEME & DESIGN EXTRACTION: Automatically infer the domain or extract visual colors from any attached screenshot/image, and invent/replicate an appropriate, harmonized 6-character Hex color palette (primaryColor, secondaryColor, accentColor, lightBgColor, textColor).
+  4. CONTEXT INTEGRATION: Ingest and incorporate key data points, facts, and insights from the attached context file into the title, outline headings, and summary table.
 
   Tasks:
   1. Create a high-level Document Title, Subtitle, and Running Header text (using perfect spelling).
   2. Generate a Table of Contents containing AT LEAST ${minSectionsTarget} DISTINCT MAJOR SECTION HEADINGS covering every aspect of "${userPrompt}" thoroughly.
-  3. Generate a relevant summary data table with headers and rows.
+  3. Generate a relevant summary data table with headers and rows based on prompt and context.
 
   Return ONLY JSON matching this structure:
   {
@@ -106,8 +141,10 @@ export const generateDocumentContent = async (userPrompt) => {
   }
   `;
 
+  const plannerInput = inlineDataPart ? [inlineDataPart, plannerPrompt] : plannerPrompt;
+
   logger.info('Step 1: Generating Document Outline & Scaling Sections to Target Page Count...');
-  const outlinePlan = await callGemini(plannerPrompt, true, 4096);
+  const outlinePlan = await callGemini(plannerInput, true, 4096);
   logger.info(`Step 1 Complete -> Title: "${outlinePlan.title}", Planned Sections: ${outlinePlan.sectionHeadings?.length || 0}`);
 
   let sectionHeadings = outlinePlan.sectionHeadings || [];
@@ -130,6 +167,7 @@ export const generateDocumentContent = async (userPrompt) => {
       You are an expert technical author writing Section ${idx + 1} of a document titled "${outlinePlan.title}".
       Section Topic: "${heading}"
       Overall Document Request: "${userPrompt}"
+      ${fileTextContext ? `\nReference Context Material:\n"""\n${fileTextContext.substring(0, 4000)}\n"""\n` : ''}
 
       Task: Write extensive, highly detailed, multi-paragraph content for this section with 100% perfect spelling and grammar.
       Requirements:
@@ -149,7 +187,8 @@ export const generateDocumentContent = async (userPrompt) => {
       `;
 
       try {
-        const secContent = await callGemini(sectionPrompt, true, 4096);
+        const secInput = inlineDataPart ? [inlineDataPart, sectionPrompt] : sectionPrompt;
+        const secContent = await callGemini(secInput, true, 4096);
         return secContent;
       } catch (err) {
         logger.warn(`Failed section generation for "${heading}", using fallback content`);
@@ -166,7 +205,7 @@ export const generateDocumentContent = async (userPrompt) => {
 
   // STEP 3: Assemble Full Document JSON AST (Including userPrompt)
   const finalDocumentJSON = {
-    prompt: userPrompt, // 👈 Included directly inside the document AST!
+    prompt: userPrompt,
     theme: outlinePlan.theme,
     title: outlinePlan.title,
     subtitle: outlinePlan.subtitle,

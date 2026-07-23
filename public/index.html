@@ -135,8 +135,11 @@
         <option value="pdf">PDF Document (.pdf)</option>
       </select>
 
+      <label for="contextFile">Upload Design Screenshot / Context File (Optional):</label>
+      <input type="file" id="contextFile" accept="image/*,.pdf,.txt,.csv,.json,.md">
+
       <label for="promptInput">Prompt Request:</label>
-      <textarea id="promptInput" placeholder="e.g. Create an executive technical proposal with budget tables..."></textarea>
+      <textarea id="promptInput" placeholder="e.g. Create an executive technical proposal based on the uploaded screenshot design..."></textarea>
       
       <button type="submit" id="submitBtn">Generate Document</button>
       <div id="statusMsg" class="status-msg">⏳ Generating document via Gemini 2.0 Flash Lite... Please wait a few seconds.</div>
@@ -153,6 +156,7 @@
       const prompt = document.getElementById("promptInput").value.trim();
       const format = document.getElementById("formatSelect").value;
       const mode = document.querySelector('input[name="mode"]:checked').value;
+      const contextFile = document.getElementById("contextFile").files[0];
       
       if (!prompt) return alert("Please enter a prompt request!");
 
@@ -164,12 +168,17 @@
       statusMsg.style.display = "block";
 
       try {
+        const formData = new FormData();
+        formData.append("prompt", prompt);
+        formData.append("format", format);
+        formData.append("mode", mode);
+        if (contextFile) {
+          formData.append("contextFile", contextFile);
+        }
+
         const response = await fetch("/api/generate", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({ prompt, format, mode })
+          body: formData
         });
 
         if (!response.ok) {
