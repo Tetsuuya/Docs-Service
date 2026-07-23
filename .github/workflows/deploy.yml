@@ -1,0 +1,41 @@
+name: Build and Deploy to Azure Container Apps
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Log in to Azure CLI
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Log in to Azure Container Registry
+        uses: azure/docker-login@v2
+        with:
+          login-server: acrdocsservice.azurecr.io
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+
+      - name: Build and Push Docker Image
+        run: |
+          docker build -t acrdocsservice.azurecr.io/docs-service:${{ github.sha }} -t acrdocsservice.azurecr.io/docs-service:latest .
+          docker push acrdocsservice.azurecr.io/docs-service:${{ github.sha }}
+          docker push acrdocsservice.azurecr.io/docs-service:latest
+
+      - name: Update Azure Container App
+        uses: azure/CLI@v2
+        with:
+          inlineScript: |
+            az containerapp update \
+              --name docs-service-api \
+              --resource-group web-scrapper-rg \
+              --image acrdocsservice.azurecr.io/docs-service:${{ github.sha }}
