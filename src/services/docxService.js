@@ -20,24 +20,82 @@ import {
 import { logger } from '../utils/logger.js';
 
 /**
- * Builds a styled Microsoft Word (.docx) file using Gemini's dynamic JSON color theme and layouts.
+ * Parses inline markdown formatting (**bold**, *italics*, `code`) into an array of styled TextRun objects.
+ */
+function parseMarkdownToTextRuns(text, baseOptions = {}) {
+  if (!text) return [new TextRun({ text: '', ...baseOptions })];
+
+  const {
+    size = 22,
+    font = 'Calibri',
+    color = '334155',
+    bold = false,
+    italics = false
+  } = baseOptions;
+
+  const runs = [];
+  // Regex matches **bold**, *italics*, `code`
+  const regex = /(\*\*(?:[^*]|\*[^*])+\*\*|\*(?:[^*])+\*|`[^`]+`)/g;
+
+  let lastIndex = 0;
+  let match;
+
+  while ((match = regex.exec(text)) !== null) {
+    if (match.index > lastIndex) {
+      const plainText = text.substring(lastIndex, match.index);
+      runs.push(new TextRun({ text: plainText, font, size, color, bold, italics }));
+    }
+
+    const token = match[0];
+    if (token.startsWith('**') && token.endsWith('**')) {
+      const content = token.slice(2, -2);
+      runs.push(new TextRun({ text: content, bold: true, font, size, color }));
+    } else if (token.startsWith('*') && token.endsWith('*')) {
+      const content = token.slice(1, -1);
+      runs.push(new TextRun({ text: content, italics: true, font, size, color }));
+    } else if (token.startsWith('`') && token.endsWith('`')) {
+      const content = token.slice(1, -1);
+      runs.push(
+        new TextRun({
+          text: content,
+          font: 'Consolas',
+          size: Math.max(16, size - 2),
+          color: '0F172A',
+          shading: { fill: 'F1F5F9', type: ShadingType.CLEAR }
+        })
+      );
+    }
+
+    lastIndex = regex.lastIndex;
+  }
+
+  if (lastIndex < text.length) {
+    const plainText = text.substring(lastIndex);
+    runs.push(new TextRun({ text: plainText, font, size, color, bold, italics }));
+  }
+
+  return runs.length > 0 ? runs : [new TextRun({ text, font, size, color, bold, italics })];
+}
+
+/**
+ * Builds a styled Microsoft Word (.docx) file using Gemini's dynamic JSON color theme and AST layouts.
  * Features:
  * - Executive Cover Page (Title Banner, Embedded Badge Image, Metadata, PageBreak)
- * - Dynamic Theme Colors per document (Primary, Secondary, Accent, Light Background)
- * - Running Header & Footer (Page X of Y)
- * - Bulleted Lists & Styled Typography
- * - Callout Highlight Boxes (Dynamic border accent + light background)
- * - Styled Data Tables (Dynamic Header fill, bold white text, alternating row shading)
+ * - Header/Footer titlePage suppression (No header/footer on page 1)
+ * - Inline Markdown Parser (**bold**, *italics*, `code`)
+ * - Multi-type Callout Cards (Info, Warning, Success, Tip, Note)
+ * - Stat / KPI Grid Cards (Big numbers + labels)
+ * - Code Blocks (Monospaced Consolas styled boxes)
+ * - Blockquotes (Left accent border + italic text)
+ * - Styled Data Tables (Header fill, bold white text, alternating row shading)
  */
 export const buildDocxFile = async (data) => {
-  logger.info(`Building DOCX Document -> Title: "${data.title || 'Untitled Document'}"`);
+  logger.info(`Building Claude-Level DOCX Document -> Title: "${data.title || 'Untitled Document'}"`);
 
   // Default values fallback
   const titleText = data.title || 'Document Report';
   const subtitleText = data.subtitle || 'Generated via AI Docs Service';
   const headerLabel = data.headerText || 'DOCS SERVICE | CONFIDENTIAL';
-  const sections = data.sections || [];
-  const tableData = data.table || null;
   const imageBuffer = data.imageBuffer || null;
 
   // Dynamic Theme Colors from Gemini (Hex strings without #)
@@ -54,11 +112,9 @@ export const buildDocxFile = async (data) => {
 
   logger.info(`Applying Dynamic Theme -> Primary: #${COLOR_NAVY}, Secondary: #${COLOR_BLUE}, LightBg: #${COLOR_LIGHT_BG}`);
 
-  // 1. Build Document Children Array
   const children = [];
 
   // --- EXECUTIVE COVER PAGE ---
-  
   const docTypeTag = (data.docTypeTag || 'DOCUMENT OVERVIEW').toUpperCase();
 
   // Title Banner Box with Primary Color Shading Fill
@@ -85,7 +141,7 @@ export const buildDocxFile = async (data) => {
                     new TextRun({
                       text: `🏷️ ${docTypeTag}`,
                       bold: true,
-                      size: 18, // 9pt
+                      size: 18,
                       color: COLOR_ACCENT,
                       font: 'Calibri'
                     })
@@ -98,7 +154,7 @@ export const buildDocxFile = async (data) => {
                     new TextRun({
                       text: titleText,
                       bold: true,
-                      size: 40, // 20pt
+                      size: 40,
                       color: COLOR_WHITE,
                       font: 'Calibri'
                     })
@@ -111,7 +167,7 @@ export const buildDocxFile = async (data) => {
                     new TextRun({
                       text: subtitleText,
                       italics: true,
-                      size: 24, // 12pt
+                      size: 24,
                       color: COLOR_LIGHT_BG,
                       font: 'Calibri'
                     })
@@ -177,9 +233,7 @@ export const buildDocxFile = async (data) => {
                   }),
                   new Paragraph({
                     spacing: { before: 0, after: 0, line: 240 },
-                    children: [
-                      new TextRun({ text: data.executiveOverview, size: 20, color: COLOR_BODY, font: 'Calibri' })
-                    ]
+                    children: parseMarkdownToTextRuns(data.executiveOverview, { size: 20, color: COLOR_BODY, font: 'Calibri' })
                   })
                 ]
               })
@@ -254,7 +308,7 @@ export const buildDocxFile = async (data) => {
     children.push(new Paragraph({ spacing: { after: 200 } }));
   }
 
-  // Metadata Card Block (Date, Author, Status)
+  // Metadata Card Block
   children.push(
     new Table({
       width: { size: 100, type: WidthType.PERCENTAGE },
@@ -281,7 +335,7 @@ export const buildDocxFile = async (data) => {
                   spacing: { before: 0, after: 20 },
                   children: [
                     new TextRun({ text: 'Author / Engine: ', bold: true, size: 18, color: COLOR_MUTED, font: 'Calibri' }),
-                    new TextRun({ text: 'Docs Service AI Publishing Engine', size: 18, color: COLOR_BODY, font: 'Calibri' })
+                    new TextRun({ text: 'Docs Service Enterprise Publishing Engine', size: 18, color: COLOR_BODY, font: 'Calibri' })
                   ]
                 }),
                 new Paragraph({
@@ -306,10 +360,11 @@ export const buildDocxFile = async (data) => {
     })
   );
 
-  // --- Render Page-Structured Content (Calibrated Page-by-Page Layout) ---
+  // --- RENDER PAGE-STRUCTURED CONTENT (AST BLOCKS) ---
   const pagesList = (data.pages && Array.isArray(data.pages) && data.pages.length > 0) ? data.pages : (data.sections || []);
 
   pagesList.forEach((sec, idx) => {
+    // 1. Heading
     if (sec.heading) {
       children.push(
         new Paragraph({
@@ -319,7 +374,7 @@ export const buildDocxFile = async (data) => {
             new TextRun({
               text: sec.heading,
               bold: true,
-              size: 32, // 16pt
+              size: 32,
               color: COLOR_NAVY,
               font: 'Calibri'
             })
@@ -328,46 +383,132 @@ export const buildDocxFile = async (data) => {
       );
     }
 
+    // 2. Paragraphs (with markdown parsing)
     if (Array.isArray(sec.paragraphs)) {
       sec.paragraphs.forEach((pText) => {
         children.push(
           new Paragraph({
             spacing: { before: 0, after: 140, line: 260 },
-            children: [
-              new TextRun({
-                text: pText,
-                size: 22, // 11pt
-                color: COLOR_BODY,
-                font: 'Calibri'
-              })
-            ]
+            children: parseMarkdownToTextRuns(pText, { size: 22, color: COLOR_BODY, font: 'Calibri' })
           })
         );
       });
     }
 
+    // 3. Stat Cards / KPI Grid
+    if (Array.isArray(sec.statCards) && sec.statCards.length > 0) {
+      const cardCells = sec.statCards.map((card) => {
+        return new TableCell({
+          shading: { fill: COLOR_LIGHT_BG, type: ShadingType.CLEAR },
+          margins: { top: 140, bottom: 140, left: 160, right: 160 },
+          borders: {
+            top: { style: BorderStyle.SINGLE, size: 4, color: COLOR_BORDER },
+            bottom: { style: BorderStyle.SINGLE, size: 4, color: COLOR_BORDER },
+            left: { style: BorderStyle.SINGLE, size: 16, color: COLOR_BLUE },
+            right: { style: BorderStyle.SINGLE, size: 4, color: COLOR_BORDER }
+          },
+          children: [
+            new Paragraph({
+              alignment: AlignmentType.CENTER,
+              spacing: { before: 0, after: 40 },
+              children: [
+                new TextRun({ text: String(card.value || '0'), bold: true, size: 36, color: COLOR_NAVY, font: 'Calibri' })
+              ]
+            }),
+            new Paragraph({
+              alignment: AlignmentType.CENTER,
+              spacing: { before: 0, after: 20 },
+              children: [
+                new TextRun({ text: String(card.label || '').toUpperCase(), bold: true, size: 16, color: COLOR_MUTED, font: 'Calibri' })
+              ]
+            }),
+            ...(card.subtext ? [
+              new Paragraph({
+                alignment: AlignmentType.CENTER,
+                spacing: { before: 0, after: 0 },
+                children: [
+                  new TextRun({ text: String(card.subtext), italics: true, size: 16, color: COLOR_BODY, font: 'Calibri' })
+                ]
+              })
+            ] : [])
+          ]
+        });
+      });
+
+      children.push(
+        new Table({
+          width: { size: 100, type: WidthType.PERCENTAGE },
+          rows: [new TableRow({ children: cardCells })]
+        })
+      );
+      children.push(new Paragraph({ spacing: { after: 160 } }));
+    }
+
+    // 4. Bullet List (with markdown parsing)
     if (Array.isArray(sec.bulletList) && sec.bulletList.length > 0) {
       sec.bulletList.forEach((bText) => {
         children.push(
           new Paragraph({
             bullet: { level: 0 },
             spacing: { before: 0, after: 100, line: 240 },
-            children: [
-              new TextRun({
-                text: bText,
-                size: 22, // 11pt
-                color: COLOR_BODY,
-                font: 'Calibri'
-              })
-            ]
+            children: parseMarkdownToTextRuns(bText, { size: 22, color: COLOR_BODY, font: 'Calibri' })
           })
         );
       });
       children.push(new Paragraph({ spacing: { after: 100 } }));
     }
 
-    // Callout / Highlight Box with Dynamic Accent Color & Background
-    if (sec.calloutBox) {
+    // 5. Code Block Snippet
+    if (sec.codeBlock) {
+      const codeObj = typeof sec.codeBlock === 'string' ? { code: sec.codeBlock, language: 'text' } : sec.codeBlock;
+      const codeLines = (codeObj.code || '').split('\n');
+
+      const codeParagraphs = [
+        new Paragraph({
+          spacing: { before: 0, after: 60 },
+          children: [
+            new TextRun({ text: `💻 ${ (codeObj.language || 'CODE').toUpperCase() } SNIPPET`, bold: true, size: 16, color: COLOR_ACCENT, font: 'Consolas' })
+          ]
+        }),
+        ...codeLines.map(line => 
+          new Paragraph({
+            spacing: { before: 0, after: 20, line: 220 },
+            children: [
+              new TextRun({ text: line, size: 18, color: '0F172A', font: 'Consolas' })
+            ]
+          })
+        )
+      ];
+
+      children.push(
+        new Table({
+          width: { size: 100, type: WidthType.PERCENTAGE },
+          rows: [
+            new TableRow({
+              children: [
+                new TableCell({
+                  shading: { fill: 'F1F5F9', type: ShadingType.CLEAR },
+                  margins: { top: 120, bottom: 120, left: 160, right: 160 },
+                  borders: {
+                    top: { style: BorderStyle.SINGLE, size: 4, color: COLOR_BORDER },
+                    bottom: { style: BorderStyle.SINGLE, size: 4, color: COLOR_BORDER },
+                    left: { style: BorderStyle.SINGLE, size: 16, color: COLOR_MUTED },
+                    right: { style: BorderStyle.SINGLE, size: 4, color: COLOR_BORDER }
+                  },
+                  children: codeParagraphs
+                })
+              ]
+            })
+          ]
+        })
+      );
+      children.push(new Paragraph({ spacing: { after: 160 } }));
+    }
+
+    // 6. Blockquote Card
+    if (sec.blockquote) {
+      const quoteObj = typeof sec.blockquote === 'string' ? { quote: sec.blockquote } : sec.blockquote;
+
       children.push(
         new Table({
           width: { size: 100, type: WidthType.PERCENTAGE },
@@ -376,25 +517,97 @@ export const buildDocxFile = async (data) => {
               children: [
                 new TableCell({
                   shading: { fill: COLOR_LIGHT_BG, type: ShadingType.CLEAR },
+                  margins: { top: 140, bottom: 140, left: 180, right: 180 },
                   borders: {
                     top: { style: BorderStyle.NONE },
                     bottom: { style: BorderStyle.NONE },
                     right: { style: BorderStyle.NONE },
-                    left: { style: BorderStyle.SINGLE, size: 24, color: COLOR_NAVY }
+                    left: { style: BorderStyle.SINGLE, size: 24, color: COLOR_BLUE }
+                  },
+                  children: [
+                    new Paragraph({
+                      spacing: { before: 0, after: quoteObj.author ? 40 : 0, line: 240 },
+                      children: [
+                        new TextRun({ text: `“${quoteObj.quote}”`, italics: true, size: 22, color: COLOR_DARK, font: 'Calibri' })
+                      ]
+                    }),
+                    ...(quoteObj.author ? [
+                      new Paragraph({
+                        spacing: { before: 0, after: 0 },
+                        children: [
+                          new TextRun({ text: `— ${quoteObj.author}`, bold: true, size: 18, color: COLOR_MUTED, font: 'Calibri' })
+                        ]
+                      })
+                    ] : [])
+                  ]
+                })
+              ]
+            })
+          ]
+        })
+      );
+      children.push(new Paragraph({ spacing: { after: 160 } }));
+    }
+
+    // 7. Multi-Type Callout Box
+    if (sec.calloutBox) {
+      let type = 'info';
+      let textStr = '';
+      let titleStr = '';
+
+      if (typeof sec.calloutBox === 'string') {
+        textStr = sec.calloutBox;
+      } else {
+        type = sec.calloutBox.type || 'info';
+        textStr = sec.calloutBox.text || '';
+        titleStr = sec.calloutBox.title || '';
+      }
+
+      let calloutBorderColor = COLOR_NAVY;
+      let calloutFill = COLOR_LIGHT_BG;
+      let iconLabel = '💡 NOTE:';
+
+      if (type === 'warning') {
+        calloutBorderColor = 'D97706';
+        calloutFill = 'FEF3C7';
+        iconLabel = '⚠️ WARNING:';
+      } else if (type === 'success') {
+        calloutBorderColor = '059669';
+        calloutFill = 'ECFDF5';
+        iconLabel = '✅ STRATEGIC HIGHLIGHT:';
+      } else if (type === 'tip') {
+        calloutBorderColor = '7C3AED';
+        calloutFill = 'F5F3FF';
+        iconLabel = '🚀 TIP / KEY TAKEAWAY:';
+      }
+
+      const displayHeader = titleStr ? `${iconLabel} ${titleStr}` : iconLabel;
+
+      children.push(
+        new Table({
+          width: { size: 100, type: WidthType.PERCENTAGE },
+          rows: [
+            new TableRow({
+              children: [
+                new TableCell({
+                  shading: { fill: calloutFill, type: ShadingType.CLEAR },
+                  borders: {
+                    top: { style: BorderStyle.NONE },
+                    bottom: { style: BorderStyle.NONE },
+                    right: { style: BorderStyle.NONE },
+                    left: { style: BorderStyle.SINGLE, size: 24, color: calloutBorderColor }
                   },
                   margins: { top: 120, bottom: 120, left: 180, right: 180 },
                   children: [
                     new Paragraph({
-                      spacing: { before: 0, after: 0, line: 240 },
+                      spacing: { before: 0, after: 40 },
                       children: [
-                        new TextRun({
-                          text: `💡 NOTE: ${sec.calloutBox}`,
-                          bold: true,
-                          size: 20, // 10pt
-                          color: COLOR_NAVY,
-                          font: 'Calibri'
-                        })
+                        new TextRun({ text: displayHeader, bold: true, size: 20, color: calloutBorderColor, font: 'Calibri' })
                       ]
+                    }),
+                    new Paragraph({
+                      spacing: { before: 0, after: 0, line: 240 },
+                      children: parseMarkdownToTextRuns(textStr, { size: 20, color: COLOR_BODY, font: 'Calibri' })
                     })
                   ]
                 })
@@ -403,9 +616,10 @@ export const buildDocxFile = async (data) => {
           ]
         })
       );
+      children.push(new Paragraph({ spacing: { after: 160 } }));
     }
 
-    // Insert Page Break after each page item (so next page starts on a new page cleanly)
+    // Insert Page Break after each section
     if (idx < pagesList.length - 1) {
       children.push(
         new Paragraph({
@@ -415,9 +629,9 @@ export const buildDocxFile = async (data) => {
     }
   });
 
-  // --- Render Styled Table ---
+  // --- RENDER STYLED DATA TABLE ---
+  const tableData = data.table || null;
   if (tableData && Array.isArray(tableData.headers) && Array.isArray(tableData.rows)) {
-
     if (tableData.title) {
       children.push(
         new Paragraph({
@@ -427,7 +641,7 @@ export const buildDocxFile = async (data) => {
             new TextRun({
               text: tableData.title,
               bold: true,
-              size: 28, // 14pt
+              size: 28,
               color: COLOR_BLUE,
               font: 'Calibri'
             })
@@ -454,9 +668,9 @@ export const buildDocxFile = async (data) => {
             alignment: AlignmentType.LEFT,
             children: [
               new TextRun({
-                text: hText,
+                text: String(hText),
                 bold: true,
-                size: 20, // 10pt
+                size: 20,
                 color: COLOR_WHITE,
                 font: 'Calibri'
               })
@@ -486,14 +700,7 @@ export const buildDocxFile = async (data) => {
           children: [
             new Paragraph({
               alignment: AlignmentType.LEFT,
-              children: [
-                new TextRun({
-                  text: String(cellText),
-                  size: 20, // 10pt
-                  color: COLOR_BODY,
-                  font: 'Calibri'
-                })
-              ]
+              children: parseMarkdownToTextRuns(String(cellText), { size: 20, color: COLOR_BODY, font: 'Calibri' })
             })
           ]
         });
@@ -510,22 +717,23 @@ export const buildDocxFile = async (data) => {
     );
   }
 
-  // 2. Create Document Instance with Header & Footer
+  // --- CREATE DOCUMENT INSTANCE WITH DIFFERENT FIRST PAGE HEADER/FOOTER ---
   const doc = new Document({
     sections: [
       {
         properties: {
           page: {
             margin: {
-              top: 1440, // 1 inch
+              top: 1440,
               bottom: 1440,
               left: 1440,
               right: 1440
             }
-          }
+          },
+          titlePage: true // Suppresses running headers & footers on Page 1 (Cover Page)
         },
-        // Running Header
         headers: {
+          first: new Header({ children: [] }), // Cover page header is empty
           default: new Header({
             children: [
               new Paragraph({
@@ -537,7 +745,7 @@ export const buildDocxFile = async (data) => {
                 children: [
                   new TextRun({
                     text: headerLabel,
-                    size: 18, // 9pt
+                    size: 18,
                     color: COLOR_MUTED,
                     bold: true,
                     font: 'Calibri'
@@ -547,8 +755,8 @@ export const buildDocxFile = async (data) => {
             ]
           })
         },
-        // Running Footer (Page Numbers)
         footers: {
+          first: new Footer({ children: [] }), // Cover page footer is empty
           default: new Footer({
             children: [
               new Paragraph({
@@ -572,8 +780,7 @@ export const buildDocxFile = async (data) => {
     ]
   });
 
-  // Pack into binary buffer
   const buffer = await Packer.toBuffer(doc);
-  logger.info(`DOCX File Generation Completed -> Buffer size: ${buffer.length} bytes`);
+  logger.info(`Claude-Level DOCX File Generation Completed -> Buffer size: ${buffer.length} bytes`);
   return buffer;
 };

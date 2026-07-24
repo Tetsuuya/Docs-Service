@@ -45,20 +45,15 @@ async function callGemini(promptInput, isJson = true, maxTokens = 8192) {
 }
 
 /**
- * Multi-Pass Document Generation Engine with:
- * 1. Multimodal File & Design Context Extraction (Images, PDFs, TXT, CSV)
- * 2. Embedded Prompt tracking inside JSON AST
- * 3. Clean Page Breaks per section in Word
- * 4. Universal Minimum Target Page-Count Scaling Rule (>= N pages, NEVER < N)
- * 5. Automatic Typo & Misspelling Correction
- * 6. Dynamic Domain-Aware Hex Theme Color Generation
+ * Multi-Pass Document Generation Engine with EXACT Page-Count Calibration:
+ * Formula: 1 Executive Cover Page (Page 1) + (N - 1) Content Sections = EXACTLY N TOTAL PAGES in Word.
  */
 export const generateDocumentContent = async (userPrompt, file = null) => {
   if (!config.geminiApiKey || config.geminiApiKey === 'your_gemini_api_key_here') {
     throw new Error('GEMINI_API_KEY is not configured in .env file');
   }
 
-  logger.info(`Starting Multi-Pass Document Generation for prompt: "${userPrompt}" ${file ? `with file: ${file.originalname}` : ''}`);
+  logger.info(`Starting Calibrated Document Generation for prompt: "${userPrompt}" ${file ? `with file: ${file.originalname}` : ''}`);
 
   let inlineDataPart = null;
   let fileTextContext = '';
@@ -96,33 +91,42 @@ export const generateDocumentContent = async (userPrompt, file = null) => {
     }
   }
 
-  // Extract requested target page count from user prompt (e.g., "5 pages", "10 page reviewer")
+  // Extract requested target page count from user prompt (e.g., "exactly 5 pages", "10 page guide")
   const pageMatch = userPrompt.match(/\b(\d+)\s*(?:-| )?page/i);
-  const requestedPages = pageMatch ? parseInt(pageMatch[1], 10) : 5;
-  const minSectionsTarget = Math.max(requestedPages, 5);
+  const requestedTotalPages = pageMatch ? parseInt(pageMatch[1], 10) : 5;
 
-  logger.info(`Target Page Count Detected: ${requestedPages} -> Planning at least ${minSectionsTarget} major sections/pages.`);
+  // EXACT PAGE COUNT RULE:
+  // Page 1 is the Executive Cover Page.
+  // The remaining (requestedTotalPages - 1) pages are dedicated content sections.
+  // Example: 5 Pages Total = 1 Cover Page + 4 Content Sections.
+  const targetSectionsCount = Math.max(1, requestedTotalPages - 1);
 
-  // STEP 1: Plan Outline, Theme, and Table with Target Page-Count Scaling
+  logger.info(`Target Page Count: ${requestedTotalPages} Total Pages -> 1 Cover Page + ${targetSectionsCount} Content Sections.`);
+
+  // STEP 1: Plan Outline, Theme, and Summary Matrix
   let plannerPrompt = `
-  You are an elite master document architect.
+  You are an elite master document architect designing a Claude-level executive publication document.
   Analyze the user's prompt request: "${userPrompt}"
   ${fileTextContext ? `\n\nATTACHED REFERENCE CONTEXT FILE CONTENT:\n"""\n${fileTextContext.substring(0, 10000)}\n"""\n` : ''}
 
-  UNIVERSAL SCALING & QUALITY RULES:
-  1. MINIMUM TARGET PAGE RULE: The user has requested a document requiring AT LEAST ${minSectionsTarget} PAGES. In Microsoft Word, EVERY major section will be formatted cleanly onto its OWN DEDICATED NEW PAGE! Therefore, you MUST plan AT LEAST ${minSectionsTarget} (or more) distinct, major section headings to guarantee the generated document meets or exceeds ${minSectionsTarget} full pages (NEVER generate fewer than ${minSectionsTarget} sections).
-  2. TYPO & MISSPELLING CORRECTION: Automatically fix all spelling, grammar, and typos in the user's prompt (e.g. "algorthim" -> "Algorithm", "scract" -> "Scratch").
-  3. DOMAIN-AWARE THEME & DESIGN EXTRACTION: Automatically infer the domain or extract visual colors from any attached screenshot/image, and invent/replicate an appropriate, harmonized 6-character Hex color palette (primaryColor, secondaryColor, accentColor, lightBgColor, textColor).
-  4. ACCURATE TITLE & BADGE OCR: If an attached screenshot or PDF contains prominent title or badge text (e.g. "CCNA: Introduction to Networks", "AWS Certified Solutions Architect", "Q3 Financial Audit"), set that EXACT text string as the "title" property. Do not use generic titles like "Document Report" when clear title text exists in the image.
-  5. UNIVERSAL CLASSIFICATION TAG: Invent an uppercase classification tag for the "docTypeTag" field matching the domain (e.g. "VERIFIED COURSE SUMMARY", "EXECUTIVE FINANCIAL AUDIT", "ENTERPRISE ARCHITECTURE PROPOSAL").
-  6. CONTEXT INTEGRATION: Ingest and incorporate key data points, facts, and insights from the attached context file into the title, outline headings, and summary table.
+  CRITICAL PAGE COUNT RULE:
+  The document must contain EXACTLY ${requestedTotalPages} TOTAL PAGES in Microsoft Word:
+  - Page 1: Executive Cover Page
+  - Pages 2 to ${requestedTotalPages}: EXACTLY ${targetSectionsCount} CONTENT SECTIONS.
+  You MUST provide EXACTLY ${targetSectionsCount} distinct major section headings in the "sectionHeadings" array. No more, no less!
+
+  QUALITY & FORMATTING RULES:
+  1. INLINE MARKDOWN FORMATTING: Use inline markdown formatting in text (e.g., **bold**, *italics*, \`code\`).
+  2. DOMAIN-AWARE THEME & COLOR PALETTE: Generate a harmonized 6-character Hex color palette (primaryColor, secondaryColor, accentColor, lightBgColor, textColor).
+  3. ACCURATE TITLE & BADGE OCR: If an attached screenshot or PDF contains title text, use that exact text string.
+  4. CLASSIFICATION TAG: Invent an uppercase classification tag for "docTypeTag" (e.g., "PRODUCT SPECIFICATION GUIDE", "EXECUTIVE BRAND AUDIT").
 
   Tasks:
-  1. Create a high-level Document Title, Subtitle, docTypeTag, and Running Header text (using perfect spelling and exact badge text if present).
-  2. Generate a Table of Contents containing AT LEAST ${minSectionsTarget} DISTINCT MAJOR SECTION HEADINGS covering every aspect of "${userPrompt}" thoroughly.
-  3. Generate a relevant summary data table with headers and rows based on prompt and context.
+  1. Create Document Title, Subtitle, docTypeTag, and Running Header text.
+  2. Generate a Table of Contents containing EXACTLY ${targetSectionsCount} MAJOR SECTION HEADINGS.
+  3. Generate a relevant summary data table (4 columns, 3-4 rows).
 
-  Return ONLY JSON matching this structure:
+  Return ONLY JSON matching:
   {
     "theme": {
       "primaryColor": "1E3A8A",
@@ -131,21 +135,19 @@ export const generateDocumentContent = async (userPrompt, file = null) => {
       "lightBgColor": "F8FAFC",
       "textColor": "334155"
     },
-    "docTypeTag": "VERIFIED COURSE SUMMARY",
-    "title": "Exact Title or Badge Text with Perfect Spelling",
-    "subtitle": "Comprehensive Technical & Strategic Guide",
-    "executiveOverview": "A high-level executive overview providing strategic context and scope for this document.",
-    "headerText": "DOCS SERVICE | COMPREHENSIVE DOCUMENTATION",
+    "docTypeTag": "PRODUCT SPECIFICATION GUIDE",
+    "title": "Exact Title or Topic with Perfect Spelling",
+    "subtitle": "Comprehensive Strategic & Technical Documentation",
+    "executiveOverview": "Executive overview providing strategic context with **key metrics** and *quality assurance standards*.",
+    "headerText": "DOCS SERVICE | EXECUTIVE PUBLICATION",
     "sectionHeadings": [
-      "1. Section Heading One",
-      "2. Section Heading Two"
-      // You MUST provide AT LEAST ${minSectionsTarget} section headings here!
+      // You MUST provide EXACTLY ${targetSectionsCount} section headings here!
     ],
     "table": {
-      "title": "Summary Matrix",
-      "headers": ["Header 1", "Header 2", "Header 3", "Header 4"],
+      "title": "Summary Performance Matrix",
+      "headers": ["Category / Metric", "Standard", "Observed", "Status"],
       "rows": [
-        ["Row 1 Item", "Category / Detail", "Status / Spec", "Metric / Value"]
+        ["Nutritional Value", "Standard", "**Optimized**", "✅ Certified"]
       ]
     }
   }
@@ -153,51 +155,59 @@ export const generateDocumentContent = async (userPrompt, file = null) => {
 
   const plannerInput = inlineDataPart ? [inlineDataPart, plannerPrompt] : plannerPrompt;
 
-  logger.info('Step 1: Generating Document Outline & Scaling Sections to Target Page Count...');
+  logger.info(`Step 1: Generating Document Outline for EXACTLY ${targetSectionsCount} content sections...`);
   const outlinePlan = await callGemini(plannerInput, true, 4096);
-  logger.info(`Step 1 Complete -> Title: "${outlinePlan.title}", Planned Sections: ${outlinePlan.sectionHeadings?.length || 0}`);
+  logger.info(`Step 1 Complete -> Title: "${outlinePlan.title}", Sections Planned: ${outlinePlan.sectionHeadings?.length || 0}`);
 
   let sectionHeadings = outlinePlan.sectionHeadings || [];
 
-  // Fallback section scaling if LLM returned fewer than target
-  if (sectionHeadings.length < minSectionsTarget) {
-    logger.warn(`LLM returned ${sectionHeadings.length} sections, scaling up to target ${minSectionsTarget}`);
-    while (sectionHeadings.length < minSectionsTarget) {
+  // Enforce EXACT target section count
+  if (sectionHeadings.length > targetSectionsCount) {
+    sectionHeadings = sectionHeadings.slice(0, targetSectionsCount);
+  } else if (sectionHeadings.length < targetSectionsCount) {
+    logger.warn(`LLM returned ${sectionHeadings.length} sections, calibrating to exact target ${targetSectionsCount}`);
+    while (sectionHeadings.length < targetSectionsCount) {
       const num = sectionHeadings.length + 1;
-      sectionHeadings.push(`${num}. Detailed Module Analysis & Strategic Insights Part ${num}`);
+      sectionHeadings.push(`${num}. Detailed Module Analysis & Strategic Roadmap Part ${num}`);
     }
   }
 
-  // STEP 2: Deep Content Generation per Section
-  logger.info(`Step 2: Generating Deep Content for all ${sectionHeadings.length} planned sections...`);
+  // STEP 2: Deep Content Generation per Section with Rich AST Blocks
+  logger.info(`Step 2: Generating Calibrated Content for all ${sectionHeadings.length} planned sections...`);
 
   const fullSections = await Promise.all(
     sectionHeadings.map(async (heading, idx) => {
       const sectionPrompt = `
-      You are an expert technical author writing Section ${idx + 1} of a document titled "${outlinePlan.title}".
+      You are an expert technical author writing Section ${idx + 1} of ${sectionHeadings.length} for document "${outlinePlan.title}".
       Section Topic: "${heading}"
       Overall Document Request: "${userPrompt}"
       ${fileTextContext ? `\nReference Context Material:\n"""\n${fileTextContext.substring(0, 4000)}\n"""\n` : ''}
 
-      Task: Write clear, highly detailed content for this section with 100% perfect spelling and grammar.
-      Requirements:
-      - Write AT LEAST 2 to 3 clear, thorough paragraphs (3-5 sentences per paragraph) covering this section topic.
-      - Provide a "bulletList" array of 3 to 5 key objectives, technical specifications, or takeaways for this section.
-      - Provide a strategic Callout Box highlight summarizing key takeaways or critical notes for this section.
+      CRITICAL DENSITY REQUIREMENT:
+      This content section will occupy EXACTLY Page ${idx + 2} of the Word document.
+      Write clear, medium-length content so it fits cleanly on 1 physical Word page without overflowing to the next page:
+      - 2 concise paragraphs (3-4 sentences each) with **bold key terms** and *italicized emphasis*.
+      - 3 bullet points in "bulletList".
+      - 1 "calloutBox" object: { "type": "info" | "warning" | "success" | "tip", "title": "...", "text": "..." }.
+      - (Optional) "statCards": 2-3 key stat cards OR "codeBlock": { "language": "...", "code": "..." }.
 
       Return ONLY JSON matching:
       {
         "heading": "${heading}",
         "paragraphs": [
-          "Detailed paragraph 1...",
-          "Detailed paragraph 2..."
+          "Detailed paragraph 1 with **bold metrics**...",
+          "Detailed paragraph 2 with *key insights*..."
         ],
         "bulletList": [
-          "Key Objective / Command / Spec 1",
-          "Key Objective / Command / Spec 2",
-          "Key Objective / Command / Spec 3"
+          "**Key Objective 1**: Description",
+          "**Key Objective 2**: Description",
+          "**Key Objective 3**: Description"
         ],
-        "calloutBox": "Key strategic takeaway or formula/note for this section"
+        "calloutBox": {
+          "type": "tip",
+          "title": "Key Strategic Takeaway",
+          "text": "Critical summary note for this section topic."
+        }
       }
       `;
 
@@ -209,24 +219,29 @@ export const generateDocumentContent = async (userPrompt, file = null) => {
         logger.warn(`Failed section generation for "${heading}", using fallback content`);
         return {
           heading,
-          paragraphs: [`Comprehensive details and deep technical breakdown regarding ${heading} for request "${userPrompt}".`],
-          bulletList: [`Core specification for ${heading}`, `Implementation metric for ${heading}`],
-          calloutBox: `Key strategic takeaway for ${heading}.`
+          paragraphs: [`Comprehensive details and strategic breakdown regarding **${heading}** for request "${userPrompt}".`],
+          bulletList: [`**Core specification**: Specification details for ${heading}`, `**Metric target**: Benchmark metrics for ${heading}`],
+          calloutBox: {
+            type: 'info',
+            title: 'Section Summary',
+            text: `Key strategic takeaway and analysis regarding ${heading}.`
+          }
         };
       }
     })
   );
 
-  logger.info(`Step 2 Complete -> Generated ${fullSections.length} rich sections.`);
+  logger.info(`Step 2 Complete -> Generated ${fullSections.length} calibrated sections.`);
 
-  // STEP 3: Assemble Full Document JSON AST (Including userPrompt and pages array)
+  // STEP 3: Assemble Full Document JSON AST
   const finalDocumentJSON = {
     prompt: userPrompt,
+    requestedTotalPages: requestedTotalPages,
     theme: outlinePlan.theme,
-    docTypeTag: outlinePlan.docTypeTag || 'DOCUMENT OVERVIEW',
+    docTypeTag: outlinePlan.docTypeTag || 'PRODUCT SPECIFICATION GUIDE',
     title: outlinePlan.title,
     subtitle: outlinePlan.subtitle,
-    executiveOverview: outlinePlan.executiveOverview || `This document outlines comprehensive technical analysis and strategic roadmap details regarding ${outlinePlan.title}.`,
+    executiveOverview: outlinePlan.executiveOverview || `This document outlines comprehensive technical analysis and strategic roadmap details regarding **${outlinePlan.title}**.`,
     sectionHeadings: sectionHeadings,
     headerText: outlinePlan.headerText,
     pages: fullSections,
@@ -236,6 +251,6 @@ export const generateDocumentContent = async (userPrompt, file = null) => {
     imageMimeType: uploadedImageMimeType
   };
 
-  logger.info(`Multi-Pass Document Generation Complete -> Total Sections: ${fullSections.length}`);
+  logger.info(`Calibrated Document Generation Complete -> Target Total Pages: ${requestedTotalPages} (1 Cover + ${fullSections.length} Sections)`);
   return finalDocumentJSON;
 };
