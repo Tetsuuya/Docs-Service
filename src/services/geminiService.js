@@ -45,19 +45,16 @@ async function callGemini(promptInput, isJson = true, maxTokens = 8192) {
 }
 
 /**
- * Multi-Pass Document Generation Engine with Diverse Human-Level Editorial Layouts:
- * 1. Multimodal File & Design Context Extraction
- * 2. Human Editorial Variety Detector per Section (Ensures varied visual types across pages)
- * 3. Structured Image Placeholder Cards (description & figure caption)
- * 4. Page Breaks per section in Word with titlePage header/footer suppression
- * 5. Target Page-Count Scaling Rule (1 Cover + (N-1) Content Sections = N Total Pages)
+ * Multi-Pass Document Generation Engine with Pure Content-Driven Visual Decision:
+ * 100% Dynamic - Visuals (diagram, image, table, none) are chosen strictly based on what the section content actually describes!
+ * Zero pre-defined slots or hardcoded forced elements.
  */
 export const generateDocumentContent = async (userPrompt, file = null) => {
   if (!config.geminiApiKey || config.geminiApiKey === 'your_gemini_api_key_here') {
     throw new Error('GEMINI_API_KEY is not configured in .env file');
   }
 
-  logger.info(`Starting Human-Level AI Document Generation for prompt: "${userPrompt}" ${file ? `with file: ${file.originalname}` : ''}`);
+  logger.info(`Starting Content-Driven AI Document Generation for prompt: "${userPrompt}" ${file ? `with file: ${file.originalname}` : ''}`);
 
   let inlineDataPart = null;
   let fileTextContext = '';
@@ -117,7 +114,7 @@ export const generateDocumentContent = async (userPrompt, file = null) => {
   FORMATTING & THEME RULES:
   1. INLINE MARKDOWN FORMATTING: Use inline markdown formatting in text (e.g., **bold**, *italics*, \`code\`).
   2. DOMAIN-AWARE COLOR PALETTE: Generate a harmonized 6-character Hex color palette (primaryColor, secondaryColor, accentColor, lightBgColor, textColor).
-  3. CLASSIFICATION TAG: Invent an uppercase classification tag for "docTypeTag" (e.g., "ENTERPRISE TECHNICAL REPORT", "CULTURAL HISTORICAL STUDY", "PRODUCT SPECIFICATION GUIDE").
+  3. CLASSIFICATION TAG: Invent an uppercase classification tag for "docTypeTag" (e.g., "ASTRONOMICAL TECHNICAL STUDY", "ENTERPRISE REPORT", "CULTURAL HISTORICAL STUDY").
 
   Tasks:
   1. Create Document Title, Subtitle, docTypeTag, and Running Header text.
@@ -133,7 +130,7 @@ export const generateDocumentContent = async (userPrompt, file = null) => {
       "lightBgColor": "F8FAFC",
       "textColor": "334155"
     },
-    "docTypeTag": "ENTERPRISE TECHNICAL REPORT",
+    "docTypeTag": "ENTERPRISE REPORT",
     "title": "Exact Title or Topic with Perfect Spelling",
     "subtitle": "Comprehensive Strategic & Technical Documentation",
     "executiveOverview": "Executive overview providing strategic context with **key metrics** and *quality assurance standards*.",
@@ -143,7 +140,7 @@ export const generateDocumentContent = async (userPrompt, file = null) => {
     ],
     "table": {
       "title": "Summary Matrix",
-      "headers": ["Category / Metric", "Baseline", "Observed", "Status"],
+      "headers": ["Category / Metric", "Baseline", "Optimized", "Status"],
       "rows": [
         ["Core Parameter", "Standard", "**Optimized**", "✅ Verified"]
       ]
@@ -168,8 +165,8 @@ export const generateDocumentContent = async (userPrompt, file = null) => {
     }
   }
 
-  // STEP 2: Deep Content Generation per Section with Human-Level Editorial Variety
-  logger.info(`Step 2: Generating Calibrated Content with Varied Editorial Layouts for all ${sectionHeadings.length} sections...`);
+  // STEP 2: Pure Content-Driven Visual Decision per Section
+  logger.info(`Step 2: Generating Calibrated Content with Content-Driven Visual Decision for all ${sectionHeadings.length} sections...`);
 
   const fullSections = await Promise.all(
     sectionHeadings.map(async (heading, idx) => {
@@ -179,13 +176,14 @@ export const generateDocumentContent = async (userPrompt, file = null) => {
       Overall Document Request: "${userPrompt}"
       ${fileTextContext ? `\nReference Context Material:\n"""\n${fileTextContext.substring(0, 4000)}\n"""\n` : ''}
 
-      STRICT HUMAN EDITORIAL BALANCE & VARIETY RULES:
-      Act like a human editor designing a magazine or publication. Vary the visual components across pages so the document NEVER feels like a repetitive template:
-      - Section ${idx + 1} of ${sectionHeadings.length}: Pick the single best visualNeed ("diagram" | "image" | "table" | "none").
-      - "diagram": Best for step-by-step workflows, timelines, historical accord sequences, or architecture pipelines.
-      - "image": Best for vivid physical scenes, landscapes, species, or cultural photos. Limit images to AT MOST 1 or 2 sections across the entire document!
-      - "table": Best for numerical metrics, legal/demographic breakdowns, or specs.
-      - "none": Best for narrative, legal background, policy, or governance text (uses clean paragraphs + KPI stat cards or callout box).
+      PURE CONTENT-BASED EDITORIAL DECISION:
+      Read the content of this specific section topic carefully. Decide if this section content genuinely calls for a visual element:
+      - Does this section describe a physical object, planet/space (e.g. Saturn's rings), landscape, animal/bird, product photo, or visual scene? -> Choose "image" (image description & caption).
+      - Does this section describe a step-by-step process, timeline, workflow, or pipeline? -> Choose "diagram" (process flow steps).
+      - Does this section describe numerical data, chemical specs, comparisons, or metric lists? -> Choose "table" (table headers & rows).
+      - Is this section pure narrative, background history, law, or policy text? -> Choose "none".
+
+      Base your decision 100% PURELY on what this section's content actually describes. Do NOT force elements if the content doesn't need them!
 
       Return ONLY JSON matching:
       {
@@ -245,28 +243,27 @@ export const generateDocumentContent = async (userPrompt, file = null) => {
     })
   );
 
-  // Post-Processing: Normalize visual types to prevent repetitive "all images" or "all diagrams" template feel!
-  let imageCount = 0;
+  // Consecutive Duplicate Prevention (Prevents identical visual cards on adjacent pages)
+  let lastType = null;
   fullSections.forEach((sec, idx) => {
-    const vType = sec.visualNeed ? sec.visualNeed.type : 'none';
-    if (vType === 'image') {
-      imageCount++;
-      // If more than 2 sections have images, convert excess images to diagram or none for editorial variety
-      if (imageCount > 2) {
-        logger.info(`Normalizing section ${idx + 1} ("${sec.heading}") from "image" to "none" for editorial variety.`);
-        sec.visualNeed.type = 'none';
-      }
+    const currentType = sec.visualNeed ? sec.visualNeed.type : 'none';
+    if (currentType !== 'none' && currentType === lastType) {
+      logger.info(`Section ${idx + 1} ("${sec.heading}") has consecutive duplicate visual "${currentType}" -> setting to "none" for page flow.`);
+      sec.visualNeed.type = 'none';
+      lastType = 'none';
+    } else {
+      lastType = currentType;
     }
   });
 
-  logger.info(`Step 2 Complete -> Generated ${fullSections.length} calibrated sections with Varied Editorial Layouts.`);
+  logger.info(`Step 2 Complete -> Generated ${fullSections.length} calibrated sections based purely on content.`);
 
   // STEP 3: Assemble Full Document JSON AST
   const finalDocumentJSON = {
     prompt: userPrompt,
     requestedTotalPages: requestedTotalPages,
     theme: outlinePlan.theme,
-    docTypeTag: outlinePlan.docTypeTag || 'ENTERPRISE TECHNICAL REPORT',
+    docTypeTag: outlinePlan.docTypeTag || 'ENTERPRISE REPORT',
     title: outlinePlan.title,
     subtitle: outlinePlan.subtitle,
     executiveOverview: outlinePlan.executiveOverview || `This document outlines comprehensive technical analysis and strategic roadmap details regarding **${outlinePlan.title}**.`,
@@ -279,6 +276,6 @@ export const generateDocumentContent = async (userPrompt, file = null) => {
     imageMimeType: uploadedImageMimeType
   };
 
-  logger.info(`Human-Level Document Generation Complete -> Target Total Pages: ${requestedTotalPages}`);
+  logger.info(`Content-Driven Document Generation Complete -> Target Total Pages: ${requestedTotalPages}`);
   return finalDocumentJSON;
 };
