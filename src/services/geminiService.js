@@ -45,15 +45,19 @@ async function callGemini(promptInput, isJson = true, maxTokens = 8192) {
 }
 
 /**
- * Multi-Pass Document Generation Engine with EXACT Page-Count Calibration:
- * Formula: 1 Executive Cover Page (Page 1) + (N - 1) Content Sections = EXACTLY N TOTAL PAGES in Word.
+ * Multi-Pass Document Generation Engine with Diverse Human-Level Editorial Layouts:
+ * 1. Multimodal File & Design Context Extraction
+ * 2. Human Editorial Variety Detector per Section (Ensures varied visual types across pages)
+ * 3. Structured Image Placeholder Cards (description & figure caption)
+ * 4. Page Breaks per section in Word with titlePage header/footer suppression
+ * 5. Target Page-Count Scaling Rule (1 Cover + (N-1) Content Sections = N Total Pages)
  */
 export const generateDocumentContent = async (userPrompt, file = null) => {
   if (!config.geminiApiKey || config.geminiApiKey === 'your_gemini_api_key_here') {
     throw new Error('GEMINI_API_KEY is not configured in .env file');
   }
 
-  logger.info(`Starting Calibrated Document Generation for prompt: "${userPrompt}" ${file ? `with file: ${file.originalname}` : ''}`);
+  logger.info(`Starting Human-Level AI Document Generation for prompt: "${userPrompt}" ${file ? `with file: ${file.originalname}` : ''}`);
 
   let inlineDataPart = null;
   let fileTextContext = '';
@@ -91,21 +95,16 @@ export const generateDocumentContent = async (userPrompt, file = null) => {
     }
   }
 
-  // Extract requested target page count from user prompt (e.g., "exactly 5 pages", "10 page guide")
+  // Extract requested target page count from user prompt
   const pageMatch = userPrompt.match(/\b(\d+)\s*(?:-| )?page/i);
   const requestedTotalPages = pageMatch ? parseInt(pageMatch[1], 10) : 5;
-
-  // EXACT PAGE COUNT RULE:
-  // Page 1 is the Executive Cover Page.
-  // The remaining (requestedTotalPages - 1) pages are dedicated content sections.
-  // Example: 5 Pages Total = 1 Cover Page + 4 Content Sections.
   const targetSectionsCount = Math.max(1, requestedTotalPages - 1);
 
   logger.info(`Target Page Count: ${requestedTotalPages} Total Pages -> 1 Cover Page + ${targetSectionsCount} Content Sections.`);
 
   // STEP 1: Plan Outline, Theme, and Summary Matrix
   let plannerPrompt = `
-  You are an elite master document architect designing a Claude-level executive publication document.
+  You are an elite master document architect designing a publication-grade document.
   Analyze the user's prompt request: "${userPrompt}"
   ${fileTextContext ? `\n\nATTACHED REFERENCE CONTEXT FILE CONTENT:\n"""\n${fileTextContext.substring(0, 10000)}\n"""\n` : ''}
 
@@ -113,18 +112,17 @@ export const generateDocumentContent = async (userPrompt, file = null) => {
   The document must contain EXACTLY ${requestedTotalPages} TOTAL PAGES in Microsoft Word:
   - Page 1: Executive Cover Page
   - Pages 2 to ${requestedTotalPages}: EXACTLY ${targetSectionsCount} CONTENT SECTIONS.
-  You MUST provide EXACTLY ${targetSectionsCount} distinct major section headings in the "sectionHeadings" array. No more, no less!
+  Provide EXACTLY ${targetSectionsCount} distinct major section headings in "sectionHeadings".
 
-  QUALITY & FORMATTING RULES:
+  FORMATTING & THEME RULES:
   1. INLINE MARKDOWN FORMATTING: Use inline markdown formatting in text (e.g., **bold**, *italics*, \`code\`).
-  2. DOMAIN-AWARE THEME & COLOR PALETTE: Generate a harmonized 6-character Hex color palette (primaryColor, secondaryColor, accentColor, lightBgColor, textColor).
-  3. ACCURATE TITLE & BADGE OCR: If an attached screenshot or PDF contains title text, use that exact text string.
-  4. CLASSIFICATION TAG: Invent an uppercase classification tag for "docTypeTag" (e.g., "PRODUCT SPECIFICATION GUIDE", "EXECUTIVE BRAND AUDIT").
+  2. DOMAIN-AWARE COLOR PALETTE: Generate a harmonized 6-character Hex color palette (primaryColor, secondaryColor, accentColor, lightBgColor, textColor).
+  3. CLASSIFICATION TAG: Invent an uppercase classification tag for "docTypeTag" (e.g., "ENTERPRISE TECHNICAL REPORT", "CULTURAL HISTORICAL STUDY", "PRODUCT SPECIFICATION GUIDE").
 
   Tasks:
   1. Create Document Title, Subtitle, docTypeTag, and Running Header text.
   2. Generate a Table of Contents containing EXACTLY ${targetSectionsCount} MAJOR SECTION HEADINGS.
-  3. Generate a relevant summary data table (4 columns, 3-4 rows).
+  3. Generate a relevant summary data table.
 
   Return ONLY JSON matching:
   {
@@ -135,7 +133,7 @@ export const generateDocumentContent = async (userPrompt, file = null) => {
       "lightBgColor": "F8FAFC",
       "textColor": "334155"
     },
-    "docTypeTag": "PRODUCT SPECIFICATION GUIDE",
+    "docTypeTag": "ENTERPRISE TECHNICAL REPORT",
     "title": "Exact Title or Topic with Perfect Spelling",
     "subtitle": "Comprehensive Strategic & Technical Documentation",
     "executiveOverview": "Executive overview providing strategic context with **key metrics** and *quality assurance standards*.",
@@ -144,10 +142,10 @@ export const generateDocumentContent = async (userPrompt, file = null) => {
       // You MUST provide EXACTLY ${targetSectionsCount} section headings here!
     ],
     "table": {
-      "title": "Summary Performance Matrix",
-      "headers": ["Category / Metric", "Standard", "Observed", "Status"],
+      "title": "Summary Matrix",
+      "headers": ["Category / Metric", "Baseline", "Observed", "Status"],
       "rows": [
-        ["Nutritional Value", "Standard", "**Optimized**", "✅ Certified"]
+        ["Core Parameter", "Standard", "**Optimized**", "✅ Verified"]
       ]
     }
   }
@@ -161,52 +159,67 @@ export const generateDocumentContent = async (userPrompt, file = null) => {
 
   let sectionHeadings = outlinePlan.sectionHeadings || [];
 
-  // Enforce EXACT target section count
   if (sectionHeadings.length > targetSectionsCount) {
     sectionHeadings = sectionHeadings.slice(0, targetSectionsCount);
   } else if (sectionHeadings.length < targetSectionsCount) {
-    logger.warn(`LLM returned ${sectionHeadings.length} sections, calibrating to exact target ${targetSectionsCount}`);
     while (sectionHeadings.length < targetSectionsCount) {
       const num = sectionHeadings.length + 1;
       sectionHeadings.push(`${num}. Detailed Module Analysis & Strategic Roadmap Part ${num}`);
     }
   }
 
-  // STEP 2: Deep Content Generation per Section with Rich AST Blocks
-  logger.info(`Step 2: Generating Calibrated Content for all ${sectionHeadings.length} planned sections...`);
+  // STEP 2: Deep Content Generation per Section with Human-Level Editorial Variety
+  logger.info(`Step 2: Generating Calibrated Content with Varied Editorial Layouts for all ${sectionHeadings.length} sections...`);
 
   const fullSections = await Promise.all(
     sectionHeadings.map(async (heading, idx) => {
       const sectionPrompt = `
-      You are an expert technical author writing Section ${idx + 1} of ${sectionHeadings.length} for document "${outlinePlan.title}".
+      You are an expert human publishing director writing Section ${idx + 1} of ${sectionHeadings.length} for document "${outlinePlan.title}".
       Section Topic: "${heading}"
       Overall Document Request: "${userPrompt}"
       ${fileTextContext ? `\nReference Context Material:\n"""\n${fileTextContext.substring(0, 4000)}\n"""\n` : ''}
 
-      CRITICAL DENSITY REQUIREMENT:
-      This content section will occupy EXACTLY Page ${idx + 2} of the Word document.
-      Write clear, medium-length content so it fits cleanly on 1 physical Word page without overflowing to the next page:
-      - 2 concise paragraphs (3-4 sentences each) with **bold key terms** and *italicized emphasis*.
-      - 3 bullet points in "bulletList".
-      - 1 "calloutBox" object: { "type": "info" | "warning" | "success" | "tip", "title": "...", "text": "..." }.
-      - (Optional) "statCards": 2-3 key stat cards OR "codeBlock": { "language": "...", "code": "..." }.
+      STRICT HUMAN EDITORIAL BALANCE & VARIETY RULES:
+      Act like a human editor designing a magazine or publication. Vary the visual components across pages so the document NEVER feels like a repetitive template:
+      - Section ${idx + 1} of ${sectionHeadings.length}: Pick the single best visualNeed ("diagram" | "image" | "table" | "none").
+      - "diagram": Best for step-by-step workflows, timelines, historical accord sequences, or architecture pipelines.
+      - "image": Best for vivid physical scenes, landscapes, species, or cultural photos. Limit images to AT MOST 1 or 2 sections across the entire document!
+      - "table": Best for numerical metrics, legal/demographic breakdowns, or specs.
+      - "none": Best for narrative, legal background, policy, or governance text (uses clean paragraphs + KPI stat cards or callout box).
 
       Return ONLY JSON matching:
       {
         "heading": "${heading}",
         "paragraphs": [
-          "Detailed paragraph 1 with **bold metrics**...",
-          "Detailed paragraph 2 with *key insights*..."
+          "Paragraph 1 with **bold metrics**...",
+          "Paragraph 2 with *key insights*..."
         ],
         "bulletList": [
-          "**Key Objective 1**: Description",
-          "**Key Objective 2**: Description",
-          "**Key Objective 3**: Description"
+          "**Key Spec 1**: Detailed explanation",
+          "**Key Spec 2**: Detailed explanation"
         ],
         "calloutBox": {
           "type": "tip",
-          "title": "Key Strategic Takeaway",
-          "text": "Critical summary note for this section topic."
+          "title": "Strategic Highlight",
+          "text": "Key takeaway note for this topic."
+        },
+        "visualNeed": {
+          "type": "diagram" | "image" | "table" | "none",
+          "diagram": {
+            "title": "Process / Workflow Title",
+            "steps": ["Step 1 Title", "Step 2 Title", "Step 3 Title", "Step 4 Title"]
+          },
+          "image": {
+            "imagePrompt": "Detailed description of the image/photo recommended for this section",
+            "caption": "Figure ${idx + 1}.1: Descriptive caption of the recommended visual"
+          },
+          "table": {
+            "title": "Section Data Table",
+            "headers": ["Header 1", "Header 2", "Header 3"],
+            "rows": [
+              ["Row 1 Data", "Value", "Status"]
+            ]
+          }
         }
       }
       `;
@@ -225,20 +238,35 @@ export const generateDocumentContent = async (userPrompt, file = null) => {
             type: 'info',
             title: 'Section Summary',
             text: `Key strategic takeaway and analysis regarding ${heading}.`
-          }
+          },
+          visualNeed: { type: 'none' }
         };
       }
     })
   );
 
-  logger.info(`Step 2 Complete -> Generated ${fullSections.length} calibrated sections.`);
+  // Post-Processing: Normalize visual types to prevent repetitive "all images" or "all diagrams" template feel!
+  let imageCount = 0;
+  fullSections.forEach((sec, idx) => {
+    const vType = sec.visualNeed ? sec.visualNeed.type : 'none';
+    if (vType === 'image') {
+      imageCount++;
+      // If more than 2 sections have images, convert excess images to diagram or none for editorial variety
+      if (imageCount > 2) {
+        logger.info(`Normalizing section ${idx + 1} ("${sec.heading}") from "image" to "none" for editorial variety.`);
+        sec.visualNeed.type = 'none';
+      }
+    }
+  });
+
+  logger.info(`Step 2 Complete -> Generated ${fullSections.length} calibrated sections with Varied Editorial Layouts.`);
 
   // STEP 3: Assemble Full Document JSON AST
   const finalDocumentJSON = {
     prompt: userPrompt,
     requestedTotalPages: requestedTotalPages,
     theme: outlinePlan.theme,
-    docTypeTag: outlinePlan.docTypeTag || 'PRODUCT SPECIFICATION GUIDE',
+    docTypeTag: outlinePlan.docTypeTag || 'ENTERPRISE TECHNICAL REPORT',
     title: outlinePlan.title,
     subtitle: outlinePlan.subtitle,
     executiveOverview: outlinePlan.executiveOverview || `This document outlines comprehensive technical analysis and strategic roadmap details regarding **${outlinePlan.title}**.`,
@@ -251,6 +279,6 @@ export const generateDocumentContent = async (userPrompt, file = null) => {
     imageMimeType: uploadedImageMimeType
   };
 
-  logger.info(`Calibrated Document Generation Complete -> Target Total Pages: ${requestedTotalPages} (1 Cover + ${fullSections.length} Sections)`);
+  logger.info(`Human-Level Document Generation Complete -> Target Total Pages: ${requestedTotalPages}`);
   return finalDocumentJSON;
 };

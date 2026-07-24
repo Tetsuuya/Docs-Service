@@ -82,11 +82,12 @@ function parseMarkdownToTextRuns(text, baseOptions = {}) {
  * Features:
  * - Executive Cover Page (Title Banner, Embedded Badge Image, Metadata, PageBreak)
  * - Header/Footer titlePage suppression (No header/footer on page 1)
+ * - Executive Image Placeholder Cards (Structured visual descriptions & captions)
+ * - Human-Level AI Visual Detector Rendering (Diagrams, Image Cards, Specification Tables)
  * - Inline Markdown Parser (**bold**, *italics*, `code`)
  * - Multi-type Callout Cards (Info, Warning, Success, Tip, Note)
  * - Stat / KPI Grid Cards (Big numbers + labels)
- * - Code Blocks (Monospaced Consolas styled boxes)
- * - Blockquotes (Left accent border + italic text)
+ * - Code Blocks & Blockquotes
  * - Styled Data Tables (Header fill, bold white text, alternating row shading)
  */
 export const buildDocxFile = async (data) => {
@@ -395,7 +396,212 @@ export const buildDocxFile = async (data) => {
       });
     }
 
-    // 3. Stat Cards / KPI Grid
+    // 3. HUMAN-LEVEL AI VISUAL DETECTOR RENDERER
+    const visual = sec.visualNeed || {};
+
+    // A. Diagram Visual (Process Flow Workflow Steps)
+    if (visual.type === 'diagram' && visual.diagram && Array.isArray(visual.diagram.steps)) {
+      const steps = visual.diagram.steps;
+      const diagTitle = visual.diagram.title || 'TECHNICAL PROCESS WORKFLOW';
+
+      const stepCells = steps.map((stepTitle, sIdx) => {
+        return new TableCell({
+          shading: { fill: COLOR_LIGHT_BG, type: ShadingType.CLEAR },
+          margins: { top: 120, bottom: 120, left: 120, right: 120 },
+          borders: {
+            top: { style: BorderStyle.SINGLE, size: 4, color: COLOR_BLUE },
+            bottom: { style: BorderStyle.SINGLE, size: 4, color: COLOR_BORDER },
+            left: { style: BorderStyle.SINGLE, size: 12, color: COLOR_BLUE },
+            right: { style: BorderStyle.SINGLE, size: 4, color: COLOR_BORDER }
+          },
+          children: [
+            new Paragraph({
+              alignment: AlignmentType.CENTER,
+              spacing: { before: 0, after: 20 },
+              children: [
+                new TextRun({ text: `STEP ${sIdx + 1}`, bold: true, size: 14, color: COLOR_BLUE, font: 'Calibri' })
+              ]
+            }),
+            new Paragraph({
+              alignment: AlignmentType.CENTER,
+              spacing: { before: 0, after: 0 },
+              children: [
+                new TextRun({ text: stepTitle, bold: true, size: 18, color: COLOR_NAVY, font: 'Calibri' })
+              ]
+            }),
+            ...(sIdx < steps.length - 1 ? [
+              new Paragraph({
+                alignment: AlignmentType.CENTER,
+                spacing: { before: 20, after: 0 },
+                children: [
+                  new TextRun({ text: '➔', bold: true, size: 18, color: COLOR_ACCENT, font: 'Calibri' })
+                ]
+              })
+            ] : [])
+          ]
+        });
+      });
+
+      children.push(
+        new Table({
+          width: { size: 100, type: WidthType.PERCENTAGE },
+          rows: [
+            new TableRow({
+              children: [
+                new TableCell({
+                  shading: { fill: COLOR_NAVY, type: ShadingType.CLEAR },
+                  margins: { top: 80, bottom: 80, left: 160, right: 160 },
+                  children: [
+                    new Paragraph({
+                      children: [
+                        new TextRun({ text: `📌 DIAGRAM: ${diagTitle.toUpperCase()}`, bold: true, size: 16, color: COLOR_WHITE, font: 'Calibri' })
+                      ]
+                    })
+                  ]
+                })
+              ]
+            }),
+            new TableRow({ children: stepCells })
+          ]
+        })
+      );
+      children.push(new Paragraph({ spacing: { after: 160 } }));
+    }
+
+    // B. Executive Image Placeholder Card (Structured Placeholder with Description & Caption)
+    if (visual.type === 'image' && visual.image) {
+      const imgInfo = visual.image;
+      const captionText = imgInfo.caption || `Figure ${idx + 1}.1: Recommended Image Visual`;
+      const imageDesc = imgInfo.imagePrompt || imgInfo.description || 'Illustrative topic photo or diagram';
+      const actualImageBuf = visual.imageBuffer || sec.imageBuffer || null;
+
+      const cellChildren = [
+        new Paragraph({
+          alignment: AlignmentType.LEFT,
+          spacing: { before: 0, after: 60 },
+          children: [
+            new TextRun({ text: '🖼️ RECOMMENDED IMAGE PLACEHOLDER', bold: true, size: 18, color: COLOR_NAVY, font: 'Calibri' })
+          ]
+        })
+      ];
+
+      if (actualImageBuf) {
+        try {
+          cellChildren.push(
+            new Paragraph({
+              alignment: AlignmentType.CENTER,
+              spacing: { before: 60, after: 60 },
+              children: [
+                new ImageRun({
+                  data: actualImageBuf,
+                  transformation: { width: 420, height: 240 }
+                })
+              ]
+            })
+          );
+        } catch (e) {
+          // ignore
+        }
+      } else {
+        cellChildren.push(
+          new Paragraph({
+            spacing: { before: 0, after: 60, line: 240 },
+            children: [
+              new TextRun({ text: 'Suggested Visual: ', bold: true, size: 18, color: COLOR_MUTED, font: 'Calibri' }),
+              new TextRun({ text: imageDesc, italics: true, size: 18, color: COLOR_BODY, font: 'Calibri' })
+            ]
+          })
+        );
+      }
+
+      cellChildren.push(
+        new Paragraph({
+          spacing: { before: 0, after: 0 },
+          children: [
+            new TextRun({ text: captionText, bold: true, size: 18, color: COLOR_NAVY, font: 'Calibri' })
+          ]
+        })
+      );
+
+      children.push(
+        new Table({
+          width: { size: 100, type: WidthType.PERCENTAGE },
+          rows: [
+            new TableRow({
+              children: [
+                new TableCell({
+                  shading: { fill: COLOR_LIGHT_BG, type: ShadingType.CLEAR },
+                  margins: { top: 140, bottom: 140, left: 180, right: 180 },
+                  borders: {
+                    top: { style: BorderStyle.SINGLE, size: 4, color: COLOR_BORDER },
+                    bottom: { style: BorderStyle.SINGLE, size: 4, color: COLOR_BORDER },
+                    left: { style: BorderStyle.SINGLE, size: 24, color: COLOR_ACCENT },
+                    right: { style: BorderStyle.SINGLE, size: 4, color: COLOR_BORDER }
+                  },
+                  children: cellChildren
+                })
+              ]
+            })
+          ]
+        })
+      );
+      children.push(new Paragraph({ spacing: { after: 160 } }));
+    }
+
+    // C. Section Data Table Visual
+    if (visual.type === 'table' && visual.table && Array.isArray(visual.table.headers) && Array.isArray(visual.table.rows)) {
+      const secTable = visual.table;
+      const secTableRows = [];
+
+      const secHeaderCells = secTable.headers.map((hText) => {
+        return new TableCell({
+          shading: { fill: COLOR_NAVY, type: ShadingType.CLEAR },
+          margins: { top: 100, bottom: 100, left: 140, right: 140 },
+          children: [
+            new Paragraph({
+              alignment: AlignmentType.LEFT,
+              children: [
+                new TextRun({ text: String(hText), bold: true, size: 18, color: COLOR_WHITE, font: 'Calibri' })
+              ]
+            })
+          ]
+        });
+      });
+
+      secTableRows.push(new TableRow({ children: secHeaderCells, tableHeader: true, cantSplit: true }));
+
+      secTable.rows.forEach((rArray, rIdx) => {
+        const rowFill = rIdx % 2 !== 0 ? COLOR_LIGHT_BG : COLOR_WHITE;
+        const rCells = rArray.map((cText) => {
+          return new TableCell({
+            shading: { fill: rowFill, type: ShadingType.CLEAR },
+            margins: { top: 80, bottom: 80, left: 140, right: 140 },
+            borders: {
+              top: { style: BorderStyle.SINGLE, size: 4, color: COLOR_BORDER },
+              bottom: { style: BorderStyle.SINGLE, size: 4, color: COLOR_BORDER },
+              left: { style: BorderStyle.SINGLE, size: 4, color: COLOR_BORDER },
+              right: { style: BorderStyle.SINGLE, size: 4, color: COLOR_BORDER }
+            },
+            children: [
+              new Paragraph({
+                children: parseMarkdownToTextRuns(String(cText), { size: 18, color: COLOR_BODY, font: 'Calibri' })
+              })
+            ]
+          });
+        });
+        secTableRows.push(new TableRow({ children: rCells, cantSplit: true }));
+      });
+
+      children.push(
+        new Table({
+          width: { size: 100, type: WidthType.PERCENTAGE },
+          rows: secTableRows
+        })
+      );
+      children.push(new Paragraph({ spacing: { after: 160 } }));
+    }
+
+    // 4. Stat Cards / KPI Grid
     if (Array.isArray(sec.statCards) && sec.statCards.length > 0) {
       const cardCells = sec.statCards.map((card) => {
         return new TableCell({
@@ -444,7 +650,7 @@ export const buildDocxFile = async (data) => {
       children.push(new Paragraph({ spacing: { after: 160 } }));
     }
 
-    // 4. Bullet List (with markdown parsing)
+    // 5. Bullet List (with markdown parsing)
     if (Array.isArray(sec.bulletList) && sec.bulletList.length > 0) {
       sec.bulletList.forEach((bText) => {
         children.push(
@@ -458,7 +664,7 @@ export const buildDocxFile = async (data) => {
       children.push(new Paragraph({ spacing: { after: 100 } }));
     }
 
-    // 5. Code Block Snippet
+    // 6. Code Block Snippet
     if (sec.codeBlock) {
       const codeObj = typeof sec.codeBlock === 'string' ? { code: sec.codeBlock, language: 'text' } : sec.codeBlock;
       const codeLines = (codeObj.code || '').split('\n');
@@ -505,7 +711,7 @@ export const buildDocxFile = async (data) => {
       children.push(new Paragraph({ spacing: { after: 160 } }));
     }
 
-    // 6. Blockquote Card
+    // 7. Blockquote Card
     if (sec.blockquote) {
       const quoteObj = typeof sec.blockquote === 'string' ? { quote: sec.blockquote } : sec.blockquote;
 
@@ -549,7 +755,7 @@ export const buildDocxFile = async (data) => {
       children.push(new Paragraph({ spacing: { after: 160 } }));
     }
 
-    // 7. Multi-Type Callout Box
+    // 8. Multi-Type Callout Box
     if (sec.calloutBox) {
       let type = 'info';
       let textStr = '';
