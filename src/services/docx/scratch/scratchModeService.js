@@ -1,7 +1,7 @@
 import fs from 'fs';
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { config } from '../config/env.js';
-import { logger } from '../utils/logger.js';
+import { config } from '../../../config/env.js';
+import { logger } from '../../../utils/logger.js';
 
 // Initialize Gemini API client
 const genAI = new GoogleGenerativeAI(config.geminiApiKey);
@@ -17,8 +17,9 @@ const candidateModels = [
 /**
  * Helper to call Gemini model with candidate fallback
  * Accepts string OR array of content parts (strings & inlineData objects)
+ * Exported for use in template service
  */
-async function callGemini(promptInput, isJson = true, maxTokens = 8192) {
+export async function callGemini(promptInput, isJson = true, maxTokens = 8192) {
   let lastError = null;
 
   for (const modelName of candidateModels) {
@@ -112,14 +113,26 @@ export const generateDocumentContent = async (userPrompt, file = null) => {
   Provide EXACTLY ${targetSectionsCount} distinct major section headings in "sectionHeadings".
 
   FORMATTING & THEME RULES:
-  1. INLINE MARKDOWN FORMATTING: Use inline markdown formatting in text (e.g., **bold**, *italics*, \`code\`).
+  1. INLINE MARKDOWN FORMATTING: Use inline markdown formatting in text:
+     - **bold** for emphasis
+     - *italics* for subtle emphasis
+     - \`code\` for technical terms
+     - ~~strikethrough~~ for deprecated/old information
+     - __underline__ for legal terms or definitions
+     - ==highlight== for critical warnings or key takeaways
+     - [link text](url) for external references and documentation links
+  
   2. DOMAIN-AWARE COLOR PALETTE: Generate a harmonized 6-character Hex color palette (primaryColor, secondaryColor, accentColor, lightBgColor, textColor).
+  
   3. CLASSIFICATION TAG: Invent an uppercase classification tag for "docTypeTag" (e.g., "ASTRONOMICAL TECHNICAL STUDY", "ENTERPRISE REPORT", "CULTURAL HISTORICAL STUDY").
+
+  4. DOCUMENT METADATA: Provide author name, keywords (comma-separated), and subject for document properties.
 
   Tasks:
   1. Create Document Title, Subtitle, docTypeTag, and Running Header text.
   2. Generate a Table of Contents containing EXACTLY ${targetSectionsCount} MAJOR SECTION HEADINGS.
   3. Generate a relevant summary data table.
+  4. Add strategic hyperlinks where official documentation or sources are referenced.
 
   Return ONLY JSON matching:
   {
@@ -133,7 +146,9 @@ export const generateDocumentContent = async (userPrompt, file = null) => {
     "docTypeTag": "ENTERPRISE REPORT",
     "title": "Exact Title or Topic with Perfect Spelling",
     "subtitle": "Comprehensive Strategic & Technical Documentation",
-    "executiveOverview": "Executive overview providing strategic context with **key metrics** and *quality assurance standards*.",
+    "author": "AI Documentation Engine",
+    "keywords": "enterprise, strategy, technical, analysis",
+    "executiveOverview": "Executive overview providing strategic context with **key metrics** and *quality assurance standards*. See [official documentation](https://example.com) for details.",
     "headerText": "DOCS SERVICE | EXECUTIVE PUBLICATION",
     "sectionHeadings": [
       // You MUST provide EXACTLY ${targetSectionsCount} section headings here!
@@ -176,30 +191,89 @@ export const generateDocumentContent = async (userPrompt, file = null) => {
       Overall Document Request: "${userPrompt}"
       ${fileTextContext ? `\nReference Context Material:\n"""\n${fileTextContext.substring(0, 4000)}\n"""\n` : ''}
 
-      PURE CONTENT-BASED EDITORIAL DECISION:
-      Read the content of this specific section topic carefully. Decide if this section content genuinely calls for a visual element:
-      - Does this section describe a physical object, planet/space (e.g. Saturn's rings), landscape, animal/bird, product photo, or visual scene? -> Choose "image" (image description & caption).
-      - Does this section describe a step-by-step process, timeline, workflow, or pipeline? -> Choose "diagram" (process flow steps).
-      - Does this section describe numerical data, chemical specs, comparisons, or metric lists? -> Choose "table" (table headers & rows).
-      - Is this section pure narrative, background history, law, or policy text? -> Choose "none".
+      AI HUMAN-JUDGMENT FORMATTING INTELLIGENCE:
+      You have complete editorial control. Make smart, context-aware decisions about:
 
-      Base your decision 100% PURELY on what this section's content actually describes. Do NOT force elements if the content doesn't need them!
+      1. HEADING HIERARCHY (headingLevel: 1-6):
+         - Is this a MAJOR section? → H1 (level 1)
+         - Sub-section under major topic? → H2 (level 2)
+         - Detailed subsection? → H3 (level 3)
+         - Minor point? → H4-H6 (level 4-6)
+         Base on: content importance, document structure, topic depth
+
+      2. HEADING ALIGNMENT (headingAlignment):
+         - Major titles, banners? → "center"
+         - Standard sections? → "left"
+         - Special emphasis? → "center"
+
+      3. PARAGRAPH ALIGNMENT (for each paragraph object):
+         - Body text, explanations? → "left" or "justify"
+         - Standalone statements, quotes? → "center"
+         - Metadata, dates? → "right"
+         - Dense professional content? → "justify"
+
+      4. LIST TYPE INTELLIGENCE (listType):
+         - Sequential steps, procedures, instructions? → "numbered"
+         - Features, benefits, unordered items? → "bullet"
+         - No list needed (narrative flow)? → omit bulletList entirely
+         
+      5. MULTI-LEVEL LISTS (for nested hierarchy):
+         - Items can have "level": 0 (main), 1 (sub), 2 (sub-sub)
+         - Use levels for: sub-steps, nested features, hierarchical info
+
+      6. INLINE MARKDOWN FORMATTING (use intelligently in text):
+         - **bold** for emphasis, key terms
+         - *italics* for subtle emphasis
+         - \`code\` for technical terms, commands, code
+         - ~~strikethrough~~ for deprecated APIs, old versions
+         - __underline__ for legal terms, important definitions
+         - ==highlight== for CRITICAL warnings, key takeaways
+         - [link text](url) for documentation, sources, references
+         Apply formatting where it ENHANCES meaning, not decoration
+
+      7. HORIZONTAL DIVIDERS (horizontalDivider: true/false):
+         - Add after section if major topic transition follows
+         - DON'T add if seamless narrative continues
+         - Consider for visual breathing room
+
+      8. VISUAL ELEMENTS (Pure Content-Based Decision):
+         - Physical objects, scenes, products? → "image"
+         - Step-by-step processes, workflows? → "diagram"
+         - Numerical data, specs, comparisons? → "table"
+         - Pure narrative, history, policy? → "none"
 
       Return ONLY JSON matching:
       {
         "heading": "${heading}",
+        "headingLevel": 1,
+        "headingAlignment": "left",
         "paragraphs": [
-          "Paragraph 1 with **bold metrics**...",
-          "Paragraph 2 with *key insights*..."
+          {
+            "text": "Paragraph with **bold**, *italic*, \`code\`, ~~strike~~, __underline__, ==highlight==, and [links](https://example.com)...",
+            "alignment": "justify"
+          },
+          "Simple string paragraphs also work and default to left alignment"
         ],
+        "listType": "numbered",
         "bulletList": [
-          "**Key Spec 1**: Detailed explanation",
-          "**Key Spec 2**: Detailed explanation"
+          {
+            "text": "**Main item 1**: Description with formatting",
+            "level": 0
+          },
+          {
+            "text": "Sub-item under item 1",
+            "level": 1
+          },
+          {
+            "text": "**Main item 2**: Another main point",
+            "level": 0
+          }
         ],
+        "horizontalDivider": false,
         "calloutBox": {
           "type": "tip",
           "title": "Strategic Highlight",
-          "text": "Key takeaway note for this topic."
+          "text": "Use ==highlight== and **bold** in callouts too!"
         },
         "visualNeed": {
           "type": "diagram" | "image" | "table" | "none",
@@ -230,7 +304,10 @@ export const generateDocumentContent = async (userPrompt, file = null) => {
         logger.warn(`Failed section generation for "${heading}", using fallback content`);
         return {
           heading,
+          headingLevel: 2,
+          headingAlignment: 'left',
           paragraphs: [`Comprehensive details and strategic breakdown regarding **${heading}** for request "${userPrompt}".`],
+          listType: 'bullet',
           bulletList: [`**Core specification**: Specification details for ${heading}`, `**Metric target**: Benchmark metrics for ${heading}`],
           calloutBox: {
             type: 'info',
@@ -258,7 +335,7 @@ export const generateDocumentContent = async (userPrompt, file = null) => {
 
   logger.info(`Step 2 Complete -> Generated ${fullSections.length} calibrated sections based purely on content.`);
 
-  // STEP 3: Assemble Full Document JSON AST
+  // STEP 3: Assemble Full Document JSON AST with AI-determined metadata
   const finalDocumentJSON = {
     prompt: userPrompt,
     requestedTotalPages: requestedTotalPages,
@@ -266,6 +343,8 @@ export const generateDocumentContent = async (userPrompt, file = null) => {
     docTypeTag: outlinePlan.docTypeTag || 'ENTERPRISE REPORT',
     title: outlinePlan.title,
     subtitle: outlinePlan.subtitle,
+    author: outlinePlan.author || 'AI Documentation Engine',
+    keywords: outlinePlan.keywords || 'professional, documentation, analysis',
     executiveOverview: outlinePlan.executiveOverview || `This document outlines comprehensive technical analysis and strategic roadmap details regarding **${outlinePlan.title}**.`,
     sectionHeadings: sectionHeadings,
     headerText: outlinePlan.headerText,
@@ -276,6 +355,6 @@ export const generateDocumentContent = async (userPrompt, file = null) => {
     imageMimeType: uploadedImageMimeType
   };
 
-  logger.info(`Content-Driven Document Generation Complete -> Target Total Pages: ${requestedTotalPages}`);
+  logger.info(`AI Human-Judgment Document Generation Complete -> Target Total Pages: ${requestedTotalPages}`);
   return finalDocumentJSON;
 };

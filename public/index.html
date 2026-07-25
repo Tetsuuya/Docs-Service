@@ -10,67 +10,93 @@
       background-color: #f8fafc;
       color: #1e293b;
       margin: 0;
-      padding: 50px 20px;
-      display: flex;
-      justify-content: center;
+      padding: 30px 20px;
+    }
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
     }
     .card {
       background: #ffffff;
-      max-width: 620px;
-      width: 100%;
-      padding: 32px;
+      padding: 24px;
       border-radius: 12px;
       border: 1px solid #e2e8f0;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     }
     h1 {
       margin-top: 0;
-      font-size: 22px;
+      font-size: 20px;
       color: #0f172a;
+      margin-bottom: 16px;
     }
     p {
       color: #64748b;
-      font-size: 14px;
-      margin-bottom: 20px;
+      font-size: 13px;
+      margin-bottom: 16px;
     }
     label {
       display: block;
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 600;
       color: #475569;
       margin-bottom: 6px;
     }
     .mode-group {
-      display: flex;
-      gap: 16px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
       margin-bottom: 16px;
     }
     .mode-option {
-      flex: 1;
-      border: 1px solid #cbd5e1;
-      border-radius: 8px;
-      padding: 12px;
-      font-size: 13px;
+      border: 2px solid #cbd5e1;
+      border-radius: 6px;
+      padding: 10px;
+      font-size: 11px;
       cursor: pointer;
       display: flex;
-      align-items: center;
-      gap: 8px;
+      flex-direction: column;
+      gap: 4px;
+      transition: all 0.2s;
+    }
+    .mode-option:hover {
+      border-color: #2563eb;
+      background: #eff6ff;
     }
     .mode-option input {
       margin: 0;
+      margin-bottom: 4px;
+    }
+    .mode-option.active {
+      border-color: #2563eb;
+      background: #eff6ff;
+    }
+    .mode-title {
+      font-weight: 600;
+      color: #0f172a;
+      font-size: 12px;
+    }
+    .mode-desc {
+      font-size: 10px;
+      color: #64748b;
+      margin-top: 2px;
     }
     select, textarea, input[type="file"] {
       width: 100%;
       border: 1px solid #cbd5e1;
-      border-radius: 8px;
-      padding: 10px 12px;
-      font-size: 14px;
+      border-radius: 6px;
+      padding: 8px 10px;
+      font-size: 13px;
       font-family: inherit;
       box-sizing: border-box;
-      margin-bottom: 16px;
+      margin-bottom: 12px;
     }
     textarea {
-      height: 100px;
+      height: 80px;
       resize: vertical;
     }
     select:focus, textarea:focus {
@@ -81,8 +107,8 @@
       background-color: #2563eb;
       color: #ffffff;
       border: none;
-      padding: 12px 20px;
-      font-size: 14px;
+      padding: 10px 16px;
+      font-size: 13px;
       font-weight: 500;
       border-radius: 6px;
       cursor: pointer;
@@ -96,59 +122,212 @@
       cursor: not-allowed;
     }
     .status-msg {
-      margin-top: 12px;
-      font-size: 13px;
+      margin-top: 10px;
+      font-size: 12px;
       color: #2563eb;
       font-weight: 500;
       display: none;
     }
+    .template-library {
+      margin-bottom: 12px;
+      padding: 12px;
+      background: #f1f5f9;
+      border-radius: 6px;
+      display: none;
+    }
+    .template-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      max-height: 200px;
+      overflow-y: auto;
+      margin-top: 8px;
+    }
+    .template-item {
+      padding: 8px;
+      border: 1px solid #cbd5e1;
+      border-radius: 4px;
+      background: white;
+      cursor: pointer;
+      font-size: 11px;
+      transition: all 0.2s;
+    }
+    .template-item:hover {
+      border-color: #2563eb;
+      background: #eff6ff;
+    }
+    .template-item.selected {
+      border-color: #2563eb;
+      background: #dbeafe;
+      font-weight: 600;
+    }
+    .template-name {
+      font-weight: 600;
+      color: #0f172a;
+      margin-bottom: 2px;
+      font-size: 11px;
+    }
+    .template-category {
+      font-size: 9px;
+      color: #64748b;
+    }
+    .hidden {
+      display: none;
+    }
+    .preview-box {
+      border: 1px solid #ccc;
+      padding: 15px;
+      background: #f5f5f5;
+      white-space: pre-wrap;
+      min-height: 200px;
+      max-height: 500px;
+      overflow-y: auto;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 13px;
+    }
   </style>
 </head>
 <body>
-  <div class="card">
-    <h1>📄 AI Document Generator Service</h1>
-    <p>Select generation mode, format, and enter a prompt to generate formatted documents:</p>
+  <div class="container">
+    <div class="grid">
+      <!-- Box 1: Generator Form -->
+      <div class="card">
+        <h1>📄 AI Document Generator</h1>
+        <p>Generate documents with AI</p>
 
-    <form id="docForm">
-      <label>Generation Mode:</label>
-      <div class="mode-group">
-        <label class="mode-option">
-          <input type="radio" name="mode" value="scratch" checked onclick="toggleTemplateUpload(false)">
-          From Scratch (AI Planned)
-        </label>
-        <label class="mode-option">
-          <input type="radio" name="mode" value="template" onclick="toggleTemplateUpload(true)">
-          Fill Existing Template
-        </label>
+        <form id="docForm">
+          <label>Mode:</label>
+          <div class="mode-group">
+            <label class="mode-option active" data-mode="scratch">
+              <input type="radio" name="mode" value="scratch" checked>
+              <span class="mode-title">✨ Scratch</span>
+              <span class="mode-desc">AI generates new</span>
+            </label>
+            
+            <label class="mode-option" data-mode="fill">
+              <input type="radio" name="mode" value="fill">
+              <span class="mode-title">📝 Fill</span>
+              <span class="mode-desc">Fill {{placeholders}}</span>
+            </label>
+            
+            <label class="mode-option" data-mode="reference">
+              <input type="radio" name="mode" value="reference">
+              <span class="mode-title">🎨 Reference</span>
+              <span class="mode-desc">Match style</span>
+            </label>
+            
+            <label class="mode-option" data-mode="library">
+              <input type="radio" name="mode" value="library">
+              <span class="mode-title">📚 Library</span>
+              <span class="mode-desc">GitHub templates</span>
+            </label>
+          </div>
+
+          <div id="templateLibrary" class="template-library">
+            <label>Select Template:</label>
+            <button type="button" id="loadTemplatesBtn" onclick="loadTemplates()">Load Templates</button>
+            <div id="templateGrid" class="template-grid"></div>
+            <input type="hidden" id="selectedTemplateId">
+          </div>
+
+          <div id="fileContainer" class="hidden">
+            <label for="templateFile">Upload (.docx):</label>
+            <input type="file" id="templateFile" accept=".docx">
+          </div>
+
+          <label for="formatSelect">Format:</label>
+          <select id="formatSelect">
+            <option value="docx" selected>.docx</option>
+            <option value="pptx">.pptx</option>
+            <option value="xlsx">.xlsx</option>
+            <option value="pdf">.pdf</option>
+          </select>
+
+          <label for="contextFile">Context (Optional):</label>
+          <input type="file" id="contextFile" accept="image/*,.pdf,.txt,.csv,.json,.md">
+
+          <label for="promptInput">Prompt:</label>
+          <textarea id="promptInput" placeholder="Your instructions here..."></textarea>
+          
+          <button type="submit" id="submitBtn">Generate</button>
+          <div id="statusMsg" class="status-msg">⏳ Generating...</div>
+        </form>
       </div>
 
-      <div id="templateContainer" style="display: none;">
-        <label for="templateFile">Upload Brand Template (.docx / .pptx):</label>
-        <input type="file" id="templateFile" accept=".docx,.pptx,.xlsx">
+      <!-- Box 2: Request Preview -->
+      <div class="card">
+        <h1>📤 Client Request</h1>
+        <p>Your request details</p>
+        <pre id="requestPreview" class="preview-box">No requests yet...</pre>
       </div>
 
-      <label for="formatSelect">Document Format:</label>
-      <select id="formatSelect">
-        <option value="docx" selected>Word Document (.docx)</option>
-        <option value="pptx">PowerPoint Presentation (.pptx)</option>
-        <option value="xlsx">Excel Spreadsheet (.xlsx)</option>
-        <option value="pdf">PDF Document (.pdf)</option>
-      </select>
-
-      <label for="contextFile">Upload Design Screenshot / Context File (Optional):</label>
-      <input type="file" id="contextFile" accept="image/*,.pdf,.txt,.csv,.json,.md">
-
-      <label for="promptInput">Prompt Request:</label>
-      <textarea id="promptInput" placeholder="e.g. Create an executive technical proposal based on the uploaded screenshot design..."></textarea>
-      
-      <button type="submit" id="submitBtn">Generate Document</button>
-      <div id="statusMsg" class="status-msg">⏳ Generating document via Gemini 2.0 Flash Lite... Please wait a few seconds.</div>
-    </form>
+      <!-- Box 3: Response Preview -->
+      <div class="card">
+        <h1>📥 Server Response</h1>
+        <p>Generation result</p>
+        <pre id="responsePreview" class="preview-box">No response yet...</pre>
+      </div>
+    </div>
   </div>
 
   <script>
-    function toggleTemplateUpload(show) {
-      document.getElementById("templateContainer").style.display = show ? "block" : "none";
+    let templates = [];
+    let selectedTemplateId = null;
+
+    // Mode switching
+    document.querySelectorAll('.mode-option').forEach(option => {
+      option.addEventListener('click', function() {
+        document.querySelectorAll('.mode-option').forEach(o => o.classList.remove('active'));
+        this.classList.add('active');
+        const mode = this.dataset.mode;
+        
+        document.getElementById('fileContainer').classList.toggle('hidden', mode === 'scratch' || mode === 'library');
+        document.getElementById('templateLibrary').style.display = mode === 'library' ? 'block' : 'none';
+      });
+    });
+
+    async function loadTemplates() {
+      const btn = document.getElementById('loadTemplatesBtn');
+      btn.disabled = true;
+      btn.innerText = 'Loading...';
+      
+      try {
+        const response = await fetch('/api/templates');
+        const data = await response.json();
+        templates = data.templates;
+        
+        const grid = document.getElementById('templateGrid');
+        grid.innerHTML = templates.map(t => `
+          <div class="template-item" onclick="selectTemplate('${t.id}')">
+            <div class="template-name">${t.name}</div>
+            <div class="template-category">${t.category}</div>
+          </div>
+        `).join('');
+        
+        btn.innerText = `Loaded ${templates.length}`;
+      } catch (err) {
+        alert('Failed: ' + err.message);
+        btn.innerText = 'Retry';
+        btn.disabled = false;
+      }
+    }
+
+    function selectTemplate(id) {
+      selectedTemplateId = id;
+      document.getElementById('selectedTemplateId').value = id;
+      document.querySelectorAll('.template-item').forEach(item => item.classList.remove('selected'));
+      event.target.closest('.template-item').classList.add('selected');
+    }
+
+    function updateRequestPreview(data) {
+      const preview = document.getElementById('requestPreview');
+      preview.textContent = JSON.stringify(data, null, 2);
+    }
+
+    function updateResponsePreview(data) {
+      const preview = document.getElementById('responsePreview');
+      preview.textContent = JSON.stringify(data, null, 2);
     }
 
     document.getElementById("docForm").addEventListener("submit", async function(e) {
@@ -157,45 +336,118 @@
       const format = document.getElementById("formatSelect").value;
       const mode = document.querySelector('input[name="mode"]:checked').value;
       const contextFile = document.getElementById("contextFile").files[0];
+      const templateFile = document.getElementById("templateFile").files[0];
       
-      if (!prompt) return alert("Please enter a prompt request!");
+      if (!prompt) return alert("Please enter a prompt!");
 
       const submitBtn = document.getElementById("submitBtn");
       const statusMsg = document.getElementById("statusMsg");
 
       submitBtn.disabled = true;
-      submitBtn.innerText = "Generating Document...";
+      submitBtn.innerText = "Generating...";
       statusMsg.style.display = "block";
 
       try {
-        const formData = new FormData();
-        formData.append("prompt", prompt);
-        formData.append("format", format);
-        formData.append("mode", mode);
-        if (contextFile) {
-          formData.append("contextFile", contextFile);
+        let response;
+        let requestData;
+        const startTime = Date.now();
+
+        if (mode === 'library') {
+          if (!selectedTemplateId) throw new Error('Select a template');
+          
+          requestData = {
+            endpoint: '/api/templates/fill',
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: { 
+              templateId: selectedTemplateId, 
+              prompt: prompt 
+            }
+          };
+
+          updateRequestPreview(requestData);
+          
+          response = await fetch('/api/templates/fill', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(requestData.body)
+          });
+        } else {
+          const bodyData = {
+            prompt: prompt,
+            format: format,
+            mode: mode,
+            hasContextFile: !!contextFile,
+            hasTemplateFile: !!templateFile,
+            contextFileName: contextFile?.name,
+            templateFileName: templateFile?.name
+          };
+
+          requestData = {
+            endpoint: '/api/generate',
+            method: 'POST',
+            headers: { 'Content-Type': 'multipart/form-data' },
+            body: bodyData
+          };
+
+          updateRequestPreview(requestData);
+
+          const formData = new FormData();
+          formData.append("prompt", prompt);
+          formData.append("format", format);
+          formData.append("mode", mode);
+          if (contextFile) formData.append("contextFile", contextFile);
+          if (templateFile && (mode === 'fill' || mode === 'reference')) {
+            formData.append("contextFile", templateFile);
+          }
+          response = await fetch("/api/generate", { method: "POST", body: formData });
         }
 
-        const response = await fetch("/api/generate", {
-          method: "POST",
-          body: formData
-        });
+        const duration = ((Date.now() - startTime) / 1000).toFixed(2);
 
         if (!response.ok) {
           const err = await response.json();
-          throw new Error(err.error || err.message || "Failed to generate document");
+          updateResponsePreview({
+            status: response.status,
+            statusText: response.statusText,
+            error: err.error || err.message,
+            timestamp: new Date().toISOString(),
+            duration: duration + 's'
+          });
+          throw new Error(err.error || "Failed");
         }
 
-        let filename = `generated_document.${format}`;
+        let filename = `generated.${format}`;
         const disposition = response.headers.get("Content-Disposition");
         if (disposition && disposition.includes("filename=")) {
           const match = disposition.match(/filename="?([^";]+)"?/);
-          if (match && match[1]) {
-            filename = match[1];
-          }
+          if (match && match[1]) filename = match[1];
         }
 
         const blob = await response.blob();
+        
+        // Show response JSON
+        updateResponsePreview({
+          status: 200,
+          statusText: 'OK',
+          headers: {
+            'Content-Type': response.headers.get('Content-Type'),
+            'Content-Disposition': response.headers.get('Content-Disposition'),
+            'X-Document-Id': response.headers.get('X-Document-Id'),
+            'X-Confidence': response.headers.get('X-Confidence'),
+            'X-Template-Id': response.headers.get('X-Template-Id')
+          },
+          body: {
+            message: 'Document generated successfully',
+            filename: filename,
+            size: blob.size,
+            sizeKB: (blob.size / 1024).toFixed(2) + ' KB'
+          },
+          timestamp: new Date().toISOString(),
+          duration: duration + 's'
+        });
+
+        // Download file
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
@@ -204,12 +456,20 @@
         a.click();
         a.remove();
         window.URL.revokeObjectURL(url);
+
       } catch (err) {
         console.error(err);
-        alert("Error: " + err.message);
+        if (!document.getElementById('responsePreview').innerHTML.includes('status')) {
+          updateResponsePreview({
+            status: 500,
+            statusText: 'Internal Server Error',
+            error: err.message,
+            timestamp: new Date().toISOString()
+          });
+        }
       } finally {
         submitBtn.disabled = false;
-        submitBtn.innerText = "Generate Document";
+        submitBtn.innerText = "Generate";
         statusMsg.style.display = "none";
       }
     });

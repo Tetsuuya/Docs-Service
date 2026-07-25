@@ -15,12 +15,21 @@ import {
   WidthType,
   ShadingType,
   HeadingLevel,
-  ImageRun
+  ImageRun,
+  UnderlineType,
+  ExternalHyperlink,
+  InternalHyperlink,
+  Bookmark,
+  LevelFormat,
+  convertInchesToTwip
 } from 'docx';
-import { logger } from '../utils/logger.js';
+import { logger } from '../../../utils/logger.js';
 
 /**
- * Parses inline markdown formatting (**bold**, *italics*, `code`) into an array of styled TextRun objects.
+ * Enhanced intelligent markdown parser supporting:
+ * - **bold**, *italics*, `code`
+ * - ~~strikethrough~~, __underline__, ==highlight==
+ * - [link text](url) - hyperlinks
  */
 function parseMarkdownToTextRuns(text, baseOptions = {}) {
   if (!text) return [new TextRun({ text: '', ...baseOptions })];
@@ -34,8 +43,8 @@ function parseMarkdownToTextRuns(text, baseOptions = {}) {
   } = baseOptions;
 
   const runs = [];
-  // Regex matches **bold**, *italics*, `code`
-  const regex = /(\*\*(?:[^*]|\*[^*])+\*\*|\*(?:[^*])+\*|`[^`]+`)/g;
+  // Enhanced regex: **bold**, *italics*, `code`, ~~strike~~, __underline__, ==highlight==, [links](url)
+  const regex = /(\[([^\]]+)\]\(([^)]+)\)|==([^=]+)==|~~([^~]+)~~|__([^_]+)__|(\*\*(?:[^*]|\*[^*])+\*\*)|(\*(?:[^*])+\*)|(`[^`]+`))/g;
 
   let lastIndex = 0;
   let match;
@@ -47,14 +56,80 @@ function parseMarkdownToTextRuns(text, baseOptions = {}) {
     }
 
     const token = match[0];
-    if (token.startsWith('**') && token.endsWith('**')) {
-      const content = token.slice(2, -2);
+    
+    // [link text](url) - hyperlink
+    if (match[1] && match[2] && match[3]) {
+      const linkText = match[2];
+      const url = match[3];
+      runs.push(
+        new ExternalHyperlink({
+          children: [
+            new TextRun({
+              text: linkText,
+              style: 'Hyperlink',
+              font,
+              size,
+              color: '0563C1',
+              underline: { type: UnderlineType.SINGLE }
+            })
+          ],
+          link: url
+        })
+      );
+    }
+    // ==highlight==
+    else if (match[4]) {
+      const content = match[4];
+      runs.push(
+        new TextRun({
+          text: content,
+          font,
+          size,
+          color: '0F172A',
+          bold: true,
+          highlight: 'yellow'
+        })
+      );
+    }
+    // ~~strikethrough~~
+    else if (match[5]) {
+      const content = match[5];
+      runs.push(
+        new TextRun({
+          text: content,
+          font,
+          size,
+          color: COLOR_MUTED || '64748B',
+          strike: true
+        })
+      );
+    }
+    // __underline__
+    else if (match[6]) {
+      const content = match[6];
+      runs.push(
+        new TextRun({
+          text: content,
+          font,
+          size,
+          color,
+          underline: { type: UnderlineType.SINGLE }
+        })
+      );
+    }
+    // **bold**
+    else if (match[7]) {
+      const content = match[7].slice(2, -2);
       runs.push(new TextRun({ text: content, bold: true, font, size, color }));
-    } else if (token.startsWith('*') && token.endsWith('*')) {
-      const content = token.slice(1, -1);
+    }
+    // *italics*
+    else if (match[8]) {
+      const content = match[8].slice(1, -1);
       runs.push(new TextRun({ text: content, italics: true, font, size, color }));
-    } else if (token.startsWith('`') && token.endsWith('`')) {
-      const content = token.slice(1, -1);
+    }
+    // `code`
+    else if (match[9]) {
+      const content = match[9].slice(1, -1);
       runs.push(
         new TextRun({
           text: content,
@@ -75,6 +150,35 @@ function parseMarkdownToTextRuns(text, baseOptions = {}) {
   }
 
   return runs.length > 0 ? runs : [new TextRun({ text, font, size, color, bold, italics })];
+}
+
+/**
+ * Maps heading level number to docx HeadingLevel enum
+ */
+function getHeadingLevel(level) {
+  const levels = {
+    1: HeadingLevel.HEADING_1,
+    2: HeadingLevel.HEADING_2,
+    3: HeadingLevel.HEADING_3,
+    4: HeadingLevel.HEADING_4,
+    5: HeadingLevel.HEADING_5,
+    6: HeadingLevel.HEADING_6
+  };
+  return levels[level] || HeadingLevel.HEADING_1;
+}
+
+/**
+ * Maps alignment string to docx AlignmentType enum
+ */
+function getAlignment(alignment) {
+  const alignments = {
+    'left': AlignmentType.LEFT,
+    'center': AlignmentType.CENTER,
+    'right': AlignmentType.RIGHT,
+    'justify': AlignmentType.JUSTIFIED,
+    'both': AlignmentType.BOTH
+  };
+  return alignments[alignment?.toLowerCase()] || AlignmentType.LEFT;
 }
 
 /**
@@ -365,17 +469,22 @@ export const buildDocxFile = async (data) => {
   const pagesList = (data.pages && Array.isArray(data.pages) && data.pages.length > 0) ? data.pages : (data.sections || []);
 
   pagesList.forEach((sec, idx) => {
-    // 1. Heading
+    // 1. Heading with AI-determined level and alignment
     if (sec.heading) {
+      const headingLevel = sec.headingLevel || 1; // AI decides: 1-6
+      const headingAlignment = sec.headingAlignment || 'left';
+      const headingSizeMap = { 1: 32, 2: 28, 3: 24, 4: 22, 5: 20, 6: 18 };
+      
       children.push(
         new Paragraph({
-          heading: HeadingLevel.HEADING_1,
+          heading: getHeadingLevel(headingLevel),
+          alignment: getAlignment(headingAlignment),
           spacing: { before: 200, after: 140 },
           children: [
             new TextRun({
               text: sec.heading,
               bold: true,
-              size: 32,
+              size: headingSizeMap[headingLevel] || 32,
               color: COLOR_NAVY,
               font: 'Calibri'
             })
@@ -384,11 +493,15 @@ export const buildDocxFile = async (data) => {
       );
     }
 
-    // 2. Paragraphs (with markdown parsing)
+    // 2. Paragraphs with AI-determined alignment (with markdown parsing)
     if (Array.isArray(sec.paragraphs)) {
-      sec.paragraphs.forEach((pText) => {
+      sec.paragraphs.forEach((pData) => {
+        const pText = typeof pData === 'string' ? pData : pData.text;
+        const pAlignment = typeof pData === 'object' ? (pData.alignment || 'left') : 'left';
+        
         children.push(
           new Paragraph({
+            alignment: getAlignment(pAlignment),
             spacing: { before: 0, after: 140, line: 260 },
             children: parseMarkdownToTextRuns(pText, { size: 22, color: COLOR_BODY, font: 'Calibri' })
           })
@@ -650,18 +763,45 @@ export const buildDocxFile = async (data) => {
       children.push(new Paragraph({ spacing: { after: 160 } }));
     }
 
-    // 5. Bullet List (with markdown parsing)
+    // 5. Intelligent Lists - AI decides bullet vs. numbered vs. multi-level
     if (Array.isArray(sec.bulletList) && sec.bulletList.length > 0) {
-      sec.bulletList.forEach((bText) => {
-        children.push(
-          new Paragraph({
-            bullet: { level: 0 },
-            spacing: { before: 0, after: 100, line: 240 },
-            children: parseMarkdownToTextRuns(bText, { size: 22, color: COLOR_BODY, font: 'Calibri' })
-          })
-        );
+      const listType = sec.listType || 'bullet'; // AI decides: 'bullet', 'numbered', 'none'
+      
+      sec.bulletList.forEach((item) => {
+        const itemText = typeof item === 'string' ? item : item.text;
+        const itemLevel = typeof item === 'object' ? (item.level || 0) : 0;
+        
+        if (listType === 'numbered') {
+          children.push(
+            new Paragraph({
+              numbering: { reference: 'default-numbering', level: itemLevel },
+              spacing: { before: 0, after: 100, line: 240 },
+              children: parseMarkdownToTextRuns(itemText, { size: 22, color: COLOR_BODY, font: 'Calibri' })
+            })
+          );
+        } else {
+          children.push(
+            new Paragraph({
+              bullet: { level: itemLevel },
+              spacing: { before: 0, after: 100, line: 240 },
+              children: parseMarkdownToTextRuns(itemText, { size: 22, color: COLOR_BODY, font: 'Calibri' })
+            })
+          );
+        }
       });
       children.push(new Paragraph({ spacing: { after: 100 } }));
+    }
+
+    // 5b. Horizontal Divider - AI decides when visual break is needed
+    if (sec.horizontalDivider === true || sec.divider === true) {
+      children.push(
+        new Paragraph({
+          spacing: { before: 100, after: 100 },
+          border: {
+            bottom: { color: COLOR_BORDER, space: 1, style: BorderStyle.SINGLE, size: 12 }
+          }
+        })
+      );
     }
 
     // 6. Code Block Snippet
@@ -923,8 +1063,59 @@ export const buildDocxFile = async (data) => {
     );
   }
 
-  // --- CREATE DOCUMENT INSTANCE WITH DIFFERENT FIRST PAGE HEADER/FOOTER ---
+  // --- CREATE DOCUMENT INSTANCE WITH METADATA AND NUMBERING SUPPORT ---
   const doc = new Document({
+    // Document metadata (AI-populated)
+    creator: data.author || 'Docs Service Enterprise Publishing Engine',
+    title: titleText,
+    description: data.subtitle || subtitleText,
+    subject: data.docTypeTag || 'Enterprise Documentation',
+    keywords: data.keywords || 'AI-Generated, Professional Document, Enterprise',
+    
+    // Numbering definitions for intelligent numbered lists
+    numbering: {
+      config: [
+        {
+          reference: 'default-numbering',
+          levels: [
+            {
+              level: 0,
+              format: LevelFormat.DECIMAL,
+              text: '%1.',
+              alignment: AlignmentType.LEFT,
+              style: {
+                paragraph: {
+                  indent: { left: convertInchesToTwip(0.5), hanging: convertInchesToTwip(0.25) }
+                }
+              }
+            },
+            {
+              level: 1,
+              format: LevelFormat.DECIMAL,
+              text: '%1.%2.',
+              alignment: AlignmentType.LEFT,
+              style: {
+                paragraph: {
+                  indent: { left: convertInchesToTwip(1), hanging: convertInchesToTwip(0.25) }
+                }
+              }
+            },
+            {
+              level: 2,
+              format: LevelFormat.DECIMAL,
+              text: '%1.%2.%3.',
+              alignment: AlignmentType.LEFT,
+              style: {
+                paragraph: {
+                  indent: { left: convertInchesToTwip(1.5), hanging: convertInchesToTwip(0.25) }
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    
     sections: [
       {
         properties: {

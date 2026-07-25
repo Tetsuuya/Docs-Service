@@ -5,7 +5,7 @@ import {
   handleGenerateDocx, 
   handleGeneratePptx, 
   handleGenerateXlsx, 
-  handleGeneratePdf 
+  handleGeneratePdf
 } from '../controllers/documentController.js';
 
 const router = Router();
