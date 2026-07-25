@@ -17,7 +17,30 @@ export const generateFillModeDocument = async (templateText, templateStructure, 
     throw new Error('Template structure analysis failed - structure object is missing');
   }
   
-  logger.info(`Template Structure: ${templateStructure.pages} pages, ${templateStructure.structure.headingCount} headings, ${templateStructure.structure.tableCount} tables, ${templateStructure.structure.imageCount} images`);
+  const templateHeadingCount = templateStructure.structure.headingCount;
+  const templatePageCount = templateStructure.pages || 2;
+  
+  logger.info(`Template Structure: ${templatePageCount} pages, ${templateHeadingCount} headings, ${templateStructure.structure.tableCount} tables, ${templateStructure.structure.imageCount} images`);
+  
+  // CRITICAL: Use template's actual heading count as minimum sections
+  // User wants to FILL the template, not simplify it!
+  const targetPages = requestedPages || templatePageCount;
+  const minSections = Math.min(templateHeadingCount, 150); // Use all template headings (cap at AI limit)
+  const targetSections = requestedPages 
+    ? Math.max(minSections, Math.ceil(requestedPages * 1.2)) // If pages specified, expand from heading count
+    : minSections; // No pages specified = use exact heading count
+  
+  const paragraphsPerSection = Math.max(2, Math.ceil((targetPages * 2.5) / targetSections)); // More content per section
+  
+  logger.info(`📊 Generation Plan:`);
+  logger.info(`   Template: ${templatePageCount} pages with ${templateHeadingCount} headings`);
+  logger.info(`   Target: ${targetPages} pages with ${targetSections} sections`);
+  logger.info(`   Content: ${paragraphsPerSection} paragraphs per section`);
+  if (requestedPages) {
+    logger.info(`   Mode: EXPAND template to ${requestedPages} pages`);
+  } else {
+    logger.info(`   Mode: PRESERVE template structure (all ${templateHeadingCount} headings)`);
+  }
   
   // Build visual structure summary for each page
   let pageVisualSummary = '';
@@ -46,15 +69,6 @@ export const generateFillModeDocument = async (templateText, templateStructure, 
   }
   
   // Determine target
-  const templatePageCount = templateStructure.pages || 2;
-  const targetPages = requestedPages || templatePageCount;
-  
-  logger.info(`📊 Template: ${templatePageCount} pages → Target: ${targetPages} pages`);
-  if (requestedPages) {
-    logger.info(`   User requested ${requestedPages} pages - AI will expand/adapt structure`);
-  } else {
-    logger.info(`   No page count specified - AI will match template depth`);
-  }
   
   // Step 1: Universal Dynamic AI Judgment - Gemini decides everything
   const analysisPrompt = `
@@ -80,7 +94,12 @@ CRITICAL: Template Table Structures (MUST MATCH):
 ${tableDescriptions || 'No tables in template'}
 
 Template Headings Found:
-${templateStructure.structure.headings.slice(0, 20).join('\n')}
+${templateStructure.structure.headings.slice(0, 30).join('\n')}
+${templateStructure.structure.headings.length > 30 ? `... and ${templateStructure.structure.headings.length - 30} more headings` : ''}
+
+🚨 CRITICAL REQUIREMENT: PRESERVE ALL TEMPLATE HEADINGS
+The template has ${templateHeadingCount} headings. You MUST generate AT LEAST ${targetSections} sections.
+DO NOT simplify or condense the template structure. USE ALL THE HEADINGS.
 
 Template Style Sample (first 1500 chars):
 """
@@ -112,12 +131,11 @@ You are NOT following rigid rules. You are making intelligent design decisions:
 
 2️⃣ DECIDE CONTENT STRUCTURE FOR USER'S TOPIC
    ${requestedPages 
-     ? `- Template has ${templatePageCount} pages, but user wants ${requestedPages} pages`
-     : `- Template has ${templatePageCount} pages, match that depth`}
-   - How many major sections make sense for "${userPrompt}"?
-   - Which sections need more depth? Which need less?
-   - Where should tables go? (Data comparisons, metrics, specifications)
-   - Where should diagrams go? (Processes, workflows, architectures)
+     ? `- Template has ${templatePageCount} pages with ${templateHeadingCount} headings, user wants ${requestedPages} pages`
+     : `- Template has ${templatePageCount} pages with ${templateHeadingCount} headings, preserve this structure`}
+   - Generate ${targetSections} sections minimum (DO NOT reduce heading count!)
+   - Each section needs ${paragraphsPerSection} paragraphs minimum
+   - Fill approximately ${targetPages} pages total
    - IMPORTANT: If user mentions foreign words (e.g., "sommaire"), translate them to English (e.g., "Executive Summary")
 
 3️⃣ MAKE SMART FORMATTING DECISIONS
@@ -205,7 +223,9 @@ CRITICAL GUIDELINES
 ═══════════════════════════════════════════════════════════
 
 ✓ Generate enough sections to properly cover "${userPrompt}" ${requestedPages ? `in ${requestedPages} pages` : ''}
+✓ MINIMUM ${targetSections} sections required (template has ${templateHeadingCount} headings - preserve them all!)
 ✓ Each paragraph should be 3-5 sentences (substantial, not thin)
+✓ Each section should have ${paragraphsPerSection} paragraphs minimum
 ✓ Use formatting intelligently (bold/italic/code/highlight) where it adds clarity
 ✓ Add tables where data/comparisons make the content clearer
 ✓ Add lists where enumeration helps (features, steps, requirements)
