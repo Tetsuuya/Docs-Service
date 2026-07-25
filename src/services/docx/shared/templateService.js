@@ -24,6 +24,18 @@ export const parseTemplate = async (templatePath) => {
     const documentXmlEntry = zipEntries.find(entry => entry.entryName === 'word/document.xml');
     const documentXml = documentXmlEntry ? documentXmlEntry.getData().toString('utf8') : '';
     
+    // Extract header.xml (header content)
+    const headerXmlEntry = zipEntries.find(entry => entry.entryName.startsWith('word/header'));
+    const headerXml = headerXmlEntry ? headerXmlEntry.getData().toString('utf8') : '';
+    const hasHeader = headerXml.length > 0;
+    const headerText = hasHeader ? extractTextFromXml(headerXml) : '';
+    
+    // Extract footer.xml (footer content)
+    const footerXmlEntry = zipEntries.find(entry => entry.entryName.startsWith('word/footer'));
+    const footerXml = footerXmlEntry ? footerXmlEntry.getData().toString('utf8') : '';
+    const hasFooter = footerXml.length > 0;
+    const footerText = hasFooter ? extractTextFromXml(footerXml) : '';
+    
     // Analyze page structure
     const pageBreaks = (documentXml.match(/<w:br w:type="page"\/>/g) || []).length;
     const estimatedPages = Math.max(1, pageBreaks + 1);
@@ -60,6 +72,9 @@ export const parseTemplate = async (templatePath) => {
     // Analyze headings with formatting
     const headings = extractHeadingsWithStyle(documentXml, fullText);
     
+    // Extract images with metadata
+    const imageMetadata = extractImageMetadata(zip, documentXml);
+    
     // Parse per-page structure
     const pageStructures = analyzePageStructure(documentXml, estimatedPages);
     
@@ -74,7 +89,9 @@ export const parseTemplate = async (templatePath) => {
     logger.info(`Template Analysis Complete:`);
     logger.info(`   - ${textLength} chars, ${lines} lines`);
     logger.info(`   - Pages detected: ${estimatedPages}`);
-    logger.info(`   - Images: ${imageRels}`);
+    logger.info(`   - Header/Footer: ${hasHeader ? '✓ Header' : ''} ${hasFooter ? '✓ Footer' : ''}`);
+    if (hasHeader) logger.info(`   - Header text: ${headerText.substring(0, 100)}`);
+    logger.info(`   - Images: ${imageRels} (${imageMetadata.length} with metadata)`);
     logger.info(`   - Tables: ${tables}`);
     logger.info(`   - Bold text: ${boldCount} instances`);
     logger.info(`   - Italic text: ${italicCount} instances`);
@@ -101,8 +118,15 @@ export const parseTemplate = async (templatePath) => {
         headings,
         headingCount: headings.length,
         
+        // Header/Footer
+        hasHeader,
+        hasFooter,
+        headerText,
+        footerText,
+        
         // Visual elements
         imageCount: imageRels,
+        imageMetadata: imageMetadata,
         boldCount,
         italicCount,
         colors,
@@ -125,7 +149,59 @@ export const parseTemplate = async (templatePath) => {
 };
 
 /**
- * Analyze structure of each page in template
+ * Extract text content from XML
+ */
+function extractTextFromXml(xml) {
+  const textMatches = xml.match(/<w:t[^>]*>([^<]*)<\/w:t>/g) || [];
+  return textMatches.map(match => {
+    const content = match.match(/<w:t[^>]*>([^<]*)<\/w:t>/);
+    return content ? content[1] : '';
+  }).join(' ').trim();
+}
+
+/**
+ * Extract image metadata from DOCX
+ */
+function extractImageMetadata(zip, documentXml) {
+  const images = [];
+  
+  // Find all image references in document.xml
+  const drawingMatches = documentXml.match(/<w:drawing>[\s\S]*?<\/w:drawing>/g) || [];
+  
+  drawingMatches.forEach((drawing, idx) => {
+    // Extract image dimensions
+    const extentMatch = drawing.match(/<wp:extent cx="(\d+)" cy="(\d+)"\/>/);
+    const widthEmu = extentMatch ? parseInt(extentMatch[1]) : 0;
+    const heightEmu = extentMatch ? parseInt(extentMatch[2]) : 0;
+    
+    // Convert EMUs (English Metric Units) to pixels (914400 EMUs = 1 inch, 96 DPI)
+    const widthPx = Math.round((widthEmu / 914400) * 96);
+    const heightPx = Math.round((heightEmu / 914400) * 96);
+    
+    // Extract alt text / description
+    const descMatch = drawing.match(/<wp:docPr[^>]*descr="([^"]*)"[^>]*\/>/);
+    const altText = descMatch ? descMatch[1] : `Image ${idx + 1}`;
+    
+    // Extract image relationship ID
+    const embedMatch = drawing.match(/<a:blip r:embed="([^"]*)"/);
+    const rId = embedMatch ? embedMatch[1] : null;
+    
+    images.push({
+      index: idx + 1,
+      width: widthPx,
+      height: heightPx,
+      altText: altText,
+      relationshipId: rId,
+      aspectRatio: widthPx > 0 ? (heightPx / widthPx).toFixed(2) : 1.0
+    });
+  });
+  
+  return images;
+}
+
+/**
+ * Analyze structure of each page in template - ENHANCED VERSION
+ * Extracts detailed element positioning and content patterns
  */
 function analyzePageStructure(documentXml, pageCount) {
   const pageStructures = [];
@@ -139,25 +215,94 @@ function analyzePageStructure(documentXml, pageCount) {
     
     const structure = {
       pageNumber: idx + 1,
+      
+      // Element counts
       hasTables: /<w:tbl>/.test(pageXml),
       tableCount: (pageXml.match(/<w:tbl>/g) || []).length,
       hasImages: /<a:blip/.test(pageXml),
       imageCount: (pageXml.match(/<a:blip/g) || []).length,
-      boldCount: (pageXml.match(/<w:b\/>/g) || []).length,
-      italicCount: (pageXml.match(/<w:i\/>/g) || []).length,
       hasList: /<w:numPr>|<w:ilvl/.test(pageXml),
       
-      // Extract headings on this page
-      headings: extractHeadingsFromXml(pageXml),
+      // Text formatting
+      boldCount: (pageXml.match(/<w:b\/>/g) || []).length,
+      italicCount: (pageXml.match(/<w:i\/>/g) || []).length,
       
-      // Paragraph count estimate
-      paragraphCount: (pageXml.match(/<w:p>/g) || []).length
+      // Headings on this page
+      headings: extractHeadingsFromXml(pageXml),
+      headingCount: extractHeadingsFromXml(pageXml),
+      
+      // Paragraph analysis
+      paragraphCount: (pageXml.match(/<w:p>/g) || []).length,
+      
+      // Advanced: Alignment patterns
+      hasCenteredText: /<w:jc w:val="center"/.test(pageXml),
+      hasRightAlignedText: /<w:jc w:val="right"/.test(pageXml),
+      
+      // Advanced: Spacing patterns
+      hasLargeSpacing: /<w:spacing w:after="[4-9]\d{2,}"/.test(pageXml) || /<w:spacing w:after="\d{4,}"/.test(pageXml),
+      
+      // Content density (estimated)
+      textDensity: estimateTextDensity(pageXml),
+      
+      // Page type detection
+      pageType: detectPageType(pageXml, idx)
     };
     
     pageStructures.push(structure);
   });
   
   return pageStructures;
+}
+
+/**
+ * Estimate text density on a page
+ */
+function estimateTextDensity(pageXml) {
+  const textMatches = pageXml.match(/<w:t[^>]*>([^<]*)<\/w:t>/g) || [];
+  const totalChars = textMatches.reduce((sum, match) => {
+    const content = match.match(/<w:t[^>]*>([^<]*)<\/w:t>/);
+    return sum + (content ? content[1].length : 0);
+  }, 0);
+  
+  const paragraphCount = (pageXml.match(/<w:p>/g) || []).length;
+  
+  if (paragraphCount === 0) return 'empty';
+  if (totalChars < 200) return 'sparse';
+  if (totalChars < 800) return 'normal';
+  return 'dense';
+}
+
+/**
+ * Detect page type based on content patterns
+ */
+function detectPageType(pageXml, pageIndex) {
+  // First page with large centered text and image = cover page
+  if (pageIndex === 0) {
+    const hasCentered = /<w:jc w:val="center"/.test(pageXml);
+    const hasImage = /<a:blip/.test(pageXml);
+    const hasLargeFont = /<w:sz w:val="[4-9]\d"/.test(pageXml); // 40+ half-points = 20+ pts
+    
+    if (hasCentered && (hasImage || hasLargeFont)) {
+      return 'cover';
+    }
+  }
+  
+  // Page with mostly tables = data page
+  const tableCount = (pageXml.match(/<w:tbl>/g) || []).length;
+  const paragraphCount = (pageXml.match(/<w:p>/g) || []).length;
+  
+  if (tableCount >= 2 && tableCount > paragraphCount / 3) {
+    return 'data-heavy';
+  }
+  
+  // Page with images = visual page
+  const imageCount = (pageXml.match(/<a:blip/g) || []).length;
+  if (imageCount >= 2) {
+    return 'visual';
+  }
+  
+  // Default = content page
+  return 'content';
 }
 
 /**

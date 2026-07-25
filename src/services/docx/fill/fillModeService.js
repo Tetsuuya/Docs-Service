@@ -22,39 +22,57 @@ export const generateFillModeDocument = async (templateText, templateStructure, 
   
   logger.info(`Template Structure: ${templatePageCount} pages, ${templateHeadingCount} headings, ${templateStructure.structure.tableCount} tables, ${templateStructure.structure.imageCount} images`);
   
-  // CRITICAL: Use template's actual heading count as minimum sections
-  // User wants to FILL the template, not simplify it!
+  // WORKAROUND: AI is generating too little content per section
+  // Instead of asking for more paragraphs (which AI ignores), ask for MORE SECTIONS
+  // Strategy: Multiply section count by 1.5-1.6x (tuned based on testing)
+  // Testing shows: 1.3x = 85%, 1.5x = 95%, 1.7x = 121% pages → optimal is 1.55x
+  const contentMultiplier = requestedPages && requestedPages > templatePageCount ? 1.6 : 1.4;
   const targetPages = requestedPages || templatePageCount;
-  const minSections = Math.min(templateHeadingCount, 150); // Use all template headings (cap at AI limit)
+  const minSections = Math.min(templateHeadingCount * contentMultiplier, 150); // 1.4-1.6x sections
   const targetSections = requestedPages 
-    ? Math.max(minSections, Math.ceil(requestedPages * 1.2)) // If pages specified, expand from heading count
-    : minSections; // No pages specified = use exact heading count
+    ? Math.max(minSections, Math.ceil(requestedPages * 2.1)) // 2.1 sections per page
+    : minSections;
   
-  const paragraphsPerSection = Math.max(2, Math.ceil((targetPages * 2.5) / targetSections)); // More content per section
+  const paragraphsPerSection = Math.max(3, Math.ceil((targetPages * 2.5) / targetSections)); // Request more
   
   logger.info(`📊 Generation Plan:`);
   logger.info(`   Template: ${templatePageCount} pages with ${templateHeadingCount} headings`);
   logger.info(`   Target: ${targetPages} pages with ${targetSections} sections`);
   logger.info(`   Content: ${paragraphsPerSection} paragraphs per section`);
+  logger.info(`   Expected: ~${targetPages * 400} words total`);
   if (requestedPages) {
     logger.info(`   Mode: EXPAND template to ${requestedPages} pages`);
   } else {
     logger.info(`   Mode: PRESERVE template structure (all ${templateHeadingCount} headings)`);
   }
+  logger.info(``);
   
-  // Build visual structure summary for each page
-  let pageVisualSummary = '';
+  // Build detailed page-by-page structure description
+  let pageDescriptions = '';
   if (templateStructure.pageStructures && templateStructure.pageStructures.length > 0) {
-    pageVisualSummary = templateStructure.pageStructures.map(page => {
+    pageDescriptions = templateStructure.pageStructures.map(page => {
       const elements = [];
-      if (page.headings > 0) elements.push(`${page.headings} heading(s)`);
+      
+      // Page type
+      elements.push(`Type: ${page.pageType || 'content'}`);
+      
+      // Headings
+      if (page.headingCount > 0) elements.push(`${page.headingCount} heading(s)`);
+      
+      // Content density
+      if (page.textDensity) elements.push(`density: ${page.textDensity}`);
+      
+      // Visual elements
       if (page.tableCount > 0) elements.push(`${page.tableCount} table(s)`);
       if (page.imageCount > 0) elements.push(`${page.imageCount} image(s)`);
       if (page.hasList) elements.push('lists');
-      if (page.boldCount > 5) elements.push('bold formatting');
-      if (page.italicCount > 5) elements.push('italic formatting');
       
-      return `Page ${page.pageNumber}: ${elements.length > 0 ? elements.join(', ') : 'text content'}`;
+      // Formatting
+      if (page.hasCenteredText) elements.push('centered text');
+      if (page.hasLargeSpacing) elements.push('large spacing');
+      if (page.boldCount > 5) elements.push('bold formatting');
+      
+      return `📄 Page ${page.pageNumber}: ${elements.join(', ')}`;
     }).join('\n');
   }
   
@@ -70,178 +88,227 @@ export const generateFillModeDocument = async (templateText, templateStructure, 
   
   // Determine target
   
-  // Step 1: Universal Dynamic AI Judgment - Gemini decides everything
-  const analysisPrompt = `
-You are a professional document designer with COMPLETE CREATIVE FREEDOM and HUMAN JUDGMENT.
+  // TWO-STEP GENERATION PROCESS
+  // Step 1: Generate section outline (lightweight, forces AI to create many sections)
+  // Step 2: Fill content in batches (prevents AI from getting lazy/overwhelmed)
+  
+  logger.info(`🎯 STEP 1: Generating section outline...`);
+  
+  const outlinePrompt = `
+You are a professional document structure designer.
 
-═══════════════════════════════════════════════════════════
-TEMPLATE VISUAL STRUCTURE ANALYSIS
-═══════════════════════════════════════════════════════════
+TEMPLATE ANALYSIS:
+- Template has ${templatePageCount} pages with ${templateHeadingCount} sections
+- User wants ${targetPages} pages about "${userPrompt}"
+- Target: ${Math.round(targetSections)} sections minimum
 
-Template Pages: ${templatePageCount}
-Visual Elements Found:
-  • Headings: ${templateStructure.structure.headingCount}
-  • Tables: ${templateStructure.structure.tableCount}
-  • Images/Diagrams: ${templateStructure.structure.imageCount}
-  • Formatting: ${templateStructure.structure.hasBoldText ? '✓ Bold' : ''} ${templateStructure.structure.hasItalicText ? '✓ Italic' : ''}
-  • Colors: ${templateStructure.structure.colors.length > 0 ? templateStructure.structure.colors.join(', ') : 'Default'}
-  • Lists: ${templateStructure.structure.hasLists ? '✓ Present' : 'None'}
+SAMPLE TEMPLATE HEADINGS:
+${templateStructure.structure.headings.slice(0, 15).join('\n')}
+${templateStructure.structure.headings.length > 15 ? `... and ${templateStructure.structure.headings.length - 15} more` : ''}
 
-Page-by-Page Layout:
-${pageVisualSummary || 'Visual structure not available'}
+YOUR TASK: Create a DETAILED section outline for "${userPrompt}"
 
-CRITICAL: Template Table Structures (MUST MATCH):
-${tableDescriptions || 'No tables in template'}
+REQUIREMENTS:
+- Generate ${Math.round(targetSections)}+ section titles
+- Follow template's hierarchy pattern (use numbering: 1., 1.1, 1.2, 2., 2.1, etc.)
+- Break down the topic into detailed subsections
+- Match professional document structure
+- Translate foreign terms to English
 
-Template Headings Found:
-${templateStructure.structure.headings.slice(0, 30).join('\n')}
-${templateStructure.structure.headings.length > 30 ? `... and ${templateStructure.structure.headings.length - 30} more headings` : ''}
-
-🚨 CRITICAL REQUIREMENT: PRESERVE ALL TEMPLATE HEADINGS
-The template has ${templateHeadingCount} headings. You MUST generate AT LEAST ${targetSections} sections.
-DO NOT simplify or condense the template structure. USE ALL THE HEADINGS.
-
-Template Style Sample (first 1500 chars):
-"""
-${templateText.substring(0, 1500)}
-"""
-
-═══════════════════════════════════════════════════════════
-USER'S REQUEST
-═══════════════════════════════════════════════════════════
-
-Topic: "${userPrompt}"
-${requestedPages ? `Target Length: ${requestedPages} pages` : `Target: Match template depth (${templatePageCount} pages)`}
-
-LANGUAGE & TERMINOLOGY:
-- Generate the document in English (professional business English)
-- If user uses foreign terms (e.g., "sommaire" = French for summary), translate to English equivalents
-- Use clear, professional terminology appropriate for business documents
-
-═══════════════════════════════════════════════════════════
-YOUR TASK: USE HUMAN JUDGMENT TO DESIGN THE DOCUMENT
-═══════════════════════════════════════════════════════════
-
-You are NOT following rigid rules. You are making intelligent design decisions:
-
-1️⃣ ANALYZE THE TEMPLATE'S INTENT
-   - What type of document is this? (Report, proposal, manual, study?)
-   - What's the professional level? (Corporate, academic, technical, creative?)
-   - What visual patterns exist? (Tables for data, images for concepts, lists for features?)
-
-2️⃣ DECIDE CONTENT STRUCTURE FOR USER'S TOPIC
-   ${requestedPages 
-     ? `- Template has ${templatePageCount} pages with ${templateHeadingCount} headings, user wants ${requestedPages} pages`
-     : `- Template has ${templatePageCount} pages with ${templateHeadingCount} headings, preserve this structure`}
-   - Generate ${targetSections} sections minimum (DO NOT reduce heading count!)
-   - Each section needs ${paragraphsPerSection} paragraphs minimum
-   - Fill approximately ${targetPages} pages total
-   - IMPORTANT: If user mentions foreign words (e.g., "sommaire"), translate them to English (e.g., "Executive Summary")
-
-3️⃣ MAKE SMART FORMATTING DECISIONS
-   - **Bold**: Key terms, metrics, important concepts, emphasis
-   - *Italic*: Definitions, technical terms, subtle emphasis
-   - \`Code\`: Technical commands, APIs, file names
-   - ==Highlight==: Critical warnings, key takeaways, important notes
-   - Tables: Comparisons, data, specifications, metrics
-   - Lists: Features, steps, requirements, bullet points
-   - Diagrams: Processes, workflows, architectures, frameworks
-
-4️⃣ DECIDE CONTENT DEPTH INTELLIGENTLY
-   - Complex sections = more paragraphs (4-6)
-   - Simple sections = fewer paragraphs (2-3)
-   - Technical details = tables + diagrams
-   - Narrative sections = more text, fewer visuals
-   - Summary sections = lists + key points
-
-🚨 CRITICAL: TABLE STRUCTURE MATCHING
-${templateStructure.structure.tableStructures && templateStructure.structure.tableStructures.length > 0 
-  ? `Template has ${templateStructure.structure.tableStructures.length} tables. You MUST generate tables with THE EXACT SAME STRUCTURE:
-
-${templateStructure.structure.tableStructures.map(t => 
-  `   Table ${t.index}: ${t.cols} columns with headers: ${t.headers.join(' | ')}`
-).join('\n')}
-
-For EACH table above:
-- Use those EXACT column headers (adapt wording to fit user's topic if needed)
-- Generate ${templateStructure.structure.tableStructures.map(t => t.rows - 1).join(', ')} data rows respectively
-- Fill with relevant data for "${userPrompt}"
-- Example: If template has "Milestone | Deliverables", adapt to topic: "Phase | Key Outcomes"
-` 
-  : 'Template has no tables - you can add tables where they make sense for the content.'
+RETURN JSON:
+{
+  "title": "Document title",
+  "subtitle": "Document subtitle",
+  "outline": [
+    { "id": 1, "heading": "Executive Summary", "level": 1 },
+    { "id": 2, "heading": "Key Points", "level": 2 },
+    { "id": 3, "heading": "1. Introduction", "level": 1 },
+    { "id": 4, "heading": "1.1 Purpose", "level": 2 },
+    ... generate ${Math.round(targetSections)}+ sections
+  ]
 }
 
-═══════════════════════════════════════════════════════════
-RETURN FORMAT
-═══════════════════════════════════════════════════════════
+CRITICAL: Generate AT LEAST ${Math.round(targetSections)} sections. More is better than less.
+`;
 
-Return JSON with as many sections as YOU decide are needed (minimum 3, maximum 150):
+  const outlineResponse = await callGemini(outlinePrompt, true, 4096);
+  const sectionOutline = outlineResponse.outline || [];
+  
+  logger.info(`✅ STEP 1 Complete: ${sectionOutline.length} sections outlined`);
+  
+  if (sectionOutline.length < targetSections * 0.7) {
+    logger.warn(`⚠️  Only ${sectionOutline.length} sections generated (target: ${Math.round(targetSections)})`);
+  }
+  
+  // Step 2: Fill content in batches
+  logger.info(`🎯 STEP 2: Filling content in batches...`);
+  
+  const batchSize = 15; // Process 15 sections at a time
+  const batches = Math.ceil(sectionOutline.length / batchSize);
+  const filledSections = [];
+  
+  for (let batchIndex = 0; batchIndex < batches; batchIndex++) {
+    const startIdx = batchIndex * batchSize;
+    const endIdx = Math.min(startIdx + batchSize, sectionOutline.length);
+    const batchSections = sectionOutline.slice(startIdx, endIdx);
+    
+    logger.info(`   Batch ${batchIndex + 1}/${batches}: Filling sections ${startIdx + 1}-${endIdx}...`);
+    
+    const fillPrompt = `
+You are filling content for a professional document about "${userPrompt}".
 
+SECTIONS TO FILL (${batchSections.length} sections):
+${batchSections.map(s => `${s.id}. ${s.heading} (Level ${s.level})`).join('\n')}
+
+TEMPLATE INFO:
+- Tables available: ${templateStructure.structure.tableCount}
+- Uses bold and italic formatting
+- Professional business style
+
+CONTENT REQUIREMENTS:
+- Each section: ${paragraphsPerSection}+ paragraphs (60-100 words each)
+- Use **bold** for key terms
+- Use *italic* for emphasis
+- Add tables where data makes sense
+- Add lists for enumeration
+
+RETURN JSON:
 {
-  "title": "Professional title for user's topic",
-  "subtitle": "Compelling subtitle",
   "sections": [
     {
-      "heading": "Section heading (you decide based on user's topic)",
-      "level": 1-3 (1=major, 2=sub, 3=detail),
+      "id": ${batchSections[0]?.id},
+      "heading": "${batchSections[0]?.heading}",
+      "level": ${batchSections[0]?.level},
       "content": [
-        "Paragraph 1 with **bold emphasis** and *italic nuance*...",
-        "Paragraph 2 with more \`technical terms\` and ==highlights==...",
-        "Paragraph 3...",
-        "Add as many paragraphs as THIS SECTION needs (2-6 typically)"
+        "Paragraph 1 with **bold** and *italic* (60-100 words)...",
+        "Paragraph 2 (60-100 words)...",
+        "Paragraph 3 (60-100 words)..."
       ],
-      "hasList": true/false (your decision - does this section need a list?),
-      "listType": "bullet" or "numbered" (if hasList is true),
-      "listItems": [
-        "**Key point 1**: Explanation with formatting",
-        "**Key point 2**: More details"
-      ],
-      "hasTable": true/false (your decision - does data/comparison make sense here?),
-      "table": {
-        "title": "Descriptive table title",
-        "headers": ["Column 1", "Column 2", "Column 3"],
-        "rows": [
-          ["Data", "Value", "Status"],
-          ["More data", "Another value", "Another status"]
-        ]
-      },
-      "needsDiagram": true/false (your decision - would a visual help explain this?),
-      "diagram": {
-        "title": "Process/Workflow/Architecture name",
-        "steps": ["Step 1", "Step 2", "Step 3", "Step 4"]
-      }
+      "hasList": false,
+      "hasTable": false
     }
-  ],
-  "metadata": {
-    "author": "AI Documentation Engine",
-    "keywords": "relevant, professional, keywords"
-  }
+    ... fill all ${batchSections.length} sections
+  ]
 }
-
-═══════════════════════════════════════════════════════════
-CRITICAL GUIDELINES
-═══════════════════════════════════════════════════════════
-
-✓ Generate enough sections to properly cover "${userPrompt}" ${requestedPages ? `in ${requestedPages} pages` : ''}
-✓ MINIMUM ${targetSections} sections required (template has ${templateHeadingCount} headings - preserve them all!)
-✓ Each paragraph should be 3-5 sentences (substantial, not thin)
-✓ Each section should have ${paragraphsPerSection} paragraphs minimum
-✓ Use formatting intelligently (bold/italic/code/highlight) where it adds clarity
-✓ Add tables where data/comparisons make the content clearer
-✓ Add lists where enumeration helps (features, steps, requirements)
-✓ Add diagrams where visual explanation helps (processes, workflows)
-✓ Match the template's professional tone and style
-✓ Ensure content directly addresses: "${userPrompt}"
-✓ Make the document feel cohesive and well-structured
-
-YOU DECIDE: How many sections, how deep each section, where visuals go, how much content each needs.
 `;
+
+    const batchResponse = await callGemini(fillPrompt, true, 8192);
+    filledSections.push(...(batchResponse.sections || []));
+    
+    logger.info(`   ✅ Batch ${batchIndex + 1} complete: ${batchResponse.sections?.length || 0} sections filled`);
+  }
   
-  logger.info(`🤖 Calling AI with human judgment approach...`);
-  const structuredContent = await callGemini(analysisPrompt, true, 8192);
+  logger.info(`✅ STEP 2 Complete: ${filledSections.length} sections filled with content`);
+  
+  // Build final structured content
+  const structuredContent = {
+    title: outlineResponse.title || 'Generated Document',
+    subtitle: outlineResponse.subtitle || 'Professional Report',
+    sections: filledSections,
+    metadata: {
+      author: 'AI Documentation Engine',
+      keywords: userPrompt.split(' ').slice(0, 5).join(', ')
+    }
+  };
   
   const sectionsGenerated = structuredContent.sections?.length || 0;
-  logger.info(`✅ AI Generated: ${sectionsGenerated} sections (AI decided this was optimal)`);
+  const preservationRatio = templateHeadingCount > 0 ? (sectionsGenerated / templateHeadingCount) : 1;
+  
+  // Calculate estimated word count
+  let estimatedWords = 0;
+  let paragraphCount = 0;
+  let tableCount = 0;
+  let listCount = 0;
+  let diagramCount = 0;
+  
+  structuredContent.sections?.forEach(section => {
+    section.content?.forEach(para => {
+      estimatedWords += para.split(' ').length;
+      paragraphCount++;
+    });
+    section.listItems?.forEach(item => {
+      estimatedWords += item.split(' ').length;
+    });
+    if (section.hasTable) tableCount++;
+    if (section.hasList) listCount++;
+    if (section.needsDiagram) diagramCount++;
+  });
+  
+  const targetWords = targetPages * 400; // 400 words per page
+  const contentRatio = targetWords > 0 ? (estimatedWords / targetWords) : 1;
+  const estimatedPages = Math.round(estimatedWords / 400);
+  
+  logger.info(`\n═══════════════════════════════════════════════════════════`);
+  logger.info(`📊 FILL MODE GENERATION ANALYSIS`);
+  logger.info(`═══════════════════════════════════════════════════════════`);
+  
+  // Template vs Output comparison
+  logger.info(`\n📄 STRUCTURE COMPARISON:`);
+  logger.info(`   Template: ${templatePageCount} pages, ${templateHeadingCount} headings, ${templateStructure.structure.tableCount} tables`);
+  logger.info(`   Generated: ${estimatedPages} pages (est), ${sectionsGenerated} sections, ${tableCount} tables`);
+  logger.info(`   Match: ${Math.round(preservationRatio * 100)}% structure depth preserved`);
+  
+  // Content volume analysis
+  logger.info(`\n📝 CONTENT VOLUME:`);
+  logger.info(`   Target: ~${targetWords} words (${targetPages} pages × 400 words/page)`);
+  logger.info(`   Generated: ~${estimatedWords} words`);
+  logger.info(`   Ratio: ${Math.round(contentRatio * 100)}% of target`);
+  logger.info(`   Estimated Pages: ${estimatedPages} (vs ${targetPages} target)`);
+  
+  // Content breakdown
+  logger.info(`\n🔍 CONTENT BREAKDOWN:`);
+  logger.info(`   Sections: ${sectionsGenerated}`);
+  logger.info(`   Paragraphs: ${paragraphCount} (avg ${(paragraphCount / sectionsGenerated).toFixed(1)} per section)`);
+  logger.info(`   Tables: ${tableCount}`);
+  logger.info(`   Lists: ${listCount}`);
+  logger.info(`   Diagrams: ${diagramCount}`);
+  logger.info(`   Avg words/section: ${(estimatedWords / sectionsGenerated).toFixed(0)}`);
+  
+  // Structure validation
+  logger.info(`\n✅ VALIDATION RESULTS:`);
+  if (preservationRatio < 0.7) {
+    logger.warn(`   ⚠️  STRUCTURE: Too condensed (${Math.round(preservationRatio * 100)}% < 70%)`);
+    logger.warn(`      → AI simplified template structure - missing ${templateHeadingCount - sectionsGenerated} sections`);
+  } else if (preservationRatio >= 0.9 && preservationRatio <= 1.1) {
+    logger.info(`   ✅ STRUCTURE: Excellent match (${Math.round(preservationRatio * 100)}%)`);
+  } else if (preservationRatio > 1.1) {
+    logger.info(`   ✅ STRUCTURE: Expanded appropriately (${Math.round(preservationRatio * 100)}%)`);
+  } else {
+    logger.info(`   ✅ STRUCTURE: Good match (${Math.round(preservationRatio * 100)}%)`);
+  }
+  
+  // Content density validation
+  if (contentRatio < 0.7) {
+    logger.warn(`   ⚠️  CONTENT: Too sparse (${Math.round(contentRatio * 100)}% < 70%)`);
+    logger.warn(`      → Document will be ${Math.abs(estimatedPages - targetPages)} pages shorter than target`);
+    logger.warn(`      → Need ~${targetWords - estimatedWords} more words`);
+  } else if (contentRatio > 1.3) {
+    logger.warn(`   ⚠️  CONTENT: Too dense (${Math.round(contentRatio * 100)}% > 130%)`);
+    logger.warn(`      → Document will be ${Math.abs(estimatedPages - targetPages)} pages longer than target`);
+    logger.warn(`      → Consider reducing content by ~${estimatedWords - targetWords} words`);
+  } else if (contentRatio < 0.85 || contentRatio > 1.15) {
+    logger.info(`   ⚠️  CONTENT: Slightly off target (${Math.round(contentRatio * 100)}%)`);
+    logger.info(`      → Expected ${targetPages} pages, got ~${estimatedPages} pages`);
+  } else {
+    logger.info(`   ✅ CONTENT: Well balanced (${Math.round(contentRatio * 100)}%)`);
+    logger.info(`      → Page count matches target (${estimatedPages} ≈ ${targetPages})`);
+  }
+  
+  // Page count specific warning
+  const pageDifference = Math.abs(estimatedPages - targetPages);
+  if (pageDifference >= 3) {
+    logger.warn(`\n⚠️  PAGE COUNT ISSUE:`);
+    logger.warn(`   Template: ${templatePageCount} pages → Output: ~${estimatedPages} pages`);
+    logger.warn(`   Difference: ${pageDifference} pages (${estimatedPages < targetPages ? 'TOO SHORT' : 'TOO LONG'})`);
+    if (estimatedPages < targetPages) {
+      logger.warn(`   💡 SOLUTION: AI needs to generate more paragraphs per section`);
+      logger.warn(`      → Each section should have ${Math.ceil((targetWords / sectionsGenerated) / 80)} paragraphs`);
+    } else {
+      logger.warn(`   💡 SOLUTION: AI generated too much content per section`);
+    }
+  }
+  
+  logger.info(`═══════════════════════════════════════════════════════════\n`);
   
   // Step 2: Build document JSON matching our docx builder format
   const documentData = {

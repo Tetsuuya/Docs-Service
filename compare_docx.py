@@ -331,7 +331,7 @@ def compare_documents(doc1_analysis, doc2_analysis, doc1_name, doc2_name):
 if __name__ == "__main__":
     # File paths
     doc1 = r"C:\Users\Rhenel Jhon Sajol\Downloads\Modele_Private_Equity.docx"
-    doc2 = r"C:\Users\Rhenel Jhon Sajol\Downloads\global_private_equity_fund_iii.docx"
+    doc2 = r"C:\Users\Rhenel Jhon Sajol\Downloads\private_equity.docx"
     
     # Check if files exist
     if not Path(doc1).exists():
