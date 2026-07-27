@@ -1,0 +1,97 @@
+================================================================================
+VISUAL LAYOUT ANALYSIS: test_2
+================================================================================
+
+
+────────────────────────────────────────────────────────────────────────────────
+SLIDE 1
+────────────────────────────────────────────────────────────────────────────────
+  [0in down, 0in right] Fill:#38b6ff
+  [0in down, 0in right] Fill:#334155
+  [0in down, 0in right] TEXT: 🏷️ BEYOND THE ATMOSPHERE
+  [0in down, 0in right] TEXT: The Infinite Horizon
+  [0in down, 5in right] Fill:#1e293b
+  [0in down, 5in right] [IMAGE]
+  [3in down, 0in right] TEXT: The evolution and future horizon of human space exploration
+  [5in down, 0in right] Fill:#334155
+  [5in down, 0in right] TEXT: DOCS-SERVICE AI DESIGN ENGINE 2026
+
+
+────────────────────────────────────────────────────────────────────────────────
+SLIDE 2
+────────────────────────────────────────────────────────────────────────────────
+  [0in down, 0in right] Fill:#38b6ff
+  [0in down, 0in right] TEXT: The Scale of the Journey
+  [1in down, 0in right] Fill:#1e293b
+  [1in down, 0in right] TEXT: 384,400
+  [1in down, 3in right] Fill:#1e293b
+  [1in down, 3in right] TEXT: Mars sits roughly 225 million kilometers away on average, re
+  [2in down, 0in right] TEXT: Kilometers from Earth to the Moon, representing just the fir
+  [5in down, 0in right] Fill:#334155
+  [5in down, 0in right] TEXT: PRESENTATION | PAGE 2
+
+
+────────────────────────────────────────────────────────────────────────────────
+SLIDE 3
+────────────────────────────────────────────────────────────────────────────────
+  [0in down, 0in right] Fill:#38b6ff
+  [0in down, 0in right] TEXT: Redefining Engineering
+  [0in down, 0in right] TEXT: Overcoming the extreme barriers of vacuum, radiation, and th
+  [1in down, 0in right] Fill:#1e293b
+  [1in down, 0in right] [IMAGE]
+  [1in down, 4in right] Fill:#1e293b
+  [1in down, 4in right] Fill:#38b6ff
+  [1in down, 5in right] TEXT: Reusable rocket architectures have fundamentally collapsed t
+  [5in down, 0in right] Fill:#334155
+  [5in down, 0in right] TEXT: PRESENTATION | PAGE 3
+
+
+────────────────────────────────────────────────────────────────────────────────
+SLIDE 4
+────────────────────────────────────────────────────────────────────────────────
+  [0in down, 0in right] Fill:#38b6ff
+  [0in down, 0in right] TEXT: Paradigm Shift in Exploration
+  [1in down, 0in right] Fill:#1e293b
+  [1in down, 0in right] Fill:#38b6ff
+  [1in down, 0in right] TEXT: Legacy Model
+  [1in down, 0in right] TEXT: State-funded, geopolitical prestige driven programs with mul
+  [1in down, 5in right] Fill:#1e293b
+  [1in down, 5in right] Fill:#38b6ff
+  [1in down, 5in right] TEXT: Commercial Era
+  [1in down, 5in right] TEXT: Agile, private-public partnerships fostering rapid iteration
+  [5in down, 0in right] Fill:#334155
+  [5in down, 0in right] TEXT: PRESENTATION | PAGE 4
+
+
+────────────────────────────────────────────────────────────────────────────────
+SLIDE 5
+────────────────────────────────────────────────────────────────────────────────
+  [0in down, 0in right] Fill:#38b6ff
+  [0in down, 0in right] TEXT: The Three Pillars of Tomorrow
+  [1in down, 0in right] Fill:#1e293b
+  [1in down, 0in right] Fill:#38b6ff
+  [1in down, 0in right] TEXT: Interplanetary Habitats
+  [1in down, 0in right] TEXT: Developing self-sustaining biospheres utilizing in-situ reso
+  [1in down, 3in right] Fill:#1e293b
+  [1in down, 3in right] Fill:#38b6ff
+  [1in down, 3in right] TEXT: Deep Space Propulsion
+  [1in down, 3in right] TEXT: Transitioning beyond chemical rockets toward nuclear thermal
+  [1in down, 6in right] Fill:#1e293b
+  [1in down, 6in right] Fill:#38b6ff
+  [1in down, 6in right] TEXT: Orbital Economies
+  [1in down, 6in right] TEXT: Building microgravity manufacturing hubs where pure fiber op
+  [5in down, 0in right] Fill:#334155
+  [5in down, 0in right] TEXT: PRESENTATION | PAGE 5
+
+
+────────────────────────────────────────────────────────────────────────────────
+SLIDE 6
+────────────────────────────────────────────────────────────────────────────────
+  [0in down, 0in right] Fill:#38b6ff
+  [0in down, 0in right] TEXT: The Long View
+  [1in down, 1in right] Fill:#1e293b
+  [1in down, 1in right] TEXT: "
+  [1in down, 2in right] TEXT: The Earth is the cradle of humanity, but mankind cannot stay
+  [3in down, 2in right] TEXT: — Konstantin Tsiolkovsky
+  [5in down, 0in right] Fill:#334155
+  [5in down, 0in right] TEXT: PRESENTATION | PAGE 6

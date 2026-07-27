@@ -56,46 +56,52 @@ export const generatePptxContent = async (userPrompt) => {
   // Generate variation constraints to force diversity
   const variationStrategies = [
     { 
-      startLayout: 'minimal', 
+      startLayout: 'hero',  // ALWAYS START WITH HERO for title slide
       imageStyle: 'abstract concepts', 
-      slideRange: '4-7',
-      forbidden: 'NEVER start with hero, NEVER use timeline on slide 5, NEVER end with hero',
-      imageSlots: [1, 3, 6]
-    },
-    { 
-      startLayout: 'stat', 
-      imageStyle: 'photographic realism', 
       slideRange: '5-8',
-      forbidden: 'NEVER use split on slide 2, NEVER put images on slides 1,2,5',
-      imageSlots: [2, 4, 7]
+      forbidden: 'NEVER use timeline on slide 5, NEVER end with split',
+      imageSlots: [1, 3, 6],
+      heroHasImage: true  // Hero slide should have image
     },
     { 
-      startLayout: 'quote', 
-      imageStyle: 'close-up details', 
+      startLayout: 'hero',  // ALWAYS START WITH HERO for title slide
+      imageStyle: 'photographic realism', 
       slideRange: '6-9',
+      forbidden: 'NEVER use split on slide 2, NEVER put images on consecutive slides',
+      imageSlots: [1, 4, 7],
+      heroHasImage: true  // Hero slide should have image
+    },
+    { 
+      startLayout: 'hero',  // ALWAYS START WITH HERO for title slide
+      imageStyle: 'close-up details', 
+      slideRange: '5-8',
       forbidden: 'NEVER follow hero→split→cards→stat pattern, NEVER use exactly 6 slides',
-      imageSlots: [1, 4, 5, 8]
+      imageSlots: [1, 3, 5, 8],
+      heroHasImage: true  // Hero slide should have image
     },
     { 
-      startLayout: 'split', 
+      startLayout: 'hero',  // ALWAYS START WITH HERO for title slide
       imageStyle: 'environmental context', 
-      slideRange: '5-10',
-      forbidden: 'NEVER put 3 images exactly, NEVER use hero layout twice',
-      imageSlots: [3, 5, 6]
+      slideRange: '6-10',
+      forbidden: 'NEVER put 3 images exactly, NEVER use timeline twice',
+      imageSlots: [1, 4, 6],
+      heroHasImage: true  // Hero slide should have image
     },
     { 
-      startLayout: 'cards', 
+      startLayout: 'hero',  // ALWAYS START WITH HERO for title slide
       imageStyle: 'action scenes', 
-      slideRange: '7-11',
-      forbidden: 'NEVER have timeline as 5th slide, NEVER use same color scheme as last time',
-      imageSlots: [2, 3, 9]
+      slideRange: '5-9',
+      forbidden: 'NEVER have timeline as 5th slide, NEVER repeat layouts',
+      imageSlots: [1, 3, 7],
+      heroHasImage: true  // Hero slide should have image
     },
     { 
-      startLayout: 'comparison', 
+      startLayout: 'hero',  // ALWAYS START WITH HERO for title slide
       imageStyle: 'before/after sequences', 
-      slideRange: '4-6',
-      forbidden: 'NEVER generate exactly 7 slides, NEVER start with hero',
-      imageSlots: [1, 2, 4]
+      slideRange: '5-7',
+      forbidden: 'NEVER generate exactly 7 slides, NEVER use comparison twice',
+      imageSlots: [1, 2, 5],
+      heroHasImage: true  // Hero slide should have image
     }
   ];
   const randomStrategy = variationStrategies[Math.floor(Math.random() * variationStrategies.length)];
@@ -166,50 +172,69 @@ PROFESSIONAL PRESENTATION DESIGN RULES
 🖼️ CRITICAL IMAGE PROMPT RULES (MUST FOLLOW EXACTLY):
 
 🚨 MANDATORY REQUIREMENTS FOR EVERY IMAGE PROMPT:
-1. **MUST include 2+ keywords from the slide's title or subtitle** (copy them directly!)
-2. **MUST describe a SPECIFIC scene with people/objects/actions** (not abstract concepts)
-3. **MUST avoid these BANNED words**: "glowing", "futuristic", "abstract", "concept", "visualization", "neural network", "circuit board", "digital illustration"
+1. **MUST include 3+ EXACT keywords from the slide's title AND subtitle** (copy them word-for-word!)
+2. **MUST describe a SPECIFIC scene matching THIS SLIDE'S EXACT CONTENT** (not general topic)
+3. **MUST avoid these BANNED words**: "glowing", "futuristic", "abstract", "concept", "visualization", "neural network", "circuit board", "digital illustration", "technology", "modern", "innovative"
 4. **MUST be 80-150 characters** (not too short, not too long)
 5. **MUST use photographic realism style** (not artistic/abstract)
 6. **Image style theme**: ${randomStrategy.imageStyle}
+7. **CRITICAL**: If slide is about "Marine Conservation", image MUST show conservation activities (NOT random ocean). If slide is about "AI Safety", image MUST show safety measures (NOT generic robots).
 
 IMAGE PROMPT FORMULA:
-[Subject with action] + [specific context from slide title] + [setting/environment] + [realistic photography style]
+[Subject with action relating to EXACT SLIDE TITLE] + [specific keywords from slide title] + [setting] + [realistic photo]
 
-EXAMPLES BY SLIDE TYPE:
+EXAMPLES (NOTICE HOW KEYWORDS FROM TITLE ARE COPIED):
 
-For slide "Acoustic Engineering":
-❌ BAD: "abstract sound waves glowing in futuristic digital space"
-❌ BAD: "microphone in studio" (too generic)
-✅ GOOD: "Audio engineer adjusting acoustic panel positioning in professional recording studio, measuring frequency response with analyzer"
-✅ GOOD: "Close-up of ribbon microphone capturing acoustic guitar performance in sound-isolated booth, wood panels visible"
+For slide titled "Acoustic Engineering Principles":
+❌ BAD: "abstract sound waves glowing" (no keywords from title, banned words)
+❌ BAD: "person in studio" (too generic, missing "acoustic engineering" keywords)
+❌ BAD: "microphone recording" (missing "principles" context)
+✅ GOOD: "Acoustic engineering lab showing sound principles demonstration with frequency analyzer and panel testing setup"
+✅ GOOD: "Engineer demonstrating acoustic principles by measuring room response in engineering test chamber"
 
-For slide "The Paradigm Shift":
-❌ BAD: "glowing silicon semiconductor abstract visualization"
-❌ BAD: "technology concept futuristic"
-✅ GOOD: "Research scientist examining paradigm shift in laboratory methodology, comparing old and new experimental protocols"
-✅ GOOD: "Conference room showing paradigm shift presentation with before/after workflow charts on screen"
+For slide titled "Marine Conservation Strategies":
+❌ BAD: "beautiful ocean underwater" (doesn't mention conservation!)
+❌ BAD: "fish swimming in sea" (misses the conservation focus completely!)
+✅ GOOD: "Marine biologist implementing conservation strategies tagging endangered sea turtles for population monitoring"
+✅ GOOD: "Conservation team deploying marine protection strategies installing artificial reef structures for habitat restoration"
 
-For slide "Neural Network Anatomy":
-❌ BAD: "abstract glowing nodes firing in digital space"
-❌ BAD: "neural network visualization concept"
-✅ GOOD: "Data scientist analyzing neural network layer architecture diagram on multiple monitors, annotating connection patterns"
-✅ GOOD: "Whiteboard showing detailed neural network anatomy with hand-drawn nodes, weights, and activation functions"
+For slide titled "Neural Network Training Process":
+❌ BAD: "abstract neural network glowing" (banned words, not about training)
+❌ BAD: "AI concept futuristic" (banned words, too vague)
+✅ GOOD: "Data scientist monitoring neural network training process on multiple screens showing loss curves and accuracy metrics"
+✅ GOOD: "Research team reviewing training process parameters for neural network optimization in collaborative workspace"
 
-For slide "Foundations of Inner Peace":
-❌ BAD: "peaceful meditation concept glowing aura"
-❌ BAD: "abstract zen visualization"
-✅ GOOD: "Person practicing meditation on foundation mat in serene morning light, embodying inner peace and mindfulness"
-✅ GOOD: "Yoga instructor demonstrating foundational breathing technique for inner peace in natural outdoor setting"
+For slide titled "The Foundations of Inner Peace":
+❌ BAD: "peaceful meditation concept" (too generic, missing "foundations")
+❌ BAD: "zen abstract visualization" (banned words)
+✅ GOOD: "Meditation instructor teaching foundations of inner peace breath work techniques to students in morning session"
+✅ GOOD: "Person practicing foundational inner peace meditation routine in serene natural garden setting at sunrise"
 
-🎯 CHECKLIST BEFORE WRITING EACH IMAGE PROMPT:
-□ Read the slide title carefully
-□ Identify 2+ specific keywords from title
-□ Include those keywords in your prompt
-□ Describe real people/objects doing specific actions
-□ Avoid ALL banned generic words
+For slide titled "Economic Impact Analysis":
+❌ BAD: "charts and graphs" (no "economic impact" keywords!)
+❌ BAD: "business meeting" (too vague)
+✅ GOOD: "Economist presenting economic impact analysis data charts to policy makers in government briefing room"
+✅ GOOD: "Financial analysts reviewing economic impact metrics and analysis reports comparing regional growth trends"
+
+🎯 STRICT CHECKLIST BEFORE WRITING EACH IMAGE PROMPT:
+□ Read the slide's EXACT title and subtitle
+□ Identify 3+ specific keywords from title (write them down!)
+□ COPY those exact keywords into your image prompt
+□ Describe what's happening that relates to THOSE SPECIFIC KEYWORDS
+□ NO generic scenes - must match the slide's precise topic
+□ Avoid ALL 13 banned words completely
 □ Keep 80-150 characters
-□ Verify prompt matches slide's EXACT topic (not just general theme)
+□ Double-check: Does this image match THIS EXACT SLIDE or just the general topic?
+
+⚠️ COMMON MISTAKES TO AVOID:
+• Slide: "Ocean Acidification" → Prompt: "beautiful coral reef" ❌ (doesn't mention acidification!)
+• Slide: "Machine Learning Bias" → Prompt: "robots in factory" ❌ (doesn't mention bias!)
+• Slide: "Renewable Energy Storage" → Prompt: "solar panels" ❌ (doesn't mention storage!)
+
+✅ CORRECT APPROACH:
+• Slide: "Ocean Acidification Effects" → "Marine researcher testing ocean acidification pH levels on damaged coral samples"
+• Slide: "Machine Learning Bias Detection" → "Data scientist reviewing machine learning bias audit results highlighting demographic disparities"
+• Slide: "Renewable Energy Storage Solutions" → "Engineers inspecting large-scale battery storage facility for renewable energy grid stabilization"
 
 🎨 DYNAMIC COLOR THEMES (pick ONE that matches topic):
 - Technology: #0F172A bg, #38B6FF accent

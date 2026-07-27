@@ -18,5 +18,11 @@ app.listen(config.port, () => {
   } else {
     logger.warn(`Gemini API Key: \x1b[31mNOT CONFIGURED IN .env\x1b[0m`);
   }
+  if (config.hfToken) {
+    const maskedHf = `${config.hfToken.substring(0, 5)}...${config.hfToken.substring(config.hfToken.length - 4)}`;
+    logger.info(`HF Image API Loaded:  \x1b[32mYES\x1b[0m (${maskedHf})`);
+  } else {
+    logger.warn(`HF Image API:         \x1b[31mNOT CONFIGURED — image generation disabled\x1b[0m`);
+  }
   console.log(`====================================================`);
 });

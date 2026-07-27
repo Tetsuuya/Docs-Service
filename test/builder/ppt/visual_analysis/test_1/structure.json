@@ -1,0 +1,794 @@
+[
+  {
+    "slide_num": 1,
+    "shapes": [
+      {
+        "type": 1,
+        "left": 0,
+        "top": 0,
+        "width": 9144000,
+        "height": 73152,
+        "fill_color": "#e91e63"
+      },
+      {
+        "type": 1,
+        "left": 457200,
+        "top": 365760,
+        "width": 3200400,
+        "height": 320040,
+        "fill_color": "#334155"
+      },
+      {
+        "type": 1,
+        "left": 502920,
+        "top": 384048,
+        "width": 3108960,
+        "height": 274320,
+        "text": "\ud83c\udff7\ufe0f THE ARCHITECTURE OF SOUND"
+      },
+      {
+        "type": 1,
+        "left": 457200,
+        "top": 822960,
+        "width": 5029200,
+        "height": 2103120,
+        "text": "The Power of Audio"
+      },
+      {
+        "type": 1,
+        "left": 457200,
+        "top": 3017520,
+        "width": 5029200,
+        "height": 1097280,
+        "text": "Opening Perspective"
+      },
+      {
+        "type": 1,
+        "left": 5303520,
+        "top": 731520,
+        "width": 3383280,
+        "height": 3474720,
+        "fill_color": "#2a0a0a"
+      },
+      {
+        "type": 13,
+        "left": 5376672,
+        "top": 804672,
+        "width": 3236976,
+        "height": 3328416,
+        "has_image": true
+      },
+      {
+        "type": 1,
+        "left": 457200,
+        "top": 4572000,
+        "width": 8229600,
+        "height": 27432,
+        "fill_color": "#334155"
+      },
+      {
+        "type": 1,
+        "left": 457200,
+        "top": 4663440,
+        "width": 8229600,
+        "height": 228600,
+        "text": "DOCS-SERVICE AI DESIGN ENGINE 2026"
+      }
+    ]
+  },
+  {
+    "slide_num": 2,
+    "shapes": [
+      {
+        "type": 1,
+        "left": 0,
+        "top": 0,
+        "width": 9144000,
+        "height": 73152,
+        "fill_color": "#e91e63"
+      },
+      {
+        "type": 1,
+        "left": 457200,
+        "top": 274320,
+        "width": 8229600,
+        "height": 457200,
+        "text": "The Dual Nature of Listening"
+      },
+      {
+        "type": 1,
+        "left": 457200,
+        "top": 731520,
+        "width": 8229600,
+        "height": 274320,
+        "text": "Passive vs. Active Engagement"
+      },
+      {
+        "type": 1,
+        "left": 457200,
+        "top": 4663440,
+        "width": 8229600,
+        "height": 18288,
+        "fill_color": "#334155"
+      },
+      {
+        "type": 1,
+        "left": 457200,
+        "top": 4709160,
+        "width": 8229600,
+        "height": 228600,
+        "text": "PRESENTATION | PAGE 2"
+      },
+      {
+        "type": 1,
+        "left": 457200,
+        "top": 1143000,
+        "width": 3840480,
+        "height": 3383280,
+        "fill_color": "#2a0a0a"
+      },
+      {
+        "type": 1,
+        "left": 457200,
+        "top": 1143000,
+        "width": 3840480,
+        "height": 73152,
+        "fill_color": "#e91e63"
+      },
+      {
+        "type": 1,
+        "left": 594360,
+        "top": 1371600,
+        "width": 3566160,
+        "height": 457200,
+        "text": "Passive Consumption"
+      },
+      {
+        "type": 1,
+        "left": 594360,
+        "top": 1874520,
+        "width": 3566160,
+        "height": 2468880,
+        "text": "Serves as background noise during daily commutes, routine tasks, and office work.\nRelies heavily on "
+      },
+      {
+        "type": 1,
+        "left": 4846320,
+        "top": 1143000,
+        "width": 3840480,
+        "height": 3383280,
+        "fill_color": "#2a0a0a"
+      },
+      {
+        "type": 1,
+        "left": 4846320,
+        "top": 1143000,
+        "width": 3840480,
+        "height": 73152,
+        "fill_color": "#e91e63"
+      },
+      {
+        "type": 1,
+        "left": 4983480,
+        "top": 1371600,
+        "width": 3566160,
+        "height": 457200,
+        "text": "Active Immersion"
+      },
+      {
+        "type": 1,
+        "left": 4983480,
+        "top": 1874520,
+        "width": 3566160,
+        "height": 2468880,
+        "text": "Involves deep analytical listening to specific instrumental layers, mixing choices, and lyricism.\nRe"
+      }
+    ]
+  },
+  {
+    "slide_num": 3,
+    "shapes": [
+      {
+        "type": 1,
+        "left": 0,
+        "top": 0,
+        "width": 9144000,
+        "height": 73152,
+        "fill_color": "#e91e63"
+      },
+      {
+        "type": 1,
+        "left": 457200,
+        "top": 274320,
+        "width": 8229600,
+        "height": 457200,
+        "text": "The Three Pillars of Sonic Impact"
+      },
+      {
+        "type": 1,
+        "left": 457200,
+        "top": 731520,
+        "width": 8229600,
+        "height": 274320,
+        "text": "Core elements that define every musical experience"
+      },
+      {
+        "type": 1,
+        "left": 457200,
+        "top": 4663440,
+        "width": 8229600,
+        "height": 18288,
+        "fill_color": "#334155"
+      },
+      {
+        "type": 1,
+        "left": 457200,
+        "top": 4709160,
+        "width": 8229600,
+        "height": 228600,
+        "text": "PRESENTATION | PAGE 3"
+      },
+      {
+        "type": 1,
+        "left": 457200,
+        "top": 1143000,
+        "width": 2560320,
+        "height": 3383280,
+        "fill_color": "#2a0a0a"
+      },
+      {
+        "type": 1,
+        "left": 457200,
+        "top": 1143000,
+        "width": 2560320,
+        "height": 73152,
+        "fill_color": "#e91e63"
+      },
+      {
+        "type": 1,
+        "left": 594360,
+        "top": 1371600,
+        "width": 2286000,
+        "height": 457200,
+        "text": "Rhythm and Pulse"
+      },
+      {
+        "type": 1,
+        "left": 594360,
+        "top": 1874520,
+        "width": 2286000,
+        "height": 2468880,
+        "text": "The foundational temporal framework that drives human movement, heart rate synchronization, and visc"
+      },
+      {
+        "type": 1,
+        "left": 3291840,
+        "top": 1143000,
+        "width": 2560320,
+        "height": 3383280,
+        "fill_color": "#2a0a0a"
+      },
+      {
+        "type": 1,
+        "left": 3291840,
+        "top": 1143000,
+        "width": 2560320,
+        "height": 73152,
+        "fill_color": "#e91e63"
+      },
+      {
+        "type": 1,
+        "left": 3429000,
+        "top": 1371600,
+        "width": 2286000,
+        "height": 457200,
+        "text": "Harmonic Resonance"
+      },
+      {
+        "type": 1,
+        "left": 3429000,
+        "top": 1874520,
+        "width": 2286000,
+        "height": 2468880,
+        "text": "The vertical combination of simultaneous frequencies that triggers complex emotional associations, t"
+      },
+      {
+        "type": 1,
+        "left": 6126480,
+        "top": 1143000,
+        "width": 2560320,
+        "height": 3383280,
+        "fill_color": "#2a0a0a"
+      },
+      {
+        "type": 1,
+        "left": 6126480,
+        "top": 1143000,
+        "width": 2560320,
+        "height": 73152,
+        "fill_color": "#e91e63"
+      },
+      {
+        "type": 1,
+        "left": 6263640,
+        "top": 1371600,
+        "width": 2286000,
+        "height": 457200,
+        "text": "Timbral Texture"
+      },
+      {
+        "type": 1,
+        "left": 6263640,
+        "top": 1874520,
+        "width": 2286000,
+        "height": 2468880,
+        "text": "The distinct sonic fingerprint of instruments and voices, defined by overtones and physical material"
+      }
+    ]
+  },
+  {
+    "slide_num": 4,
+    "shapes": [
+      {
+        "type": 1,
+        "left": 0,
+        "top": 0,
+        "width": 9144000,
+        "height": 73152,
+        "fill_color": "#e91e63"
+      },
+      {
+        "type": 1,
+        "left": 457200,
+        "top": 274320,
+        "width": 8229600,
+        "height": 457200,
+        "text": "Acoustic Engineering"
+      },
+      {
+        "type": 1,
+        "left": 457200,
+        "top": 731520,
+        "width": 8229600,
+        "height": 274320,
+        "text": "The physics of modern sound capture"
+      },
+      {
+        "type": 1,
+        "left": 457200,
+        "top": 4663440,
+        "width": 8229600,
+        "height": 18288,
+        "fill_color": "#334155"
+      },
+      {
+        "type": 1,
+        "left": 457200,
+        "top": 4709160,
+        "width": 8229600,
+        "height": 228600,
+        "text": "PRESENTATION | PAGE 4"
+      },
+      {
+        "type": 1,
+        "left": 457200,
+        "top": 1143000,
+        "width": 3749040,
+        "height": 3383280,
+        "fill_color": "#2a0a0a"
+      },
+      {
+        "type": 13,
+        "left": 530352,
+        "top": 1216152,
+        "width": 3602736,
+        "height": 3236976,
+        "has_image": true
+      },
+      {
+        "type": 1,
+        "left": 4389120,
+        "top": 1143000,
+        "width": 4297680,
+        "height": 3383280,
+        "fill_color": "#2a0a0a"
+      },
+      {
+        "type": 1,
+        "left": 4389120,
+        "top": 1143000,
+        "width": 4297680,
+        "height": 73152,
+        "fill_color": "#e91e63"
+      },
+      {
+        "type": 1,
+        "left": 4572000,
+        "top": 1371600,
+        "width": 3931920,
+        "height": 3017520,
+        "text": "Modern production requires meticulous attention to phase cancellation, room modes, and frequency mas"
+      }
+    ]
+  },
+  {
+    "slide_num": 5,
+    "shapes": [
+      {
+        "type": 1,
+        "left": 0,
+        "top": 0,
+        "width": 9144000,
+        "height": 73152,
+        "fill_color": "#e91e63"
+      },
+      {
+        "type": 1,
+        "left": 457200,
+        "top": 274320,
+        "width": 8229600,
+        "height": 457200,
+        "text": "The Neurochemistry of Melody"
+      },
+      {
+        "type": 1,
+        "left": 457200,
+        "top": 731520,
+        "width": 8229600,
+        "height": 274320,
+        "text": "Biological response to auditory stimuli"
+      },
+      {
+        "type": 1,
+        "left": 457200,
+        "top": 4663440,
+        "width": 8229600,
+        "height": 18288,
+        "fill_color": "#334155"
+      },
+      {
+        "type": 1,
+        "left": 457200,
+        "top": 4709160,
+        "width": 8229600,
+        "height": 228600,
+        "text": "PRESENTATION | PAGE 5"
+      },
+      {
+        "type": 1,
+        "left": 457200,
+        "top": 1143000,
+        "width": 2468880,
+        "height": 3383280,
+        "fill_color": "#2a0a0a"
+      },
+      {
+        "type": 1,
+        "left": 502920,
+        "top": 1691640,
+        "width": 2377440,
+        "height": 1097280,
+        "text": "300%"
+      },
+      {
+        "type": 1,
+        "left": 502920,
+        "top": 2880360,
+        "width": 2377440,
+        "height": 1280160,
+        "text": "Dopamine Surge"
+      },
+      {
+        "type": 1,
+        "left": 3108960,
+        "top": 1143000,
+        "width": 5577840,
+        "height": 3383280,
+        "fill_color": "#2a0a0a"
+      },
+      {
+        "type": 1,
+        "left": 3246120,
+        "top": 1417320,
+        "width": 5303520,
+        "height": 2926080,
+        "text": "Listening to emotionally resonant musical passages triggers significant dopamine releases within the"
+      }
+    ]
+  },
+  {
+    "slide_num": 6,
+    "shapes": [
+      {
+        "type": 1,
+        "left": 0,
+        "top": 0,
+        "width": 9144000,
+        "height": 73152,
+        "fill_color": "#e91e63"
+      },
+      {
+        "type": 1,
+        "left": 457200,
+        "top": 274320,
+        "width": 8229600,
+        "height": 457200,
+        "text": "The Universal Language"
+      },
+      {
+        "type": 1,
+        "left": 457200,
+        "top": 731520,
+        "width": 8229600,
+        "height": 274320,
+        "text": "Beyond words"
+      },
+      {
+        "type": 1,
+        "left": 457200,
+        "top": 4663440,
+        "width": 8229600,
+        "height": 18288,
+        "fill_color": "#334155"
+      },
+      {
+        "type": 1,
+        "left": 457200,
+        "top": 4709160,
+        "width": 8229600,
+        "height": 228600,
+        "text": "PRESENTATION | PAGE 6"
+      },
+      {
+        "type": 1,
+        "left": 914400,
+        "top": 2057400,
+        "width": 7315200,
+        "height": 1828800,
+        "text": "Music transcends linguistic boundaries, uniting diverse human consciousnesses through pure mathemati"
+      },
+      {
+        "type": 1,
+        "left": 1371600,
+        "top": 4069080,
+        "width": 6400800,
+        "height": 457200,
+        "text": "It is humanity's most enduring bridge across cultural divides."
+      }
+    ]
+  },
+  {
+    "slide_num": 7,
+    "shapes": [
+      {
+        "type": 1,
+        "left": 0,
+        "top": 0,
+        "width": 9144000,
+        "height": 73152,
+        "fill_color": "#e91e63"
+      },
+      {
+        "type": 1,
+        "left": 457200,
+        "top": 274320,
+        "width": 8229600,
+        "height": 457200,
+        "text": "Evolution of Delivery Systems"
+      },
+      {
+        "type": 1,
+        "left": 457200,
+        "top": 731520,
+        "width": 8229600,
+        "height": 274320,
+        "text": "How we access and consume sound"
+      },
+      {
+        "type": 1,
+        "left": 457200,
+        "top": 4663440,
+        "width": 8229600,
+        "height": 18288,
+        "fill_color": "#334155"
+      },
+      {
+        "type": 1,
+        "left": 457200,
+        "top": 4709160,
+        "width": 8229600,
+        "height": 228600,
+        "text": "PRESENTATION | PAGE 7"
+      },
+      {
+        "type": 1,
+        "left": 457200,
+        "top": 1143000,
+        "width": 8229600,
+        "height": 3383280,
+        "fill_color": "#2a0a0a"
+      },
+      {
+        "type": 1,
+        "left": 640080,
+        "top": 1371600,
+        "width": 7863840,
+        "height": 3017520,
+        "text": "Wax cylinders and shellac 78s initiated the era of preserved acoustic performances, allowing home pl"
+      }
+    ]
+  },
+  {
+    "slide_num": 8,
+    "shapes": [
+      {
+        "type": 1,
+        "left": 0,
+        "top": 0,
+        "width": 9144000,
+        "height": 73152,
+        "fill_color": "#e91e63"
+      },
+      {
+        "type": 1,
+        "left": 457200,
+        "top": 274320,
+        "width": 8229600,
+        "height": 457200,
+        "text": "From Composition to Master"
+      },
+      {
+        "type": 1,
+        "left": 457200,
+        "top": 731520,
+        "width": 8229600,
+        "height": 274320,
+        "text": "The lifecycle of an audio recording"
+      },
+      {
+        "type": 1,
+        "left": 457200,
+        "top": 4663440,
+        "width": 8229600,
+        "height": 18288,
+        "fill_color": "#334155"
+      },
+      {
+        "type": 1,
+        "left": 457200,
+        "top": 4709160,
+        "width": 8229600,
+        "height": 228600,
+        "text": "PRESENTATION | PAGE 8"
+      },
+      {
+        "type": 1,
+        "left": 457200,
+        "top": 1143000,
+        "width": 8229600,
+        "height": 754380,
+        "fill_color": "#2a0a0a"
+      },
+      {
+        "type": 1,
+        "left": 640080,
+        "top": 1337310,
+        "width": 457200,
+        "height": 457200,
+        "fill_color": "#e91e63"
+      },
+      {
+        "type": 1,
+        "left": 640080,
+        "top": 1337310,
+        "width": 457200,
+        "height": 457200,
+        "text": "1"
+      },
+      {
+        "type": 1,
+        "left": 1280160,
+        "top": 1234440,
+        "width": 7223760,
+        "height": 662940,
+        "text": "Ideation"
+      },
+      {
+        "type": 1,
+        "left": 457200,
+        "top": 1988820,
+        "width": 8229600,
+        "height": 754380,
+        "fill_color": "#2a0a0a"
+      },
+      {
+        "type": 1,
+        "left": 640080,
+        "top": 2183130,
+        "width": 457200,
+        "height": 457200,
+        "fill_color": "#e91e63"
+      },
+      {
+        "type": 1,
+        "left": 640080,
+        "top": 2183130,
+        "width": 457200,
+        "height": 457200,
+        "text": "2"
+      },
+      {
+        "type": 1,
+        "left": 1280160,
+        "top": 2080260,
+        "width": 7223760,
+        "height": 662940,
+        "text": "Tracking"
+      },
+      {
+        "type": 1,
+        "left": 457200,
+        "top": 2834640,
+        "width": 8229600,
+        "height": 754380,
+        "fill_color": "#2a0a0a"
+      },
+      {
+        "type": 1,
+        "left": 640080,
+        "top": 3028950,
+        "width": 457200,
+        "height": 457200,
+        "fill_color": "#e91e63"
+      },
+      {
+        "type": 1,
+        "left": 640080,
+        "top": 3028950,
+        "width": 457200,
+        "height": 457200,
+        "text": "3"
+      },
+      {
+        "type": 1,
+        "left": 1280160,
+        "top": 2926080,
+        "width": 7223760,
+        "height": 662940,
+        "text": "Mixing"
+      },
+      {
+        "type": 1,
+        "left": 457200,
+        "top": 3680460,
+        "width": 8229600,
+        "height": 754380,
+        "fill_color": "#2a0a0a"
+      },
+      {
+        "type": 1,
+        "left": 640080,
+        "top": 3874770,
+        "width": 457200,
+        "height": 457200,
+        "fill_color": "#e91e63"
+      },
+      {
+        "type": 1,
+        "left": 640080,
+        "top": 3874770,
+        "width": 457200,
+        "height": 457200,
+        "text": "4"
+      },
+      {
+        "type": 1,
+        "left": 1280160,
+        "top": 3771900,
+        "width": 7223760,
+        "height": 662940,
+        "text": "Mastering"
+      }
+    ]
+  }
+]

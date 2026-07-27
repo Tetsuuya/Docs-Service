@@ -4,5 +4,6 @@ dotenv.config();
 export const config = {
   port: process.env.PORT || 3000,
   geminiApiKey: process.env.GEMINI_API_KEY || '',
-  geminiModel: process.env.GEMINI_MODEL || 'gemini-flash-lite-latest'
+  geminiModel: process.env.GEMINI_MODEL || 'gemini-flash-lite-latest',
+  hfToken: process.env.HF_TOKEN || '',
 };

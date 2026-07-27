@@ -1,0 +1,544 @@
+[
+  {
+    "slide_num": 1,
+    "shapes": [
+      {
+        "type": 1,
+        "left": 0,
+        "top": 0,
+        "width": 9144000,
+        "height": 73152,
+        "fill_color": "#38b6ff"
+      },
+      {
+        "type": 1,
+        "left": 457200,
+        "top": 365760,
+        "width": 3200400,
+        "height": 320040,
+        "fill_color": "#334155"
+      },
+      {
+        "type": 1,
+        "left": 502920,
+        "top": 384048,
+        "width": 3108960,
+        "height": 274320,
+        "text": "\ud83c\udff7\ufe0f BEYOND THE ATMOSPHERE"
+      },
+      {
+        "type": 1,
+        "left": 457200,
+        "top": 822960,
+        "width": 5029200,
+        "height": 2103120,
+        "text": "The Infinite Horizon"
+      },
+      {
+        "type": 1,
+        "left": 457200,
+        "top": 3017520,
+        "width": 5029200,
+        "height": 1097280,
+        "text": "The evolution and future horizon of human space exploration"
+      },
+      {
+        "type": 1,
+        "left": 5303520,
+        "top": 731520,
+        "width": 3383280,
+        "height": 3474720,
+        "fill_color": "#1e293b"
+      },
+      {
+        "type": 13,
+        "left": 5376672,
+        "top": 804672,
+        "width": 3236976,
+        "height": 3328416,
+        "has_image": true
+      },
+      {
+        "type": 1,
+        "left": 457200,
+        "top": 4572000,
+        "width": 8229600,
+        "height": 27432,
+        "fill_color": "#334155"
+      },
+      {
+        "type": 1,
+        "left": 457200,
+        "top": 4663440,
+        "width": 8229600,
+        "height": 228600,
+        "text": "DOCS-SERVICE AI DESIGN ENGINE 2026"
+      }
+    ]
+  },
+  {
+    "slide_num": 2,
+    "shapes": [
+      {
+        "type": 1,
+        "left": 0,
+        "top": 0,
+        "width": 9144000,
+        "height": 73152,
+        "fill_color": "#38b6ff"
+      },
+      {
+        "type": 1,
+        "left": 457200,
+        "top": 274320,
+        "width": 8229600,
+        "height": 457200,
+        "text": "The Scale of the Journey"
+      },
+      {
+        "type": 1,
+        "left": 457200,
+        "top": 4663440,
+        "width": 8229600,
+        "height": 18288,
+        "fill_color": "#334155"
+      },
+      {
+        "type": 1,
+        "left": 457200,
+        "top": 4709160,
+        "width": 8229600,
+        "height": 228600,
+        "text": "PRESENTATION | PAGE 2"
+      },
+      {
+        "type": 1,
+        "left": 457200,
+        "top": 914400,
+        "width": 2468880,
+        "height": 3383280,
+        "fill_color": "#1e293b"
+      },
+      {
+        "type": 1,
+        "left": 502920,
+        "top": 1463040,
+        "width": 2377440,
+        "height": 1097280,
+        "text": "384,400"
+      },
+      {
+        "type": 1,
+        "left": 502920,
+        "top": 2651760,
+        "width": 2377440,
+        "height": 1280160,
+        "text": "Kilometers from Earth to the Moon, representing just the first stepping stone into the vast expanse "
+      },
+      {
+        "type": 1,
+        "left": 3108960,
+        "top": 914400,
+        "width": 5577840,
+        "height": 3383280,
+        "fill_color": "#1e293b"
+      },
+      {
+        "type": 1,
+        "left": 3246120,
+        "top": 1188720,
+        "width": 5303520,
+        "height": 2926080,
+        "text": "Mars sits roughly 225 million kilometers away on average, requiring entirely new propulsion paradigm"
+      }
+    ]
+  },
+  {
+    "slide_num": 3,
+    "shapes": [
+      {
+        "type": 1,
+        "left": 0,
+        "top": 0,
+        "width": 9144000,
+        "height": 73152,
+        "fill_color": "#38b6ff"
+      },
+      {
+        "type": 1,
+        "left": 457200,
+        "top": 274320,
+        "width": 8229600,
+        "height": 457200,
+        "text": "Redefining Engineering"
+      },
+      {
+        "type": 1,
+        "left": 457200,
+        "top": 731520,
+        "width": 8229600,
+        "height": 274320,
+        "text": "Overcoming the extreme barriers of vacuum, radiation, and thermal extremes."
+      },
+      {
+        "type": 1,
+        "left": 457200,
+        "top": 4663440,
+        "width": 8229600,
+        "height": 18288,
+        "fill_color": "#334155"
+      },
+      {
+        "type": 1,
+        "left": 457200,
+        "top": 4709160,
+        "width": 8229600,
+        "height": 228600,
+        "text": "PRESENTATION | PAGE 3"
+      },
+      {
+        "type": 1,
+        "left": 457200,
+        "top": 1143000,
+        "width": 3749040,
+        "height": 3383280,
+        "fill_color": "#1e293b"
+      },
+      {
+        "type": 13,
+        "left": 530352,
+        "top": 1216152,
+        "width": 3602736,
+        "height": 3236976,
+        "has_image": true
+      },
+      {
+        "type": 1,
+        "left": 4389120,
+        "top": 1143000,
+        "width": 4297680,
+        "height": 3383280,
+        "fill_color": "#1e293b"
+      },
+      {
+        "type": 1,
+        "left": 4389120,
+        "top": 1143000,
+        "width": 4297680,
+        "height": 73152,
+        "fill_color": "#38b6ff"
+      },
+      {
+        "type": 1,
+        "left": 4572000,
+        "top": 1371600,
+        "width": 3931920,
+        "height": 3017520,
+        "text": "Reusable rocket architectures have fundamentally collapsed the cost per kilogram to orbit, democrati"
+      }
+    ]
+  },
+  {
+    "slide_num": 4,
+    "shapes": [
+      {
+        "type": 1,
+        "left": 0,
+        "top": 0,
+        "width": 9144000,
+        "height": 73152,
+        "fill_color": "#38b6ff"
+      },
+      {
+        "type": 1,
+        "left": 457200,
+        "top": 274320,
+        "width": 8229600,
+        "height": 457200,
+        "text": "Paradigm Shift in Exploration"
+      },
+      {
+        "type": 1,
+        "left": 457200,
+        "top": 4663440,
+        "width": 8229600,
+        "height": 18288,
+        "fill_color": "#334155"
+      },
+      {
+        "type": 1,
+        "left": 457200,
+        "top": 4709160,
+        "width": 8229600,
+        "height": 228600,
+        "text": "PRESENTATION | PAGE 4"
+      },
+      {
+        "type": 1,
+        "left": 457200,
+        "top": 914400,
+        "width": 3840480,
+        "height": 3383280,
+        "fill_color": "#1e293b"
+      },
+      {
+        "type": 1,
+        "left": 457200,
+        "top": 914400,
+        "width": 3840480,
+        "height": 73152,
+        "fill_color": "#38b6ff"
+      },
+      {
+        "type": 1,
+        "left": 594360,
+        "top": 1143000,
+        "width": 3566160,
+        "height": 457200,
+        "text": "Legacy Model"
+      },
+      {
+        "type": 1,
+        "left": 594360,
+        "top": 1645920,
+        "width": 3566160,
+        "height": 2468880,
+        "text": "State-funded, geopolitical prestige driven programs with multi-decade timelines\nExpendable single-us"
+      },
+      {
+        "type": 1,
+        "left": 4846320,
+        "top": 914400,
+        "width": 3840480,
+        "height": 3383280,
+        "fill_color": "#1e293b"
+      },
+      {
+        "type": 1,
+        "left": 4846320,
+        "top": 914400,
+        "width": 3840480,
+        "height": 73152,
+        "fill_color": "#38b6ff"
+      },
+      {
+        "type": 1,
+        "left": 4983480,
+        "top": 1143000,
+        "width": 3566160,
+        "height": 457200,
+        "text": "Commercial Era"
+      },
+      {
+        "type": 1,
+        "left": 4983480,
+        "top": 1645920,
+        "width": 3566160,
+        "height": 2468880,
+        "text": "Agile, private-public partnerships fostering rapid iteration and commercial viability\nRapidly reusab"
+      }
+    ]
+  },
+  {
+    "slide_num": 5,
+    "shapes": [
+      {
+        "type": 1,
+        "left": 0,
+        "top": 0,
+        "width": 9144000,
+        "height": 73152,
+        "fill_color": "#38b6ff"
+      },
+      {
+        "type": 1,
+        "left": 457200,
+        "top": 274320,
+        "width": 8229600,
+        "height": 457200,
+        "text": "The Three Pillars of Tomorrow"
+      },
+      {
+        "type": 1,
+        "left": 457200,
+        "top": 4663440,
+        "width": 8229600,
+        "height": 18288,
+        "fill_color": "#334155"
+      },
+      {
+        "type": 1,
+        "left": 457200,
+        "top": 4709160,
+        "width": 8229600,
+        "height": 228600,
+        "text": "PRESENTATION | PAGE 5"
+      },
+      {
+        "type": 1,
+        "left": 457200,
+        "top": 914400,
+        "width": 2560320,
+        "height": 3383280,
+        "fill_color": "#1e293b"
+      },
+      {
+        "type": 1,
+        "left": 457200,
+        "top": 914400,
+        "width": 2560320,
+        "height": 73152,
+        "fill_color": "#38b6ff"
+      },
+      {
+        "type": 1,
+        "left": 594360,
+        "top": 1143000,
+        "width": 2286000,
+        "height": 457200,
+        "text": "Interplanetary Habitats"
+      },
+      {
+        "type": 1,
+        "left": 594360,
+        "top": 1645920,
+        "width": 2286000,
+        "height": 2468880,
+        "text": "Developing self-sustaining biospheres utilizing in-situ resource utilization, turning Martian regoli"
+      },
+      {
+        "type": 1,
+        "left": 3291840,
+        "top": 914400,
+        "width": 2560320,
+        "height": 3383280,
+        "fill_color": "#1e293b"
+      },
+      {
+        "type": 1,
+        "left": 3291840,
+        "top": 914400,
+        "width": 2560320,
+        "height": 73152,
+        "fill_color": "#38b6ff"
+      },
+      {
+        "type": 1,
+        "left": 3429000,
+        "top": 1143000,
+        "width": 2286000,
+        "height": 457200,
+        "text": "Deep Space Propulsion"
+      },
+      {
+        "type": 1,
+        "left": 3429000,
+        "top": 1645920,
+        "width": 2286000,
+        "height": 2468880,
+        "text": "Transitioning beyond chemical rockets toward nuclear thermal propulsion and ion drives to cut transi"
+      },
+      {
+        "type": 1,
+        "left": 6126480,
+        "top": 914400,
+        "width": 2560320,
+        "height": 3383280,
+        "fill_color": "#1e293b"
+      },
+      {
+        "type": 1,
+        "left": 6126480,
+        "top": 914400,
+        "width": 2560320,
+        "height": 73152,
+        "fill_color": "#38b6ff"
+      },
+      {
+        "type": 1,
+        "left": 6263640,
+        "top": 1143000,
+        "width": 2286000,
+        "height": 457200,
+        "text": "Orbital Economies"
+      },
+      {
+        "type": 1,
+        "left": 6263640,
+        "top": 1645920,
+        "width": 2286000,
+        "height": 2468880,
+        "text": "Building microgravity manufacturing hubs where pure fiber optics and faultless semiconductor crystal"
+      }
+    ]
+  },
+  {
+    "slide_num": 6,
+    "shapes": [
+      {
+        "type": 1,
+        "left": 0,
+        "top": 0,
+        "width": 9144000,
+        "height": 73152,
+        "fill_color": "#38b6ff"
+      },
+      {
+        "type": 1,
+        "left": 457200,
+        "top": 274320,
+        "width": 8229600,
+        "height": 457200,
+        "text": "The Long View"
+      },
+      {
+        "type": 1,
+        "left": 457200,
+        "top": 4663440,
+        "width": 8229600,
+        "height": 18288,
+        "fill_color": "#334155"
+      },
+      {
+        "type": 1,
+        "left": 457200,
+        "top": 4709160,
+        "width": 8229600,
+        "height": 228600,
+        "text": "PRESENTATION | PAGE 6"
+      },
+      {
+        "type": 1,
+        "left": 1371600,
+        "top": 1371600,
+        "width": 6400800,
+        "height": 2286000,
+        "fill_color": "#1e293b"
+      },
+      {
+        "type": 1,
+        "left": 1645920,
+        "top": 1188720,
+        "width": 457200,
+        "height": 457200,
+        "text": "\""
+      },
+      {
+        "type": 1,
+        "left": 1828800,
+        "top": 1737360,
+        "width": 5486400,
+        "height": 1371600,
+        "text": "The Earth is the cradle of humanity, but mankind cannot stay in the cradle forever."
+      },
+      {
+        "type": 1,
+        "left": 1828800,
+        "top": 3291840,
+        "width": 5486400,
+        "height": 274320,
+        "text": "\u2014 Konstantin Tsiolkovsky"
+      }
+    ]
+  }
+]

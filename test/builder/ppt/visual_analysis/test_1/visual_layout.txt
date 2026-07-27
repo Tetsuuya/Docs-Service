@@ -1,0 +1,137 @@
+================================================================================
+VISUAL LAYOUT ANALYSIS: test_1
+================================================================================
+
+
+────────────────────────────────────────────────────────────────────────────────
+SLIDE 1
+────────────────────────────────────────────────────────────────────────────────
+  [0in down, 0in right] Fill:#e91e63
+  [0in down, 0in right] Fill:#334155
+  [0in down, 0in right] TEXT: 🏷️ THE ARCHITECTURE OF SOUND
+  [0in down, 0in right] TEXT: The Power of Audio
+  [0in down, 5in right] Fill:#2a0a0a
+  [0in down, 5in right] [IMAGE]
+  [3in down, 0in right] TEXT: Opening Perspective
+  [5in down, 0in right] Fill:#334155
+  [5in down, 0in right] TEXT: DOCS-SERVICE AI DESIGN ENGINE 2026
+
+
+────────────────────────────────────────────────────────────────────────────────
+SLIDE 2
+────────────────────────────────────────────────────────────────────────────────
+  [0in down, 0in right] Fill:#e91e63
+  [0in down, 0in right] TEXT: The Dual Nature of Listening
+  [0in down, 0in right] TEXT: Passive vs. Active Engagement
+  [1in down, 0in right] Fill:#2a0a0a
+  [1in down, 0in right] Fill:#e91e63
+  [1in down, 0in right] TEXT: Passive Consumption
+  [1in down, 5in right] Fill:#2a0a0a
+  [1in down, 5in right] Fill:#e91e63
+  [1in down, 5in right] TEXT: Active Immersion
+  [2in down, 0in right] TEXT: Serves as background noise during daily commutes, routine ta
+  [2in down, 5in right] TEXT: Involves deep analytical listening to specific instrumental 
+  [5in down, 0in right] Fill:#334155
+  [5in down, 0in right] TEXT: PRESENTATION | PAGE 2
+
+
+────────────────────────────────────────────────────────────────────────────────
+SLIDE 3
+────────────────────────────────────────────────────────────────────────────────
+  [0in down, 0in right] Fill:#e91e63
+  [0in down, 0in right] TEXT: The Three Pillars of Sonic Impact
+  [0in down, 0in right] TEXT: Core elements that define every musical experience
+  [1in down, 0in right] Fill:#2a0a0a
+  [1in down, 0in right] Fill:#e91e63
+  [1in down, 0in right] TEXT: Rhythm and Pulse
+  [1in down, 3in right] Fill:#2a0a0a
+  [1in down, 3in right] Fill:#e91e63
+  [1in down, 3in right] TEXT: Harmonic Resonance
+  [1in down, 6in right] Fill:#2a0a0a
+  [1in down, 6in right] Fill:#e91e63
+  [1in down, 6in right] TEXT: Timbral Texture
+  [2in down, 0in right] TEXT: The foundational temporal framework that drives human moveme
+  [2in down, 3in right] TEXT: The vertical combination of simultaneous frequencies that tr
+  [2in down, 6in right] TEXT: The distinct sonic fingerprint of instruments and voices, de
+  [5in down, 0in right] Fill:#334155
+  [5in down, 0in right] TEXT: PRESENTATION | PAGE 3
+
+
+────────────────────────────────────────────────────────────────────────────────
+SLIDE 4
+────────────────────────────────────────────────────────────────────────────────
+  [0in down, 0in right] Fill:#e91e63
+  [0in down, 0in right] TEXT: Acoustic Engineering
+  [0in down, 0in right] TEXT: The physics of modern sound capture
+  [1in down, 0in right] Fill:#2a0a0a
+  [1in down, 0in right] [IMAGE]
+  [1in down, 4in right] Fill:#2a0a0a
+  [1in down, 4in right] Fill:#e91e63
+  [1in down, 5in right] TEXT: Modern production requires meticulous attention to phase can
+  [5in down, 0in right] Fill:#334155
+  [5in down, 0in right] TEXT: PRESENTATION | PAGE 4
+
+
+────────────────────────────────────────────────────────────────────────────────
+SLIDE 5
+────────────────────────────────────────────────────────────────────────────────
+  [0in down, 0in right] Fill:#e91e63
+  [0in down, 0in right] TEXT: The Neurochemistry of Melody
+  [0in down, 0in right] TEXT: Biological response to auditory stimuli
+  [1in down, 0in right] Fill:#2a0a0a
+  [1in down, 0in right] TEXT: 300%
+  [1in down, 3in right] Fill:#2a0a0a
+  [1in down, 3in right] TEXT: Listening to emotionally resonant musical passages triggers 
+  [3in down, 0in right] TEXT: Dopamine Surge
+  [5in down, 0in right] Fill:#334155
+  [5in down, 0in right] TEXT: PRESENTATION | PAGE 5
+
+
+────────────────────────────────────────────────────────────────────────────────
+SLIDE 6
+────────────────────────────────────────────────────────────────────────────────
+  [0in down, 0in right] Fill:#e91e63
+  [0in down, 0in right] TEXT: The Universal Language
+  [0in down, 0in right] TEXT: Beyond words
+  [2in down, 1in right] TEXT: Music transcends linguistic boundaries, uniting diverse huma
+  [4in down, 1in right] TEXT: It is humanity's most enduring bridge across cultural divide
+  [5in down, 0in right] Fill:#334155
+  [5in down, 0in right] TEXT: PRESENTATION | PAGE 6
+
+
+────────────────────────────────────────────────────────────────────────────────
+SLIDE 7
+────────────────────────────────────────────────────────────────────────────────
+  [0in down, 0in right] Fill:#e91e63
+  [0in down, 0in right] TEXT: Evolution of Delivery Systems
+  [0in down, 0in right] TEXT: How we access and consume sound
+  [1in down, 0in right] Fill:#2a0a0a
+  [1in down, 0in right] TEXT: Wax cylinders and shellac 78s initiated the era of preserved
+  [5in down, 0in right] Fill:#334155
+  [5in down, 0in right] TEXT: PRESENTATION | PAGE 7
+
+
+────────────────────────────────────────────────────────────────────────────────
+SLIDE 8
+────────────────────────────────────────────────────────────────────────────────
+  [0in down, 0in right] Fill:#e91e63
+  [0in down, 0in right] TEXT: From Composition to Master
+  [0in down, 0in right] TEXT: The lifecycle of an audio recording
+  [1in down, 0in right] Fill:#2a0a0a
+  [1in down, 0in right] Fill:#e91e63
+  [1in down, 0in right] TEXT: 1
+  [1in down, 1in right] TEXT: Ideation
+  [2in down, 0in right] Fill:#2a0a0a
+  [2in down, 0in right] Fill:#e91e63
+  [2in down, 0in right] TEXT: 2
+  [2in down, 1in right] TEXT: Tracking
+  [3in down, 0in right] Fill:#2a0a0a
+  [3in down, 0in right] Fill:#e91e63
+  [3in down, 0in right] TEXT: 3
+  [3in down, 1in right] TEXT: Mixing
+  [4in down, 0in right] Fill:#2a0a0a
+  [4in down, 0in right] Fill:#e91e63
+  [4in down, 0in right] TEXT: 4
+  [4in down, 1in right] TEXT: Mastering
+  [5in down, 0in right] Fill:#334155
+  [5in down, 0in right] TEXT: PRESENTATION | PAGE 8

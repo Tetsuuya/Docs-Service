@@ -1,0 +1,129 @@
+================================================================================
+VISUAL LAYOUT ANALYSIS: test_3
+================================================================================
+
+
+────────────────────────────────────────────────────────────────────────────────
+SLIDE 1
+────────────────────────────────────────────────────────────────────────────────
+  [0in down, 0in right] Fill:#38b6ff
+  [0in down, 0in right] Fill:#334155
+  [0in down, 0in right] TEXT: 🏷️ DECODING ARTIFICIAL INTELLIGENCE
+  [0in down, 0in right] TEXT: The Paradigm Shift
+  [0in down, 5in right] Fill:#1e293b
+  [0in down, 5in right] [IMAGE]
+  [3in down, 0in right] TEXT: Philosophy of Computation
+  [5in down, 0in right] Fill:#334155
+  [5in down, 0in right] TEXT: DOCS-SERVICE AI DESIGN ENGINE 2026
+
+
+────────────────────────────────────────────────────────────────────────────────
+SLIDE 2
+────────────────────────────────────────────────────────────────────────────────
+  [0in down, 0in right] Fill:#38b6ff
+  [0in down, 0in right] TEXT: Foundational Truth
+  [2in down, 1in right] TEXT: Artificial intelligence does not understand the world; it mo
+  [4in down, 1in right] TEXT: A crucial distinction separating computation from true compr
+  [5in down, 0in right] Fill:#334155
+  [5in down, 0in right] TEXT: PRESENTATION | PAGE 2
+
+
+────────────────────────────────────────────────────────────────────────────────
+SLIDE 3
+────────────────────────────────────────────────────────────────────────────────
+  [0in down, 0in right] Fill:#38b6ff
+  [0in down, 0in right] TEXT: Cognitive Architecture
+  [1in down, 0in right] Fill:#1e293b
+  [1in down, 0in right] Fill:#38b6ff
+  [1in down, 0in right] TEXT: Classical Programming
+  [1in down, 0in right] TEXT: Human engineers explicitly define every rule and conditional
+  [1in down, 5in right] Fill:#1e293b
+  [1in down, 5in right] Fill:#38b6ff
+  [1in down, 5in right] TEXT: Machine Learning
+  [1in down, 5in right] TEXT: Algorithms discover underlying patterns independently from m
+  [5in down, 0in right] Fill:#334155
+  [5in down, 0in right] TEXT: PRESENTATION | PAGE 3
+
+
+────────────────────────────────────────────────────────────────────────────────
+SLIDE 4
+────────────────────────────────────────────────────────────────────────────────
+  [0in down, 0in right] Fill:#38b6ff
+  [0in down, 0in right] TEXT: Neural Network Anatomy
+  [0in down, 0in right] TEXT: The mechanics of artificial perception
+  [1in down, 0in right] Fill:#1e293b
+  [1in down, 0in right] TEXT: Input layers ingest raw multi-dimensional vectors such as pi
+  [5in down, 0in right] Fill:#334155
+  [5in down, 0in right] TEXT: PRESENTATION | PAGE 4
+
+
+────────────────────────────────────────────────────────────────────────────────
+SLIDE 5
+────────────────────────────────────────────────────────────────────────────────
+  [0in down, 0in right] Fill:#38b6ff
+  [0in down, 0in right] TEXT: Core Learning Paradigms
+  [1in down, 0in right] Fill:#1e293b
+  [1in down, 0in right] Fill:#38b6ff
+  [1in down, 0in right] TEXT: Supervised Learning
+  [1in down, 0in right] TEXT: Models train on meticulously labeled input-output pairs, mas
+  [1in down, 3in right] Fill:#1e293b
+  [1in down, 3in right] Fill:#38b6ff
+  [1in down, 3in right] TEXT: Unsupervised Learning
+  [1in down, 3in right] TEXT: Algorithms navigate completely unlabeled data spaces, autono
+  [1in down, 6in right] Fill:#1e293b
+  [1in down, 6in right] Fill:#38b6ff
+  [1in down, 6in right] TEXT: Reinforcement Learning
+  [1in down, 6in right] TEXT: Autonomous agents interact directly with dynamic environment
+  [5in down, 0in right] Fill:#334155
+  [5in down, 0in right] TEXT: PRESENTATION | PAGE 5
+
+
+────────────────────────────────────────────────────────────────────────────────
+SLIDE 6
+────────────────────────────────────────────────────────────────────────────────
+  [0in down, 0in right] Fill:#38b6ff
+  [0in down, 0in right] TEXT: Scaling Laws
+  [1in down, 0in right] Fill:#1e293b
+  [1in down, 0in right] TEXT: 1000x
+  [1in down, 3in right] Fill:#1e293b
+  [1in down, 3in right] TEXT: Compute budgets have expanded exponentially over the last fi
+  [2in down, 0in right] TEXT: Parameter Growth
+  [5in down, 0in right] Fill:#334155
+  [5in down, 0in right] TEXT: PRESENTATION | PAGE 6
+
+
+────────────────────────────────────────────────────────────────────────────────
+SLIDE 7
+────────────────────────────────────────────────────────────────────────────────
+  [0in down, 0in right] Fill:#38b6ff
+  [0in down, 0in right] TEXT: The Model Lifecycle
+  [1in down, 0in right] Fill:#1e293b
+  [1in down, 0in right] Fill:#38b6ff
+  [1in down, 0in right] TEXT: 1
+  [1in down, 1in right] TEXT: Curation
+  [1in down, 0in right] Fill:#1e293b
+  [2in down, 0in right] Fill:#38b6ff
+  [2in down, 0in right] TEXT: 2
+  [2in down, 1in right] TEXT: Training
+  [2in down, 0in right] Fill:#1e293b
+  [2in down, 1in right] TEXT: Alignment
+  [3in down, 0in right] Fill:#38b6ff
+  [3in down, 0in right] TEXT: 3
+  [3in down, 0in right] Fill:#1e293b
+  [3in down, 0in right] Fill:#38b6ff
+  [3in down, 0in right] TEXT: 4
+  [3in down, 1in right] TEXT: Deployment
+  [5in down, 0in right] Fill:#334155
+  [5in down, 0in right] TEXT: PRESENTATION | PAGE 7
+
+
+────────────────────────────────────────────────────────────────────────────────
+SLIDE 8
+────────────────────────────────────────────────────────────────────────────────
+  [0in down, 0in right] Fill:#38b6ff
+  [0in down, 0in right] TEXT: The Road Ahead
+  [0in down, 0in right] TEXT: Navigating the technological horizon
+  [1in down, 0in right] Fill:#1e293b
+  [1in down, 0in right] TEXT: Energy constraints demand hardware innovations and highly ef
+  [5in down, 0in right] Fill:#334155
+  [5in down, 0in right] TEXT: PRESENTATION | PAGE 8
