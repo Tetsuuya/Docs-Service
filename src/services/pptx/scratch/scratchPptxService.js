@@ -66,13 +66,13 @@ JSON SCHEMA TO RETURN (Strict JSON, no markdown formatting):
   "title": "Presentation Title",
   "subtitle": "Catchy Subtitle",
   "theme": {
-    "primaryColor": "071E3D",     // Dark Navy hex without #
-    "secondaryColor": "032853",   // Container card hex
-    "accentColor": "38B6FF",      // Bright Electric Blue accent hex
-    "backgroundColor": "071E3D",  // Dark canvas background hex
-    "cardBgColor": "032853",      // Card container hex background
-    "textColor": "FFFFFF",        // Crisp white text hex
-    "fontFamily": "Poppins"
+    "primaryColor": "071E3D",     // Dark text color (navy/charcoal) - ADAPT to topic theme
+    "secondaryColor": "0070FF",   // Accent highlight color (blue/teal/etc) - ADAPT to topic theme
+    "accentColor": "489EF9",      // Secondary accent (lighter version) - ADAPT to topic theme
+    "backgroundColor": "FFFFFF",  // Clean white/light background
+    "cardBgColor": "F8F9FA",      // Subtle card background (light gray)
+    "textColor": "032853",        // Body text color (dark)
+    "fontFamily": "Inter"         // Clean modern sans-serif
   },
   "slides": [
     {
@@ -130,6 +130,16 @@ REQUISITE RULES:
 1. Provide rich, highly informative, and realistic business text. No placeholders like "Lorem Ipsum" or "Add text here".
 2. Set "hasImage": true and write a unique, highly specific "imagePrompt" string for slides that use visual split layouts (such as Slide 1, Slide 2, Slide 4).
 3. Make each "imagePrompt" highly descriptive and unique to the slide's specific sub-topic (e.g. for robots: "3D surgical robotic arm performing micro-surgery", for planets: "3D render of Jupiter and Saturn with glowing icy rings").
+4. CRITICAL: Adapt the theme colors to match the presentation topic:
+   - For technology/AI/robotics: Use cool blues (#071E3D primary, #0070FF accent, #489EF9 light accent)
+   - For nature/environment: Use greens (#0A3622 primary, #00A86B accent, #7FE5B0 light)
+   - For finance/business: Use navy/gold (#1A2332 primary, #FFD700 accent, #FFF4CC light)
+   - For health/medical: Use blue/green (#003D5B primary, #00A7B5 accent, #A0E7E5 light)
+   - For energy/fire: Use reds/oranges (#4A1C00 primary, #FF5722 accent, #FFB39C light)
+   - For luxury/premium: Use purple/gold (#2D1B69 primary, #9B51E0 accent, #D4B3FF light)
+   - For education: Use teal/yellow (#0D3B4F primary, #00BCD4 accent, #FFD54F light)
+   Always keep backgroundColor FFFFFF (white) and cardBgColor F8F9FA (light gray) for readability.
+5. Ensure slide 5 (Challenges/Stats) has complete content with statNumber, statLabel, and bullets filled out properly.
 `;
 
   const presentationData = await callGemini(systemPrompt, true);
