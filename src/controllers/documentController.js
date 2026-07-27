@@ -16,7 +16,25 @@ import fs from 'fs';
  */
 export const handleGenerateDocument = async (req, res) => {
   try {
-    const { prompt, format = 'docx', mode = 'scratch' } = req.body;
+    let { prompt, format = 'docx', mode = 'scratch' } = req.body;
+    
+    // Auto-detect format = 'pptx' if uploaded file is a PPTX or if prompt requests PowerPoint / slides
+    if (req.file) {
+      const origName = (req.file.originalname || '').toLowerCase();
+      if (origName.endsWith('.pptx')) {
+        format = 'pptx';
+      } else {
+        try {
+          const buffer = fs.readFileSync(req.file.path);
+          if (buffer.length >= 4 && buffer[0] === 0x50 && buffer[1] === 0x4B) { // PK Zip Header
+            format = 'pptx';
+          }
+        } catch (e) {}
+      }
+    } else if (prompt.toLowerCase().includes('create a ppt') || prompt.toLowerCase().includes('powerpoint')) {
+      format = 'pptx';
+    }
+
     logger.info(`Unified Request Received -> Format: ${format}, Mode: ${mode}, Prompt: "${prompt}"`);
 
     if (!prompt) {
@@ -173,6 +191,29 @@ export const handleGenerateDocument = async (req, res) => {
       return res.send(buffer);
     }
 
+    if (format === 'pptx') {
+      const docId = generateDocumentId();
+      const templatePath = req.file ? req.file.path : null;
+
+      try {
+        const buffer = await buildPptxFile(prompt, mode, templatePath);
+
+        if (templatePath && fs.existsSync(templatePath)) {
+          fs.unlinkSync(templatePath);
+        }
+
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.presentationml.presentation');
+        res.setHeader('Content-Disposition', `attachment; filename="presentation_${docId}.pptx"`);
+        res.setHeader('X-Document-Id', docId);
+        return res.send(buffer);
+      } catch (err) {
+        if (templatePath && fs.existsSync(templatePath)) {
+          fs.unlinkSync(templatePath);
+        }
+        throw err;
+      }
+    }
+
     return res.status(501).json({ 
       message: `Unified generation endpoint skeleton for format: ${format}`,
       format,
@@ -226,7 +267,11 @@ export const handleGeneratePptx = async (req, res) => {
   try {
     const { prompt } = req.body;
     if (!prompt) return res.status(400).json({ error: 'Prompt is required' });
-    const buffer = await buildPptxFile({ prompt });
+    const docId = generateDocumentId();
+    const buffer = await buildPptxFile(prompt, 'scratch');
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.presentationml.presentation');
+    res.setHeader('Content-Disposition', `attachment; filename="presentation_${docId}.pptx"`);
+    res.setHeader('X-Document-Id', docId);
     return res.send(buffer);
   } catch (error) {
     logger.error('Error in handleGeneratePptx:', error.message);

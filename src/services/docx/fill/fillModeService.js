@@ -321,6 +321,9 @@ RETURN JSON:
     templatePages: templatePageCount,
     sectionsGenerated: sectionsGenerated,
     
+    // Pass template structure for header/footer adaptation
+    templateStructure: templateStructure,
+    
     // Pass template styling to builder
     templateStyle: {
       colors: templateStructure.structure.colors || [],

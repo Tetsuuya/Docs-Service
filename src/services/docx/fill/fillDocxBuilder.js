@@ -9,8 +9,10 @@ import {
   PageBreak,
   AlignmentType,
   WidthType,
-  ShadingType,
-  HeadingLevel
+  HeadingLevel,
+  Header,
+  Footer,
+  PageNumber
 } from 'docx';
 import { logger } from '../../../utils/logger.js';
 
@@ -70,16 +72,91 @@ function parseMarkdownToTextRuns(text, baseOptions = {}) {
 }
 
 /**
+ * Adapt template header/footer text to new document topic
+ * Universal approach: intelligently replaces placeholder text with user's topic
+ * Preserves structure, formatting indicators like [Confidential]
+ */
+function adaptHeaderFooterText(templateText, userTopic, docTitle) {
+  if (!templateText) return null;
+  
+  let adapted = templateText.trim();
+  
+  // Step 1: Extract and preserve bracketed text (e.g., [Confidential], [Draft])
+  const bracketedMatch = adapted.match(/\[([^\]]+)\]/);
+  const bracketedText = bracketedMatch ? bracketedMatch[0] : null;
+  
+  // Step 2: Detect separator and split into parts
+  const separatorMatch = adapted.match(/(\s*[—|–-]\s*)/);
+  const separator = separatorMatch ? separatorMatch[1] : null;
+  
+  if (separator) {
+    // Split by separator: "PART1 — PART2 [bracket]"
+    const parts = adapted.split(separator);
+    
+    if (parts.length >= 2) {
+      // Replace first part with user topic
+      const part1 = parts[0].trim();
+      const part2 = parts.slice(1).join(separator).replace(/\s*\[([^\]]+)\]/, '').trim();
+      
+      // Simplify topic (first 3 words max)
+      const topicWords = userTopic.split(' ').slice(0, 3);
+      const simplifiedTopic = topicWords
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+        .join(' ');
+      
+      // Generic second part (usually document type)
+      const genericSecond = 'Report';
+      
+      adapted = `${simplifiedTopic}${separator}${genericSecond}`;
+      
+      // Re-add bracketed text if exists
+      if (bracketedText) {
+        adapted = `${adapted}   ${bracketedText}`;
+      }
+      
+      return adapted.trim();
+    }
+  }
+  
+  // Fallback: No separator detected, replace all-caps sequences
+  const allCapsPattern = /\b[A-ZÀ-ÖØ-Þ]{2,}(?:\s+[A-ZÀ-ÖØ-Þ]{2,})*\b/g;
+  
+  let replacementCount = 0;
+  adapted = adapted.replace(allCapsPattern, (match) => {
+    // Preserve confidentiality markers
+    const preserveWords = ['CONFIDENTIAL', 'CONFIDENTIEL', 'DRAFT', 'BROUILLON', 'INTERNAL', 'PRIVATE'];
+    if (preserveWords.includes(match.trim())) {
+      return match;
+    }
+    
+    replacementCount++;
+    
+    // First replacement: use user topic
+    if (replacementCount === 1) {
+      const topicWords = userTopic.split(' ').slice(0, 3);
+      return topicWords
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+        .join(' ');
+    }
+    
+    // Subsequent replacements: generic term
+    return 'Report';
+  });
+  
+  return adapted.trim();
+}
+
+/**
  * FILL MODE DOCX BUILDER
  * Creates clean, simple documents matching template style
- * No fancy cover pages, headers, or custom themes
- * Just content, tables, and basic formatting
+ * Now with universal header/footer support that adapts to user's topic
  */
 export const buildFillModeDocx = async (data) => {
   logger.info(`Building Fill Mode DOCX -> Title: "${data.title}"`);
   
   // Extract template styling
   const templateStyle = data.templateStyle || {};
+  const templateStructure = data.templateStructure || {};
   const primaryColor = templateStyle.colors?.[0] || '000000';
   const headerColor = templateStyle.colors?.[1] || '4472C4';
   const shadingColor = templateStyle.shadingColors?.[0] || 'F2F2F2';
@@ -251,7 +328,114 @@ export const buildFillModeDocx = async (data) => {
     });
   }
   
-  // Create document - simple, no headers/footers
+  // Create header/footer if template has them
+  let headerObj = undefined;
+  let footerObj = undefined;
+  
+  if (templateStructure.structure?.hasHeader && templateStructure.structure.headerText) {
+    const adaptedHeaderText = adaptHeaderFooterText(
+      templateStructure.structure.headerText,
+      data.subtitle || data.title,
+      data.title
+    );
+    
+    if (adaptedHeaderText) {
+      logger.info(`📄 Header adapted: "${templateStructure.structure.headerText}" → "${adaptedHeaderText}"`);
+      
+      headerObj = new Header({
+        children: [
+          new Paragraph({
+            children: [
+              new TextRun({
+                text: adaptedHeaderText,
+                size: baseFontSize * 2,
+                color: primaryColor
+              })
+            ],
+            alignment: AlignmentType.CENTER
+          })
+        ]
+      });
+    }
+  }
+  
+  if (templateStructure.structure?.hasFooter && templateStructure.structure.footerText) {
+    let footerText = templateStructure.structure.footerText;
+    
+    // Clean up footer text that contains page number placeholders
+    // Pattern: "Page   /    Something" or just "Page   /"
+    const hasPageNumbers = /page\s+\/|page\s+of/i.test(footerText);
+    
+    if (hasPageNumbers) {
+      // Extract only the text after page numbers (usually company name or document info)
+      const afterPageMatch = footerText.match(/\/\s+(.+)$/i);
+      const additionalText = afterPageMatch ? afterPageMatch[1].trim() : '';
+      
+      // Adapt the additional text if it exists
+      const adaptedText = additionalText ? adaptHeaderFooterText(additionalText, data.subtitle || data.title, data.title) : '';
+      
+      if (adaptedText) {
+        logger.info(`📄 Footer adapted: "${footerText}" → "Page X of Y   ${adaptedText}"`);
+      } else {
+        logger.info(`📄 Footer: Using standard "Page X of Y" format`);
+      }
+      
+      footerObj = new Footer({
+        children: [
+          new Paragraph({
+            children: [
+              new TextRun({
+                text: 'Page ',
+                size: baseFontSize * 2
+              }),
+              new TextRun({
+                children: [PageNumber.CURRENT]
+              }),
+              new TextRun({
+                text: ' of ',
+                size: baseFontSize * 2
+              }),
+              new TextRun({
+                children: [PageNumber.TOTAL_PAGES]
+              }),
+              ...(adaptedText ? [
+                new TextRun({
+                  text: `          ${adaptedText}`,
+                  size: baseFontSize * 2
+                })
+              ] : [])
+            ],
+            alignment: AlignmentType.CENTER
+          })
+        ]
+      });
+    } else {
+      // Footer has no page numbers, just adapt the text
+      const adaptedFooterText = adaptHeaderFooterText(
+        footerText,
+        data.subtitle || data.title,
+        data.title
+      );
+      
+      logger.info(`📄 Footer adapted: "${footerText}" → "${adaptedFooterText}"`);
+      
+      footerObj = new Footer({
+        children: [
+          new Paragraph({
+            children: [
+              new TextRun({
+                text: adaptedFooterText,
+                size: baseFontSize * 2
+              })
+            ],
+            alignment: AlignmentType.CENTER
+          })
+        ]
+      });
+    }
+  }
+  
+  // Create document with headers/footers if available
   const doc = new Document({
     sections: [{
       properties: {
@@ -264,6 +448,8 @@ export const buildFillModeDocx = async (data) => {
           }
         }
       },
+      headers: headerObj ? { default: headerObj } : undefined,
+      footers: footerObj ? { default: footerObj } : undefined,
       children: children
     }]
   });

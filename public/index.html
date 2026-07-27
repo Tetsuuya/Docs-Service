@@ -232,8 +232,8 @@
           </div>
 
           <div id="fileContainer" class="hidden">
-            <label for="templateFile">Upload (.docx):</label>
-            <input type="file" id="templateFile" accept=".docx">
+            <label for="templateFile">Upload Reference / Template File (.pptx, .docx, .pdf):</label>
+            <input type="file" id="templateFile" accept=".pptx,.docx,.pdf">
           </div>
 
           <label for="formatSelect">Format:</label>
@@ -285,6 +285,21 @@
         document.getElementById('fileContainer').classList.toggle('hidden', mode === 'scratch' || mode === 'library');
         document.getElementById('templateLibrary').style.display = mode === 'library' ? 'block' : 'none';
       });
+    });
+
+    // Auto-select format dropdown based on uploaded template file
+    document.getElementById('templateFile').addEventListener('change', function() {
+      const file = this.files[0];
+      if (file) {
+        const ext = file.name.split('.').pop().toLowerCase();
+        if (ext === 'pptx') {
+          document.getElementById('formatSelect').value = 'pptx';
+        } else if (ext === 'docx') {
+          document.getElementById('formatSelect').value = 'docx';
+        } else if (ext === 'pdf') {
+          document.getElementById('formatSelect').value = 'pdf';
+        }
+      }
     });
 
     async function loadTemplates() {
