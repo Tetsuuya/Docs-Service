@@ -1,0 +1,132 @@
+{
+  "title": "The Anatomy of a Venture",
+  "subtitle": "Unveiling the granular realities of modern entrepreneurship",
+  "theme": {
+    "primaryColor": "FFFFFF",
+    "secondaryColor": "CBD5E1",
+    "accentColor": "FFD700",
+    "backgroundColor": "1A1A2E",
+    "cardBgColor": "252542",
+    "textColor": "FFFFFF",
+    "fontFamily": "Inter"
+  },
+  "slides": [
+    {
+      "slideNumber": 1,
+      "type": "content",
+      "layout": "quote",
+      "title": "The Spark",
+      "subtitle": "Philosophy",
+      "hasImage": true,
+      "imagePrompt": "Close-up macro shot of a weathered artisan's fingers carefully soldering delicate microchips on a circuit board under warm workbench lamp light",
+      "quote": "Entrepreneurship is neither a science nor an art; it is a practice anchored in relentless execution and profound empathy for human friction.",
+      "author": "Peter Drucker's Modern Successors"
+    },
+    {
+      "slideNumber": 2,
+      "type": "content",
+      "layout": "comparison",
+      "title": "Mental Models: Myth vs. Reality",
+      "subtitle": "Shifting paradigms of startup creation",
+      "hasImage": false,
+      "imagePrompt": "",
+      "leftSide": {
+        "title": "The Hollywood Myth",
+        "bullets": [
+          "Instant overnight success driven by a singular lightning-bolt idea",
+          "Relentless media spotlight focusing exclusively on massive funding rounds",
+          "Solitary genius working in isolation to build a market-dominating empire"
+        ]
+      },
+      "rightSide": {
+        "title": "The Granular Reality",
+        "bullets": [
+          "Years of invisible iteration, failed experiments, and brutal pivots",
+          "Unglamorous cash-flow management, customer churn analysis, and payroll stress",
+          "Deeply collaborative ecosystem dependent on resilient co-founders and early believers"
+        ]
+      }
+    },
+    {
+      "slideNumber": 3,
+      "type": "content",
+      "layout": "cards",
+      "title": "The Three Pillars of Viability",
+      "subtitle": "Foundational requirements for a sustainable business model",
+      "hasImage": false,
+      "imagePrompt": "",
+      "cards": [
+        {
+          "title": "Acute Problem Validation",
+          "description": "Identifying a genuine, hair-on-fire problem that customers are actively spending their own hard-earned money and valuable time trying to solve imperfectly."
+        },
+        {
+          "title": "Defensible Unit Economics",
+          "description": "Ensuring that the lifetime value of every acquired customer significantly outpaces the cost of acquisition while maintaining healthy gross margins."
+        },
+        {
+          "title": "Asymmetric Distribution",
+          "description": "Possessing a unique, repeatable channel to reach your target audience that competitors cannot easily replicate or outspend in the open market."
+        }
+      ]
+    },
+    {
+      "slideNumber": 4,
+      "type": "content",
+      "layout": "process",
+      "title": "From Hypothesis to Scale",
+      "subtitle": "The iterative lifecycle of venture building",
+      "hasImage": true,
+      "imagePrompt": "Close-up of a whiteboard covered in messy handwritten product roadmaps, sticky notes, and wireframe sketches under harsh fluorescent office lighting",
+      "steps": [
+        {
+          "title": "Discovery",
+          "subtitle": "Listening",
+          "description": "Conducting deep ethnographic interviews with potential users to uncover hidden pain points."
+        },
+        {
+          "title": "Prototyping",
+          "subtitle": "Building",
+          "description": "Constructing the absolute minimum viable product required to test core assumptions."
+        },
+        {
+          "title": "Validation",
+          "subtitle": "Measuring",
+          "description": "Analyzing early user retention and engagement metrics rather than vanity sign-ups."
+        },
+        {
+          "title": "Expansion",
+          "subtitle": "Scaling",
+          "description": "Pouring fuel on the fire only after product-market fit has been definitively proven."
+        }
+      ]
+    },
+    {
+      "slideNumber": 5,
+      "type": "content",
+      "layout": "stat",
+      "title": "The Margin of Error",
+      "subtitle": "Understanding the quantitative realities of early-stage risk",
+      "hasImage": true,
+      "imagePrompt": "Close-up macro shot of an antique brass hourglass resting on a stack of financial ledger papers, sand grains pooling sharply in the lower glass bulb",
+      "statNumber": "42%",
+      "statLabel": "of startups fail due to a simple lack of genuine market need for their product",
+      "bullets": [
+        "Building solutions in search of problems is the single greatest capital incinerator",
+        "Continuous customer feedback loops are the only reliable antidote to irrelevance",
+        "Pivoting early based on hard data preserves runway and prevents total collapse"
+      ]
+    },
+    {
+      "slideNumber": 6,
+      "type": "content",
+      "layout": "minimal",
+      "title": "The Final Rule",
+      "subtitle": "Core takeaway",
+      "hasImage": false,
+      "imagePrompt": "",
+      "statement": "An entrepreneur does not predict the future; they construct the infrastructure that allows a better future to happen.",
+      "support": "Build with intention, execute with relentless discipline, and never fall in love with your own assumptions."
+    }
+  ]
+}

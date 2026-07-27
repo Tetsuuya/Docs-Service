@@ -1,0 +1,497 @@
+{
+  "analysisDate": "2026-07-27T13:15:33.122Z",
+  "totalImages": 26,
+  "averageScore": 2.576923076923077,
+  "qualityDistribution": {
+    "excellent": 0,
+    "good": 4,
+    "fair": 4,
+    "poor": 18
+  },
+  "commonIssues": {
+    "No keywords match slide title/subtitle": 19,
+    "Generic keyword": 14
+  },
+  "detailedAnalyses": [
+    {
+      "presentation": "The Architecture of Sound",
+      "slideNumber": 1,
+      "slideTitle": "The Power of Audio",
+      "prompt": "Close-up macro detail of golden brass trumpet valves being pressed by musician's fingers, reflecting warm stage lights",
+      "length": 118,
+      "score": 3,
+      "maxScore": 10,
+      "quality": "🔴 POOR",
+      "issues": [
+        "No keywords match slide title/subtitle"
+      ],
+      "strengths": [
+        "specific: \"close-up\"",
+        "technical: \"macro\"",
+        "technical: \"detail\"",
+        "Detailed length (> 100 chars)"
+      ]
+    },
+    {
+      "presentation": "The Architecture of Sound",
+      "slideNumber": 4,
+      "slideTitle": "Acoustic Engineering",
+      "prompt": "Close-up detail of a vintage ribbon microphone capsule capturing sound waves in a damp, wood-paneled recording studio",
+      "length": 117,
+      "score": 6,
+      "maxScore": 10,
+      "quality": "🟡 GOOD",
+      "issues": [],
+      "strengths": [
+        "specific: \"close-up\"",
+        "contextual: \"studio\"",
+        "technical: \"detail\"",
+        "Detailed length (> 100 chars)",
+        "Matches 1 slide keywords"
+      ]
+    },
+    {
+      "presentation": "The Architecture of Sound",
+      "slideNumber": 5,
+      "slideTitle": "The Neurochemistry of Melody",
+      "prompt": "Macro close-up of vinyl record grooves glowing with colorful laser light refraction, showing microscopic audio waveform variations",
+      "length": 130,
+      "score": 4,
+      "maxScore": 10,
+      "quality": "🟠 FAIR",
+      "issues": [
+        "Generic keyword: \"glowing\"",
+        "No keywords match slide title/subtitle"
+      ],
+      "strengths": [
+        "specific: \"close-up\"",
+        "specific: \"showing\"",
+        "specific: \"with\"",
+        "technical: \"macro\"",
+        "Detailed length (> 100 chars)"
+      ]
+    },
+    {
+      "presentation": "The Architecture of Sound",
+      "slideNumber": 8,
+      "slideTitle": "From Composition to Master",
+      "prompt": "Extreme close-up of a producer's hands editing digital audio waveforms on a high-resolution timeline display with glowing metering plugins",
+      "length": 138,
+      "score": 4.5,
+      "maxScore": 10,
+      "quality": "🟠 FAIR",
+      "issues": [
+        "Generic keyword: \"glowing\""
+      ],
+      "strengths": [
+        "specific: \"close-up\"",
+        "specific: \"with\"",
+        "technical: \"high-resolution\"",
+        "Detailed length (> 100 chars)",
+        "Matches 1 slide keywords"
+      ]
+    },
+    {
+      "presentation": "Beyond the Atmosphere",
+      "slideNumber": 1,
+      "slideTitle": "The Infinite Horizon",
+      "prompt": "Abstract visualization of human curiosity meeting the cosmos, glowing neural network pathways dissolving into distant swirling galaxies against deep navy velvet space, minimalist digital art style",
+      "length": 196,
+      "score": 0,
+      "maxScore": 10,
+      "quality": "🔴 POOR",
+      "issues": [
+        "Generic keyword: \"glowing\"",
+        "No keywords match slide title/subtitle"
+      ],
+      "strengths": [
+        "Detailed length (> 100 chars)"
+      ]
+    },
+    {
+      "presentation": "Beyond the Atmosphere",
+      "slideNumber": 3,
+      "slideTitle": "Redefining Engineering",
+      "prompt": "Abstract concept of advanced aerospace engineering, geometric metallic folds and glowing quantum blue blueprints forming a futuristic spacecraft hull floating in zero gravity",
+      "length": 174,
+      "score": 0,
+      "maxScore": 10,
+      "quality": "🔴 POOR",
+      "issues": [
+        "Generic keyword: \"abstract concept\"",
+        "Generic keyword: \"futuristic\"",
+        "Generic keyword: \"glowing\""
+      ],
+      "strengths": [
+        "specific: \"engineer\"",
+        "Detailed length (> 100 chars)",
+        "Matches 1 slide keywords"
+      ]
+    },
+    {
+      "presentation": "Beyond the Atmosphere",
+      "slideNumber": 6,
+      "slideTitle": "The Long View",
+      "prompt": "Abstract conceptual art representing humanity leaving its cradle, a fragile glowing blue marble fragile Earth enveloped in a warm golden atmospheric halo fading into infinite starlight",
+      "length": 184,
+      "score": 0,
+      "maxScore": 10,
+      "quality": "🔴 POOR",
+      "issues": [
+        "Generic keyword: \"abstract concept\"",
+        "Generic keyword: \"glowing\"",
+        "No keywords match slide title/subtitle"
+      ],
+      "strengths": [
+        "Detailed length (> 100 chars)"
+      ]
+    },
+    {
+      "presentation": "Decoding Artificial Intelligence",
+      "slideNumber": 1,
+      "slideTitle": "The Paradigm Shift",
+      "prompt": "Macro close-up detail of microscopic silicon semiconductor traces on a modern multi-core processor illuminated by blue ambient light",
+      "length": 132,
+      "score": 3,
+      "maxScore": 10,
+      "quality": "🔴 POOR",
+      "issues": [
+        "No keywords match slide title/subtitle"
+      ],
+      "strengths": [
+        "specific: \"close-up\"",
+        "technical: \"macro\"",
+        "technical: \"detail\"",
+        "Detailed length (> 100 chars)"
+      ]
+    },
+    {
+      "presentation": "Decoding Artificial Intelligence",
+      "slideNumber": 4,
+      "slideTitle": "Neural Network Anatomy",
+      "prompt": "Detailed abstract visualization of glowing artificial neural network nodes firing electrical impulses across interconnected synaptic pathways",
+      "length": 141,
+      "score": 1.5,
+      "maxScore": 10,
+      "quality": "🔴 POOR",
+      "issues": [
+        "Generic keyword: \"glowing\""
+      ],
+      "strengths": [
+        "technical: \"detail\"",
+        "Detailed length (> 100 chars)",
+        "Matches 3 slide keywords"
+      ]
+    },
+    {
+      "presentation": "Decoding Artificial Intelligence",
+      "slideNumber": 8,
+      "slideTitle": "The Road Ahead",
+      "prompt": "Close-up of a high-performance liquid cooling pipe running across an enterprise AI server rack glowing with emerald indicator lights",
+      "length": 132,
+      "score": 1,
+      "maxScore": 10,
+      "quality": "🔴 POOR",
+      "issues": [
+        "Generic keyword: \"glowing\"",
+        "No keywords match slide title/subtitle"
+      ],
+      "strengths": [
+        "specific: \"close-up\"",
+        "specific: \"with\"",
+        "Detailed length (> 100 chars)"
+      ]
+    },
+    {
+      "presentation": "The Art of Healthy Cooking",
+      "slideNumber": 2,
+      "slideTitle": "Pillars of Wholesome Kitchens",
+      "prompt": "Close-up of chef hands meticulously chopping vibrant organic bell peppers and leafy greens on a rustic wooden cutting board with soft kitchen lighting",
+      "length": 150,
+      "score": 4.5,
+      "maxScore": 10,
+      "quality": "🟠 FAIR",
+      "issues": [
+        "No keywords match slide title/subtitle"
+      ],
+      "strengths": [
+        "specific: \"close-up\"",
+        "specific: \"with\"",
+        "contextual: \"kitchen\"",
+        "Detailed length (> 100 chars)"
+      ]
+    },
+    {
+      "presentation": "The Art of Healthy Cooking",
+      "slideNumber": 4,
+      "slideTitle": "The Meal Preparation Workflow",
+      "prompt": "Overhead view of a clean modern kitchen counter with neatly arranged bowls of colourful vegetables, grains, and herbs ready for cooking, photographic realism",
+      "length": 157,
+      "score": 6,
+      "maxScore": 10,
+      "quality": "🟡 GOOD",
+      "issues": [],
+      "strengths": [
+        "specific: \"with\"",
+        "contextual: \"kitchen\"",
+        "technical: \"photographic realism\"",
+        "Detailed length (> 100 chars)",
+        "Matches 1 slide keywords"
+      ]
+    },
+    {
+      "presentation": "The Changing Earth",
+      "slideNumber": 1,
+      "slideTitle": "The Anthropocene Shift",
+      "prompt": "Side-by-side comparison split composition showing a lush green alpine glacier in 1980 on the left transitioning into a heavily receded rock and mud landscape with minimal ice patches in modern times on the right",
+      "length": 211,
+      "score": 5.5,
+      "maxScore": 10,
+      "quality": "🟠 FAIR",
+      "issues": [],
+      "strengths": [
+        "specific: \"showing\"",
+        "specific: \"with\"",
+        "Detailed length (> 100 chars)",
+        "Matches 1 slide keywords"
+      ]
+    },
+    {
+      "presentation": "The Changing Earth",
+      "slideNumber": 2,
+      "slideTitle": "Oceanic Consequences",
+      "prompt": "Split image showing vibrant multi-colored coral reef teeming with diverse fish life on one half, transitioning into bleached, white, lifeless coral skeleton on the murky ocean floor on the other half",
+      "length": 199,
+      "score": 3,
+      "maxScore": 10,
+      "quality": "🔴 POOR",
+      "issues": [
+        "No keywords match slide title/subtitle"
+      ],
+      "strengths": [
+        "specific: \"showing\"",
+        "specific: \"with\"",
+        "Detailed length (> 100 chars)"
+      ]
+    },
+    {
+      "presentation": "The Changing Earth",
+      "slideNumber": 4,
+      "slideTitle": "Ecosystem Vulnerability Index",
+      "prompt": "Before and after aerial photograph sequence showing dense Amazonian rainforest canopy on top transitioning into fragmented, burned deforested cattle pastureland on the bottom",
+      "length": 174,
+      "score": 1,
+      "maxScore": 10,
+      "quality": "🔴 POOR",
+      "issues": [
+        "No keywords match slide title/subtitle"
+      ],
+      "strengths": [
+        "specific: \"showing\"",
+        "Detailed length (> 100 chars)"
+      ]
+    },
+    {
+      "presentation": "The Changing Earth",
+      "slideNumber": 5,
+      "slideTitle": "The Decarbonization Pathway",
+      "prompt": "Futuristic urban landscape showing a smog-filled city skyline on the left transitioning into a clean, green, solar-powered eco-city with vertical forests and electric transit on the right",
+      "length": 187,
+      "score": 1,
+      "maxScore": 10,
+      "quality": "🔴 POOR",
+      "issues": [
+        "Generic keyword: \"futuristic\"",
+        "No keywords match slide title/subtitle"
+      ],
+      "strengths": [
+        "specific: \"showing\"",
+        "specific: \"with\"",
+        "Detailed length (> 100 chars)"
+      ]
+    },
+    {
+      "presentation": "The Anatomy of a Venture",
+      "slideNumber": 1,
+      "slideTitle": "The Spark",
+      "prompt": "Close-up macro shot of a weathered artisan's fingers carefully soldering delicate microchips on a circuit board under warm workbench lamp light",
+      "length": 143,
+      "score": 0,
+      "maxScore": 10,
+      "quality": "🔴 POOR",
+      "issues": [
+        "Generic keyword: \"circuit board\"",
+        "No keywords match slide title/subtitle"
+      ],
+      "strengths": [
+        "specific: \"close-up\"",
+        "technical: \"macro\"",
+        "Detailed length (> 100 chars)"
+      ]
+    },
+    {
+      "presentation": "The Anatomy of a Venture",
+      "slideNumber": 4,
+      "slideTitle": "From Hypothesis to Scale",
+      "prompt": "Close-up of a whiteboard covered in messy handwritten product roadmaps, sticky notes, and wireframe sketches under harsh fluorescent office lighting",
+      "length": 148,
+      "score": 2.5,
+      "maxScore": 10,
+      "quality": "🔴 POOR",
+      "issues": [
+        "No keywords match slide title/subtitle"
+      ],
+      "strengths": [
+        "specific: \"close-up\"",
+        "contextual: \"office\"",
+        "Detailed length (> 100 chars)"
+      ]
+    },
+    {
+      "presentation": "The Anatomy of a Venture",
+      "slideNumber": 5,
+      "slideTitle": "The Margin of Error",
+      "prompt": "Close-up macro shot of an antique brass hourglass resting on a stack of financial ledger papers, sand grains pooling sharply in the lower glass bulb",
+      "length": 148,
+      "score": 2,
+      "maxScore": 10,
+      "quality": "🔴 POOR",
+      "issues": [
+        "No keywords match slide title/subtitle"
+      ],
+      "strengths": [
+        "specific: \"close-up\"",
+        "technical: \"macro\"",
+        "Detailed length (> 100 chars)"
+      ]
+    },
+    {
+      "presentation": "The Sanctuary Within",
+      "slideNumber": 1,
+      "slideTitle": "Foundations of Inner Peace",
+      "prompt": "Serene individual practicing yoga asana outdoors in a lush bamboo forest during early morning golden hour mist, environmental context style showing deep connection with nature",
+      "length": 175,
+      "score": 6.5,
+      "maxScore": 10,
+      "quality": "🟡 GOOD",
+      "issues": [
+        "No keywords match slide title/subtitle"
+      ],
+      "strengths": [
+        "specific: \"showing\"",
+        "specific: \"during\"",
+        "specific: \"with\"",
+        "contextual: \"environment\"",
+        "Detailed length (> 100 chars)"
+      ]
+    },
+    {
+      "presentation": "The Sanctuary Within",
+      "slideNumber": 3,
+      "slideTitle": "The Three Pillars of Practice",
+      "prompt": "Minimalist meditation cushion resting on natural wooden floor inside a sunlit sunroom overlooking a tranquil Japanese Zen rock garden, natural environmental context",
+      "length": 164,
+      "score": 0.5,
+      "maxScore": 10,
+      "quality": "🔴 POOR",
+      "issues": [
+        "No keywords match slide title/subtitle"
+      ],
+      "strengths": [
+        "contextual: \"environment\"",
+        "Detailed length (> 100 chars)"
+      ]
+    },
+    {
+      "presentation": "The Sanctuary Within",
+      "slideNumber": 5,
+      "slideTitle": "Developing Your Daily Ritual",
+      "prompt": "Close-up of a person's hands holding a warm ceramic tea cup sitting cross-legged on a woven jute rug inside a softly lit living room surrounded by indoor houseplants, cozy environmental context",
+      "length": 193,
+      "score": 2.5,
+      "maxScore": 10,
+      "quality": "🔴 POOR",
+      "issues": [
+        "No keywords match slide title/subtitle"
+      ],
+      "strengths": [
+        "specific: \"close-up\"",
+        "contextual: \"environment\"",
+        "Detailed length (> 100 chars)"
+      ]
+    },
+    {
+      "presentation": "The Sanctuary Within",
+      "slideNumber": 6,
+      "slideTitle": "The Ultimate Destination",
+      "prompt": "A solitary figure walking peacefully along a misty ocean shoreline at sunrise, leaving gentle footprints in the damp sand, environmental context shot emphasizing solitude and tranquility",
+      "length": 186,
+      "score": 0.5,
+      "maxScore": 10,
+      "quality": "🔴 POOR",
+      "issues": [
+        "No keywords match slide title/subtitle"
+      ],
+      "strengths": [
+        "contextual: \"environment\"",
+        "Detailed length (> 100 chars)"
+      ]
+    },
+    {
+      "presentation": "The Invisible Perimeter",
+      "slideNumber": 1,
+      "slideTitle": "Opening Perspective",
+      "prompt": "Macro close-up of fiber optic cable connectors plugged into a high-density server rack, glowing blue status lights reflecting on dust motes in the air",
+      "length": 150,
+      "score": 0,
+      "maxScore": 10,
+      "quality": "🔴 POOR",
+      "issues": [
+        "Generic keyword: \"glowing\"",
+        "No keywords match slide title/subtitle"
+      ],
+      "strengths": [
+        "specific: \"close-up\"",
+        "technical: \"macro\"",
+        "Detailed length (> 100 chars)"
+      ]
+    },
+    {
+      "presentation": "The Invisible Perimeter",
+      "slideNumber": 4,
+      "slideTitle": "Anatomy of a Breach",
+      "prompt": "Extreme close-up of a developer's fingers typing command line prompts on a mechanical keyboard with glowing RGB backlighting, terminal window reflecting complex hexadecimal code",
+      "length": 177,
+      "score": 1,
+      "maxScore": 10,
+      "quality": "🔴 POOR",
+      "issues": [
+        "Generic keyword: \"glowing\"",
+        "No keywords match slide title/subtitle"
+      ],
+      "strengths": [
+        "specific: \"close-up\"",
+        "specific: \"with\"",
+        "Detailed length (> 100 chars)"
+      ]
+    },
+    {
+      "presentation": "The Invisible Perimeter",
+      "slideNumber": 5,
+      "slideTitle": "Incident Response Lifecycle",
+      "prompt": "Close-up of a security analyst's hand operating a multi-monitor setup displaying red threat heatmaps and global attack vector node graphs in a dark operations center",
+      "length": 165,
+      "score": 7.5,
+      "maxScore": 10,
+      "quality": "🟡 GOOD",
+      "issues": [],
+      "strengths": [
+        "specific: \"close-up\"",
+        "specific: \"displaying\"",
+        "action: \"operating\"",
+        "Detailed length (> 100 chars)",
+        "Matches 1 slide keywords"
+      ]
+    }
+  ]
+}

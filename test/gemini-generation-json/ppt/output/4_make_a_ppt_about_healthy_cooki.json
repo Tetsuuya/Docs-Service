@@ -1,0 +1,116 @@
+{
+  "title": "The Art of Healthy Cooking",
+  "subtitle": "Transforming nutrition into culinary excellence",
+  "theme": {
+    "primaryColor": "FFFFFF",
+    "secondaryColor": "A5D6A7",
+    "accentColor": "4CAF50",
+    "backgroundColor": "0A2818",
+    "cardBgColor": "123B23",
+    "textColor": "FFFFFF",
+    "fontFamily": "Inter"
+  },
+  "slides": [
+    {
+      "slideNumber": 1,
+      "type": "content",
+      "layout": "stat",
+      "title": "Nutrient Preservation",
+      "subtitle": "The impact of proper cooking techniques",
+      "hasImage": false,
+      "statNumber": "40%",
+      "statLabel": "More vitamins retained",
+      "bullets": [
+        "Light steaming preserves water-soluble vitamins far better than heavy boiling.",
+        "Rapid sautéing in stable oils locks in vital micronutrients without degradation.",
+        "Proper temperature control prevents the breakdown of essential dietary antioxidants."
+      ]
+    },
+    {
+      "slideNumber": 2,
+      "type": "content",
+      "layout": "cards",
+      "title": "Pillars of Wholesome Kitchens",
+      "subtitle": "Core strategies for daily meal preparation",
+      "hasImage": true,
+      "imagePrompt": "Close-up of chef hands meticulously chopping vibrant organic bell peppers and leafy greens on a rustic wooden cutting board with soft kitchen lighting",
+      "cards": [
+        {
+          "title": "Whole Ingredients",
+          "description": "Prioritizing unprocessed foods ensures your body receives complex carbohydrates, clean fibers, and untouched micronutrients directly from nature without hidden chemical additives."
+        },
+        {
+          "title": "Mindful Seasoning",
+          "description": "Replacing excess sodium with fresh herbs, citrus zests, and aromatic spices elevates natural flavors while protecting cardiovascular health and maintaining balanced blood pressure."
+        },
+        {
+          "title": "Healthy Fats",
+          "description": "Utilizing cold-pressed olive oil, avocado extracts, and omega-3 rich seeds supports optimal brain function and enhances the bioavailability of fat-soluble vitamins."
+        }
+      ]
+    },
+    {
+      "slideNumber": 3,
+      "type": "content",
+      "layout": "comparison",
+      "title": "Cooking Method Face-Off",
+      "subtitle": "Understanding the difference in daily preparation",
+      "hasImage": false,
+      "leftSide": {
+        "title": "Traditional Boiling",
+        "bullets": [
+          "Leaches essential water-soluble vitamins B and C directly into the cooking water.",
+          "Often results in muted colors, altered textures, and a significant loss of natural taste.",
+          "Requires heavy post-cooking seasoning to recover lost flavor profiles."
+        ]
+      },
+      "rightSide": {
+        "title": "Modern Steaming & Roasting",
+        "bullets": [
+          "Encloses natural juices and locks in maximum nutritional value with minimal loss.",
+          "Caramelizes natural sugars to create rich, deep flavors without added heavy fats.",
+          "Maintains vibrant visual presentation and crisp, satisfying textures."
+        ]
+      }
+    },
+    {
+      "slideNumber": 4,
+      "type": "content",
+      "layout": "process",
+      "title": "The Meal Preparation Workflow",
+      "subtitle": "A step-by-step approach to efficient cooking",
+      "hasImage": true,
+      "imagePrompt": "Overhead view of a clean modern kitchen counter with neatly arranged bowls of colourful vegetables, grains, and herbs ready for cooking, photographic realism",
+      "steps": [
+        {
+          "title": "1. Inventory",
+          "subtitle": "Assess pantry",
+          "description": "Review existing fresh produce and pantry staples to plan balanced, nutrient-dense meals."
+        },
+        {
+          "title": "2. Prep",
+          "subtitle": "Mise en place",
+          "description": "Wash, chop, and organize all ingredients before turning on the heat for seamless execution."
+        },
+        {
+          "title": "3. Cook",
+          "subtitle": "Gentle heat",
+          "description": "Apply low-to-medium heat cooking methods that preserve delicate flavors and nutrients."
+        },
+        {
+          "title": "4. Plate",
+          "subtitle": "Mindful portioning",
+          "description": "Assemble colorful, balanced plates focusing on vegetable-forward portions and lean proteins."
+        }
+      ]
+    },
+    {
+      "slideNumber": 5,
+      "type": "content",
+      "layout": "minimal",
+      "title": "The Ultimate Objective",
+      "statement": "Let food be thy medicine and medicine be thy food.",
+      "support": "Healthy cooking is an act of self-respect that nourishes both body and mind."
+    }
+  ]
+}

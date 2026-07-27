@@ -1,0 +1,104 @@
+{
+  "title": "Beyond the Atmosphere",
+  "subtitle": "The evolution and future horizon of human space exploration",
+  "theme": {
+    "primaryColor": "FFFFFF",
+    "secondaryColor": "CBD5E1",
+    "accentColor": "38B6FF",
+    "backgroundColor": "0F172A",
+    "cardBgColor": "1E293B",
+    "textColor": "FFFFFF",
+    "fontFamily": "Inter"
+  },
+  "slides": [
+    {
+      "slideNumber": 1,
+      "type": "content",
+      "layout": "minimal",
+      "title": "The Infinite Horizon",
+      "statement": "We are a species driven by the fundamental need to look up, wonder, and venture into the dark unknown.",
+      "support": "Space exploration is not merely a scientific endeavor; it is the ultimate expression of human curiosity.",
+      "hasImage": true,
+      "imagePrompt": "Abstract visualization of human curiosity meeting the cosmos, glowing neural network pathways dissolving into distant swirling galaxies against deep navy velvet space, minimalist digital art style"
+    },
+    {
+      "slideNumber": 2,
+      "type": "content",
+      "layout": "stat",
+      "title": "The Scale of the Journey",
+      "statNumber": "384,400",
+      "statLabel": "Kilometers from Earth to the Moon, representing just the first stepping stone into the vast expanse of our solar system.",
+      "bullets": [
+        "Mars sits roughly 225 million kilometers away on average, requiring entirely new propulsion paradigms.",
+        "The nearest star system, Alpha Centauri, is 4.37 light-years away—demanding breakthroughs in velocity and lifespan.",
+        "Data transmission across interplanetary distances currently suffers from delays ranging from minutes to hours."
+      ]
+    },
+    {
+      "slideNumber": 3,
+      "type": "content",
+      "layout": "split",
+      "title": "Redefining Engineering",
+      "subtitle": "Overcoming the extreme barriers of vacuum, radiation, and thermal extremes.",
+      "bullets": [
+        "Reusable rocket architectures have fundamentally collapsed the cost per kilogram to orbit, democratizing access to space infrastructure and lowering economic barriers.",
+        "Advanced life support closed-loop systems are being engineered to recycle 98% of water and oxygen on long-duration crewed missions to deep space.",
+        "Autonomous navigation algorithms allow deep-space probes to make critical trajectory decisions without waiting for round-trip signals from Earth mission control."
+      ],
+      "hasImage": true,
+      "imagePrompt": "Abstract concept of advanced aerospace engineering, geometric metallic folds and glowing quantum blue blueprints forming a futuristic spacecraft hull floating in zero gravity"
+    },
+    {
+      "slideNumber": 4,
+      "type": "content",
+      "layout": "comparison",
+      "title": "Paradigm Shift in Exploration",
+      "leftSide": {
+        "title": "Legacy Model",
+        "bullets": [
+          "State-funded, geopolitical prestige driven programs with multi-decade timelines",
+          "Expendable single-use hardware built with bespoke, ultra-expensive components",
+          "Mission profiles focused on brief flybys and short-term orbital observation"
+        ]
+      },
+      "rightSide": {
+        "title": "Commercial Era",
+        "bullets": [
+          "Agile, private-public partnerships fostering rapid iteration and commercial viability",
+          "Rapidly reusable vertical-landing rockets drastically altering mission economics",
+          "Permanent infrastructure establishment including lunar bases and orbital habitats"
+        ]
+      }
+    },
+    {
+      "slideNumber": 5,
+      "type": "content",
+      "layout": "cards",
+      "title": "The Three Pillars of Tomorrow",
+      "cards": [
+        {
+          "title": "Interplanetary Habitats",
+          "description": "Developing self-sustaining biospheres utilizing in-situ resource utilization, turning Martian regolith and lunar ice into breathable air, water, and rocket fuel."
+        },
+        {
+          "title": "Deep Space Propulsion",
+          "description": "Transitioning beyond chemical rockets toward nuclear thermal propulsion and ion drives to cut transit times to the outer planets in half."
+        },
+        {
+          "title": "Orbital Economies",
+          "description": "Building microgravity manufacturing hubs where pure fiber optics and faultless semiconductor crystals can be produced free from atmospheric and seismic interference."
+        }
+      ]
+    },
+    {
+      "slideNumber": 6,
+      "type": "content",
+      "layout": "quote",
+      "title": "The Long View",
+      "quote": "The Earth is the cradle of humanity, but mankind cannot stay in the cradle forever.",
+      "author": "Konstantin Tsiolkovsky",
+      "hasImage": true,
+      "imagePrompt": "Abstract conceptual art representing humanity leaving its cradle, a fragile glowing blue marble fragile Earth enveloped in a warm golden atmospheric halo fading into infinite starlight"
+    }
+  ]
+}

@@ -18,15 +18,15 @@ function buildSlideImagePrompt(slide, topic, defaultRole) {
 }
 
 /**
- * Automatically generates AI images on-the-fly using Gemini-planned imagePrompts per slide
- * @param {Object|string} presentationDataOrTopic - Presentation JSON AST from Gemini or raw prompt topic
- * @returns {Promise<Object>} - Map of generated image file paths keyed by slide index or layout role
+ * Automatically generates AI images on-the-fly for slides that request them
+ * @param {Object|string} presentationDataOrTopic - Presentation JSON AST from Gemini
+ * @returns {Promise<Object>} - Map of generated image file paths keyed by slide index
  */
 export const generateTopicImages = async (presentationDataOrTopic) => {
   const isObject = typeof presentationDataOrTopic === 'object';
   const promptTopic = isObject ? (presentationDataOrTopic.title || presentationDataOrTopic.topic || 'presentation') : presentationDataOrTopic;
 
-  logger.info(`🤖 Auto-Generating Exact Slide-Matched AI Images for presentation: "${promptTopic}"...`);
+  logger.info(`🤖 Auto-Generating AI Images for: "${promptTopic}"...`);
 
   const tempImgDir = path.join(process.cwd(), 'temp', 'images');
   fs.mkdirSync(tempImgDir, { recursive: true });
@@ -36,36 +36,38 @@ export const generateTopicImages = async (presentationDataOrTopic) => {
 
   const slides = isObject && Array.isArray(presentationDataOrTopic.slides) ? presentationDataOrTopic.slides : [];
 
-  // Construct exact slide-matched prompts
-  const slide1Prompt = buildSlideImagePrompt(slides[0], promptTopic, 'hero cover');
-  const slide2Prompt = buildSlideImagePrompt(slides[1], promptTopic, 'section 1 feature');
-  const slide4Prompt = buildSlideImagePrompt(slides[3], promptTopic, 'section 2 deep dive');
-  const slide5Prompt = buildSlideImagePrompt(slides[4], promptTopic, 'key performance metric');
-  const slide6Prompt = buildSlideImagePrompt(slides[5], promptTopic, 'future outlook conclusion');
+  // DYNAMIC: Only generate images for slides that request them
+  const imageTasks = [];
+  slides.forEach((slide, idx) => {
+    if (slide.hasImage && slide.imagePrompt) {
+      imageTasks.push({
+        index: idx,
+        prompt: slide.imagePrompt,
+        file: `slide_${idx}.jpg`
+      });
+    }
+  });
 
-  const imageTasks = [
-    { key: 'banner', prompt: slide1Prompt, file: 'banner.jpg' },
-    { key: 'terrestrial', prompt: slide2Prompt, file: 'terrestrial.jpg' },
-    { key: 'gasGiants', prompt: slide4Prompt, file: 'gasGiants.jpg' },
-    { key: 'statVisual', prompt: slide5Prompt, file: 'statVisual.jpg' },
-    { key: 'exploration', prompt: slide6Prompt, file: 'exploration.jpg' }
-  ];
+  logger.info(`  → ${imageTasks.length} slides requested images`);
 
   for (const task of imageTasks) {
     try {
-      logger.info(`  -> Generating Image [${task.key}] matching slide topic: "${task.prompt}"`);
-      const cmd = `python "${helperScript}" "${task.prompt}" "${task.key}"`;
-      execSync(cmd, { encoding: 'utf8' });
+      logger.info(`  → Slide ${task.index + 1}: "${task.prompt.substring(0, 60)}..."`);
+      const cmd = `python "${helperScript}" "${task.prompt}" "slide_${task.index}"`;
+      execSync(cmd, { encoding: 'utf8', timeout: 45000 }); // 45 seconds (industry standard for API calls)
 
       const imgPath = path.join(tempImgDir, task.file);
       if (fs.existsSync(imgPath) && fs.statSync(imgPath).size > 2000) {
-        resultImages[task.key] = imgPath;
+        resultImages[task.index] = imgPath;
+        logger.info(`     ✅ Generated (${Math.round(fs.statSync(imgPath).size / 1024)}KB)`);
+      } else {
+        logger.warn(`     ❌ Failed or too small`);
       }
     } catch (err) {
-      logger.warn(`Notice generating image for ${task.key}: ${err.message}`);
+      logger.warn(`     ❌ Error: ${err.message}`);
     }
   }
 
-  logger.info(`✅ Slide-Matched AI Images successfully generated! (${Object.keys(resultImages).length} images)`);
+  logger.info(`📸 Image Generation Complete: ${Object.keys(resultImages).length}/${imageTasks.length} successful`);
   return resultImages;
 };

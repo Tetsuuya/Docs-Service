@@ -21,7 +21,14 @@ export const buildPptxFile = async (presentationDataOrPrompt, mode = 'scratch', 
     if (typeof presentationDataOrPrompt === 'string') {
       presentationData = await generatePptxContent(presentationDataOrPrompt);
     }
-    return await buildScratchPptx(presentationData);
+    
+    // Generate images for scratch mode (like reference does)
+    let autoImages = imagePaths;
+    if (!autoImages || Object.keys(autoImages).length === 0) {
+      autoImages = await generateTopicImages(presentationData);
+    }
+    
+    return await buildScratchPptx(presentationData, autoImages);
   }
 
   if (mode === 'fill') {

@@ -1,0 +1,288 @@
+{
+  "testDate": "2026-07-27T13:12:42.052Z",
+  "totalTests": 8,
+  "successful": 8,
+  "failed": 0,
+  "analysis": {
+    "slideCounts": {
+      "range": [
+        5,
+        8
+      ],
+      "unique": [
+        8,
+        6,
+        5
+      ],
+      "varietyScore": 0.375
+    },
+    "imageCounts": {
+      "range": [
+        2,
+        4
+      ],
+      "unique": [
+        4,
+        3,
+        2
+      ],
+      "varietyScore": 0.375
+    },
+    "layoutSequences": {
+      "unique": 8,
+      "total": 8,
+      "allUnique": true
+    },
+    "firstLayouts": {
+      "quote": 4,
+      "minimal": 1,
+      "stat": 1,
+      "comparison": 1,
+      "split": 1
+    },
+    "layoutDistribution": {
+      "quote": 5,
+      "comparison": 8,
+      "cards": 8,
+      "split": 7,
+      "stat": 8,
+      "minimal": 8,
+      "list": 1,
+      "process": 7,
+      "hero": 1
+    },
+    "imagePlacementPatterns": [
+      "1,4,5,8",
+      "1,3,6",
+      "1,4,8",
+      "2,4",
+      "1,2,4,5",
+      "1,4,5",
+      "1,3,5,6"
+    ]
+  },
+  "results": [
+    {
+      "prompt": "make a ppt about music",
+      "duration": "7.39s",
+      "title": "The Architecture of Sound",
+      "slideCount": 8,
+      "layouts": "quote → comparison → cards → split → stat → minimal → list → process",
+      "layoutDistribution": {
+        "quote": 1,
+        "comparison": 1,
+        "cards": 1,
+        "split": 1,
+        "stat": 1,
+        "minimal": 1,
+        "list": 1,
+        "process": 1
+      },
+      "imagesCount": 4,
+      "imageSlides": [
+        1,
+        4,
+        5,
+        8
+      ],
+      "firstLayout": "quote",
+      "lastLayout": "process",
+      "theme": {
+        "bg": "1A0505",
+        "accent": "E91E63"
+      }
+    },
+    {
+      "prompt": "make a ppt about space exploration",
+      "duration": "5.20s",
+      "title": "Beyond the Atmosphere",
+      "slideCount": 6,
+      "layouts": "minimal → stat → split → comparison → cards → quote",
+      "layoutDistribution": {
+        "minimal": 1,
+        "stat": 1,
+        "split": 1,
+        "comparison": 1,
+        "cards": 1,
+        "quote": 1
+      },
+      "imagesCount": 3,
+      "imageSlides": [
+        1,
+        3,
+        6
+      ],
+      "firstLayout": "minimal",
+      "lastLayout": "quote",
+      "theme": {
+        "bg": "0F172A",
+        "accent": "38B6FF"
+      }
+    },
+    {
+      "prompt": "make a ppt about artificial intelligence",
+      "duration": "5.20s",
+      "title": "Decoding Artificial Intelligence",
+      "slideCount": 8,
+      "layouts": "quote → minimal → comparison → split → cards → stat → process → split",
+      "layoutDistribution": {
+        "quote": 1,
+        "minimal": 1,
+        "comparison": 1,
+        "split": 2,
+        "cards": 1,
+        "stat": 1,
+        "process": 1
+      },
+      "imagesCount": 3,
+      "imageSlides": [
+        1,
+        4,
+        8
+      ],
+      "firstLayout": "quote",
+      "lastLayout": "split",
+      "theme": {
+        "bg": "0F172A",
+        "accent": "38B6FF"
+      }
+    },
+    {
+      "prompt": "make a ppt about healthy cooking",
+      "duration": "4.82s",
+      "title": "The Art of Healthy Cooking",
+      "slideCount": 5,
+      "layouts": "stat → cards → comparison → process → minimal",
+      "layoutDistribution": {
+        "stat": 1,
+        "cards": 1,
+        "comparison": 1,
+        "process": 1,
+        "minimal": 1
+      },
+      "imagesCount": 2,
+      "imageSlides": [
+        2,
+        4
+      ],
+      "firstLayout": "stat",
+      "lastLayout": "minimal",
+      "theme": {
+        "bg": "0A2818",
+        "accent": "4CAF50"
+      }
+    },
+    {
+      "prompt": "make a ppt about climate change",
+      "duration": "6.34s",
+      "title": "The Changing Earth",
+      "slideCount": 6,
+      "layouts": "comparison → split → stat → cards → process → minimal",
+      "layoutDistribution": {
+        "comparison": 1,
+        "split": 1,
+        "stat": 1,
+        "cards": 1,
+        "process": 1,
+        "minimal": 1
+      },
+      "imagesCount": 4,
+      "imageSlides": [
+        1,
+        2,
+        4,
+        5
+      ],
+      "firstLayout": "comparison",
+      "lastLayout": "minimal",
+      "theme": {
+        "bg": "0A2818",
+        "accent": "4CAF50"
+      }
+    },
+    {
+      "prompt": "make a ppt about entrepreneurship",
+      "duration": "5.12s",
+      "title": "The Anatomy of a Venture",
+      "slideCount": 6,
+      "layouts": "quote → comparison → cards → process → stat → minimal",
+      "layoutDistribution": {
+        "quote": 1,
+        "comparison": 1,
+        "cards": 1,
+        "process": 1,
+        "stat": 1,
+        "minimal": 1
+      },
+      "imagesCount": 3,
+      "imageSlides": [
+        1,
+        4,
+        5
+      ],
+      "firstLayout": "quote",
+      "lastLayout": "minimal",
+      "theme": {
+        "bg": "1A1A2E",
+        "accent": "FFD700"
+      }
+    },
+    {
+      "prompt": "make a ppt about yoga and meditation",
+      "duration": "5.41s",
+      "title": "The Sanctuary Within",
+      "slideCount": 6,
+      "layouts": "split → stat → cards → comparison → process → minimal",
+      "layoutDistribution": {
+        "split": 1,
+        "stat": 1,
+        "cards": 1,
+        "comparison": 1,
+        "process": 1,
+        "minimal": 1
+      },
+      "imagesCount": 4,
+      "imageSlides": [
+        1,
+        3,
+        5,
+        6
+      ],
+      "firstLayout": "split",
+      "lastLayout": "minimal",
+      "theme": {
+        "bg": "0A2818",
+        "accent": "4CAF50"
+      }
+    },
+    {
+      "prompt": "make a ppt about cybersecurity",
+      "duration": "5.55s",
+      "title": "The Invisible Perimeter",
+      "slideCount": 8,
+      "layouts": "quote → minimal → comparison → split → process → stat → cards → hero",
+      "layoutDistribution": {
+        "quote": 1,
+        "minimal": 1,
+        "comparison": 1,
+        "split": 1,
+        "process": 1,
+        "stat": 1,
+        "cards": 1,
+        "hero": 1
+      },
+      "imagesCount": 3,
+      "imageSlides": [
+        1,
+        4,
+        5
+      ],
+      "firstLayout": "quote",
+      "lastLayout": "hero",
+      "theme": {
+        "bg": "0F172A",
+        "accent": "38B6FF"
+      }
+    }
+  ]
+}

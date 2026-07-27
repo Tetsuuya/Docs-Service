@@ -1,0 +1,132 @@
+{
+  "title": "The Sanctuary Within",
+  "subtitle": "Bridging ancient yoga traditions with modern mindfulness practices for holistic well-being.",
+  "theme": {
+    "primaryColor": "FFFFFF",
+    "secondaryColor": "A5D6A7",
+    "accentColor": "4CAF50",
+    "backgroundColor": "0A2818",
+    "cardBgColor": "143824",
+    "textColor": "FFFFFF",
+    "fontFamily": "Poppins"
+  },
+  "slides": [
+    {
+      "slideNumber": 1,
+      "type": "content",
+      "layout": "split",
+      "title": "Foundations of Inner Peace",
+      "subtitle": "Harmonizing body and breath",
+      "hasImage": true,
+      "imagePrompt": "Serene individual practicing yoga asana outdoors in a lush bamboo forest during early morning golden hour mist, environmental context style showing deep connection with nature",
+      "bullets": [
+        "Integrating physical movement with conscious breathwork creates a resilient nervous system and promotes deep physiological relaxation.",
+        "Ancient yogic philosophies provide a structured pathway for cultivating mental clarity amidst the overwhelming noise of contemporary daily life.",
+        "Regular disciplined practice shifts the body out of chronic fight-or-flight states, restoring natural equilibrium and promoting emotional stability."
+      ]
+    },
+    {
+      "slideNumber": 2,
+      "type": "content",
+      "layout": "stat",
+      "title": "Measurable Transformation",
+      "subtitle": "Scientific validation of mindfulness",
+      "hasImage": false,
+      "statNumber": "83%",
+      "statLabel": "Reduction in self-reported daily stress levels after 8 weeks of consistent meditation practice.",
+      "bullets": [
+        "Participants demonstrated significant physical decreases in resting cortisol and adrenaline hormone concentrations.",
+        "Neuroimaging studies reveal actual structural thickening of the prefrontal cortex responsible for emotional regulation.",
+        "Routine practitioners report profound improvements in sleep onset latency, sleep maintenance, and overall restorative deep rest."
+      ]
+    },
+    {
+      "slideNumber": 3,
+      "type": "content",
+      "layout": "cards",
+      "title": "The Three Pillars of Practice",
+      "subtitle": "Core disciplines for daily integration",
+      "hasImage": true,
+      "imagePrompt": "Minimalist meditation cushion resting on natural wooden floor inside a sunlit sunroom overlooking a tranquil Japanese Zen rock garden, natural environmental context",
+      "cards": [
+        {
+          "title": "Asana (Physical Postures)",
+          "description": "Cultivating strength, flexibility, and spatial awareness through intentional physical movement synchronized completely with the rhythm of the breath."
+        },
+        {
+          "title": "Pranayama (Breath Control)",
+          "description": "Harnessing the vital life force energy of the breath to consciously regulate the autonomic nervous system and calm an overactive mind."
+        },
+        {
+          "title": "Dhyana (Meditation)",
+          "description": "Training the distracted mind in sustained concentration and open-monitoring awareness to discover profound stillness beneath passing thoughts."
+        }
+      ]
+    },
+    {
+      "slideNumber": 4,
+      "type": "content",
+      "layout": "comparison",
+      "title": "Active Movement vs. Still Awareness",
+      "subtitle": "Two sides of the same meditative coin",
+      "hasImage": false,
+      "leftSide": {
+        "title": "Dynamic Yoga Practice",
+        "bullets": [
+          "Engages large muscle groups and releases chronic physical tension stored in connective tissues.",
+          "Improves proprioception, core stabilization, joint health, and overall physical vitality.",
+          "Serves as active meditation through continuous focus on physical alignment and breath."
+        ]
+      },
+      "rightSide": {
+        "title": "Still Meditation Practice",
+        "bullets": [
+          "Directly addresses mental agitation, cognitive fatigue, and emotional reactivity.",
+          "Builds meta-awareness allowing practitioners to observe thoughts without identifying with them.",
+          "Fosters deep inner quietude and spiritual grounding through uninterrupted stillness."
+        ]
+      }
+    },
+    {
+      "slideNumber": 5,
+      "type": "content",
+      "layout": "process",
+      "title": "Developing Your Daily Ritual",
+      "subtitle": "A sustainable framework for personal practice",
+      "hasImage": true,
+      "imagePrompt": "Close-up of a person's hands holding a warm ceramic tea cup sitting cross-legged on a woven jute rug inside a softly lit living room surrounded by indoor houseplants, cozy environmental context",
+      "steps": [
+        {
+          "title": "Create Space",
+          "subtitle": "Environment",
+          "description": "Designate a clean, quiet physical corner in your living space dedicated solely to your daily practice."
+        },
+        {
+          "title": "Grounding",
+          "subtitle": "Transition",
+          "description": "Begin with five minutes of uninterrupted silent breathing to arrive fully into your physical body."
+        },
+        {
+          "title": "Movement",
+          "subtitle": "Activation",
+          "description": "Flow through gentle stretches or postures to release stagnation and prepare the body for stillness."
+        },
+        {
+          "title": "Integration",
+          "subtitle": "Rest",
+          "description": "Conclude with seated meditation or deep restorative rest to seal the energetic benefits of the session."
+        }
+      ]
+    },
+    {
+      "slideNumber": 6,
+      "type": "content",
+      "layout": "minimal",
+      "title": "The Ultimate Destination",
+      "statement": "Peace is not the absence of chaos, but the ability to remain centered within it.",
+      "support": "Carry your practice off the mat and into the unfolding moments of everyday life.",
+      "hasImage": true,
+      "imagePrompt": "A solitary figure walking peacefully along a misty ocean shoreline at sunrise, leaving gentle footprints in the damp sand, environmental context shot emphasizing solitude and tranquility"
+    }
+  ]
+}

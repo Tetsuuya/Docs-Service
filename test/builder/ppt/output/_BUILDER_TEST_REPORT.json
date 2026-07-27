@@ -1,0 +1,78 @@
+{
+  "testDate": "2026-07-27T13:25:52.907Z",
+  "summary": {
+    "totalTests": 3,
+    "successful": 3,
+    "failed": 0,
+    "contentIssues": 0
+  },
+  "layoutsCovered": [
+    "quote",
+    "comparison",
+    "cards",
+    "split",
+    "stat",
+    "minimal",
+    "list",
+    "process"
+  ],
+  "results": [
+    {
+      "jsonFile": "1_make_a_ppt_about_music.json",
+      "title": "The Architecture of Sound",
+      "slideCount": 8,
+      "imageCount": 4,
+      "layouts": {
+        "quote": 1,
+        "comparison": 1,
+        "cards": 1,
+        "split": 1,
+        "stat": 1,
+        "minimal": 1,
+        "list": 1,
+        "process": 1
+      },
+      "buildSuccess": true,
+      "fileSize": 140385,
+      "contentIssues": 0,
+      "issues": []
+    },
+    {
+      "jsonFile": "2_make_a_ppt_about_space_explora.json",
+      "title": "Beyond the Atmosphere",
+      "slideCount": 6,
+      "imageCount": 3,
+      "layouts": {
+        "minimal": 1,
+        "stat": 1,
+        "split": 1,
+        "comparison": 1,
+        "cards": 1,
+        "quote": 1
+      },
+      "buildSuccess": true,
+      "fileSize": 110196,
+      "contentIssues": 0,
+      "issues": []
+    },
+    {
+      "jsonFile": "3_make_a_ppt_about_artificial_in.json",
+      "title": "Decoding Artificial Intelligence",
+      "slideCount": 8,
+      "imageCount": 3,
+      "layouts": {
+        "quote": 1,
+        "minimal": 1,
+        "comparison": 1,
+        "split": 2,
+        "cards": 1,
+        "stat": 1,
+        "process": 1
+      },
+      "buildSuccess": true,
+      "fileSize": 134199,
+      "contentIssues": 0,
+      "issues": []
+    }
+  ]
+}

@@ -1,0 +1,157 @@
+{
+  "title": "The Architecture of Sound",
+  "subtitle": "An Exploration into How Music Shapes Human Experience, Culture, and Emotion",
+  "theme": {
+    "primaryColor": "FFFFFF",
+    "secondaryColor": "CBD5E1",
+    "accentColor": "E91E63",
+    "backgroundColor": "1A0505",
+    "cardBgColor": "2A0A0A",
+    "textColor": "FFFFFF",
+    "fontFamily": "Poppins"
+  },
+  "slides": [
+    {
+      "slideNumber": 1,
+      "type": "content",
+      "layout": "quote",
+      "title": "The Power of Audio",
+      "subtitle": "Opening Perspective",
+      "hasImage": true,
+      "imagePrompt": "Close-up macro detail of golden brass trumpet valves being pressed by musician's fingers, reflecting warm stage lights",
+      "quote": "Music is the shorthand of emotion. Emotions which let themselves be put into words are what we are expressing.",
+      "author": "Leo Tolstoy"
+    },
+    {
+      "slideNumber": 2,
+      "type": "content",
+      "layout": "comparison",
+      "title": "The Dual Nature of Listening",
+      "subtitle": "Passive vs. Active Engagement",
+      "hasImage": false,
+      "leftSide": {
+        "title": "Passive Consumption",
+        "bullets": [
+          "Serves as background noise during daily commutes, routine tasks, and office work.",
+          "Relies heavily on algorithmic recommendation feeds and personalized streaming playlists.",
+          "Creates familiar sonic wallpaper that modulates mood without conscious intellectual effort."
+        ]
+      },
+      "rightSide": {
+        "title": "Active Immersion",
+        "bullets": [
+          "Involves deep analytical listening to specific instrumental layers, mixing choices, and lyricism.",
+          "Requires dedicated physical spaces, high-fidelity transducers, and uninterrupted attention.",
+          "Fosters profound emotional catharsis and intellectual appreciation of musical composition."
+        ]
+      }
+    },
+    {
+      "slideNumber": 3,
+      "type": "content",
+      "layout": "cards",
+      "title": "The Three Pillars of Sonic Impact",
+      "subtitle": "Core elements that define every musical experience",
+      "hasImage": false,
+      "cards": [
+        {
+          "title": "Rhythm and Pulse",
+          "description": "The foundational temporal framework that drives human movement, heart rate synchronization, and visceral physical responses across every known global culture."
+        },
+        {
+          "title": "Harmonic Resonance",
+          "description": "The vertical combination of simultaneous frequencies that triggers complex emotional associations, tension, release, and psychological depth within the listener."
+        },
+        {
+          "title": "Timbral Texture",
+          "description": "The distinct sonic fingerprint of instruments and voices, defined by overtones and physical materials, creating unique acoustic environments."
+        }
+      ]
+    },
+    {
+      "slideNumber": 4,
+      "type": "content",
+      "layout": "split",
+      "title": "Acoustic Engineering",
+      "subtitle": "The physics of modern sound capture",
+      "hasImage": true,
+      "imagePrompt": "Close-up detail of a vintage ribbon microphone capsule capturing sound waves in a damp, wood-paneled recording studio",
+      "bullets": [
+        "Modern production requires meticulous attention to phase cancellation, room modes, and frequency masking to ensure absolute clarity across massive dynamic ranges.",
+        "Engineers utilize specialized analog hardware compressors and saturation units to impart warmth, harmonic distortion, and perceived loudness onto digital signals.",
+        "Acoustic treatment within monitoring environments dictates translation accuracy, ensuring mixes sound equally balanced in professional studios and consumer earbuds."
+      ]
+    },
+    {
+      "slideNumber": 5,
+      "type": "content",
+      "layout": "stat",
+      "title": "The Neurochemistry of Melody",
+      "subtitle": "Biological response to auditory stimuli",
+      "hasImage": true,
+      "imagePrompt": "Macro close-up of vinyl record grooves glowing with colorful laser light refraction, showing microscopic audio waveform variations",
+      "statNumber": "300%",
+      "statLabel": "Dopamine Surge",
+      "bullets": [
+        "Listening to emotionally resonant musical passages triggers significant dopamine releases within the brain's reward pathway, mirroring biological responses to food and survival stimuli.",
+        "Neural entrainment allows human brainwaves to synchronize with external auditory rhythms, enhancing focus, reducing cortisol levels, and accelerating cognitive recovery.",
+        "Musical memory remains remarkably resilient against neurodegenerative conditions, often unlocking profound autobiographical recall in patients with severe cognitive decline."
+      ]
+    },
+    {
+      "slideNumber": 6,
+      "type": "content",
+      "layout": "minimal",
+      "title": "The Universal Language",
+      "subtitle": "Beyond words",
+      "hasImage": false,
+      "statement": "Music transcends linguistic boundaries, uniting diverse human consciousnesses through pure mathematical vibration and emotional resonance.",
+      "support": "It is humanity's most enduring bridge across cultural divides."
+    },
+    {
+      "slideNumber": 7,
+      "type": "content",
+      "layout": "list",
+      "title": "Evolution of Delivery Systems",
+      "subtitle": "How we access and consume sound",
+      "hasImage": false,
+      "bullets": [
+        "Wax cylinders and shellac 78s initiated the era of preserved acoustic performances, allowing home playback for the first time.",
+        "Magnetic tape and vinyl microgrooves revolutionized fidelity, enabling multi-track overdubbing and revolutionary studio production techniques.",
+        "Compact discs and digital audio files democratized distribution, shifting physical ownership into frictionless digital file collections.",
+        "Cloud-based streaming platforms aggregate the entirety of human recorded history into instant, on-demand subscriptions available anywhere on earth."
+      ]
+    },
+    {
+      "slideNumber": 8,
+      "type": "content",
+      "layout": "process",
+      "title": "From Composition to Master",
+      "subtitle": "The lifecycle of an audio recording",
+      "hasImage": true,
+      "imagePrompt": "Extreme close-up of a producer's hands editing digital audio waveforms on a high-resolution timeline display with glowing metering plugins",
+      "steps": [
+        {
+          "title": "Ideation",
+          "subtitle": "Inception",
+          "description": "Songwriting, melodic sketching, and chord structure development within an intimate creative space."
+        },
+        {
+          "title": "Tracking",
+          "subtitle": "Capture",
+          "description": "Recording raw acoustic and electronic performances through high-end preamplifiers and pristine converters."
+        },
+        {
+          "title": "Mixing",
+          "subtitle": "Balance",
+          "description": "Balancing levels, spatial positioning, EQ adjustments, and dynamic processing to construct a cohesive mix."
+        },
+        {
+          "title": "Mastering",
+          "subtitle": "Finalization",
+          "description": "Applying final limiting, tonal optimization, and metadata tagging to prepare files for universal distribution."
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,133 @@
+{
+  "title": "The Changing Earth",
+  "subtitle": "Analyzing the stark realities and actionable transformations of our global climate",
+  "theme": {
+    "primaryColor": "FFFFFF",
+    "secondaryColor": "A3E4D7",
+    "accentColor": "4CAF50",
+    "backgroundColor": "0A2818",
+    "cardBgColor": "133E28",
+    "textColor": "FFFFFF",
+    "fontFamily": "Poppins"
+  },
+  "slides": [
+    {
+      "slideNumber": 1,
+      "type": "content",
+      "layout": "comparison",
+      "title": "The Anthropocene Shift",
+      "subtitle": "Comparing historical baselines with modern ecological realities",
+      "hasImage": true,
+      "imagePrompt": "Side-by-side comparison split composition showing a lush green alpine glacier in 1980 on the left transitioning into a heavily receded rock and mud landscape with minimal ice patches in modern times on the right",
+      "leftSide": {
+        "title": "Historical Baseline (1900)",
+        "bullets": [
+          "Stable polar ice caps maintaining global sea level equilibrium and reflecting solar radiation effectively",
+          "Predictable seasonal precipitation patterns supporting indigenous biodiversity and stable agricultural zones",
+          "Balanced atmospheric carbon concentrations operating within natural pre-industrial cyclical limits"
+        ]
+      },
+      "rightSide": {
+        "title": "Contemporary Reality (Present)",
+        "bullets": [
+          "Accelerated glacial retreat in Greenland and Antarctica driving unprecedented global sea level rise",
+          "Intensified extreme weather events including prolonged multi-year droughts and catastrophic flash flooding",
+          "Atmospheric carbon dioxide levels exceeding 420 ppm, triggering irreversible tipping points"
+        ]
+      }
+    },
+    {
+      "slideNumber": 2,
+      "type": "content",
+      "layout": "split",
+      "title": "Oceanic Consequences",
+      "subtitle": "How rising temperatures and acidification reshape marine biomes",
+      "hasImage": true,
+      "imagePrompt": "Split image showing vibrant multi-colored coral reef teeming with diverse fish life on one half, transitioning into bleached, white, lifeless coral skeleton on the murky ocean floor on the other half",
+      "bullets": [
+        "Marine heatwaves cause widespread coral bleaching events, destroying vital breeding grounds for twenty-five percent of all marine species globally.",
+        "Increased carbon dioxide absorption leads to ocean acidification, dissolving the calcium carbonate shells of microscopic pteropods and crustaceans.",
+        "Expanding oceanic dead zones resulting from agricultural runoff and thermal stratification suffocate pelagic ecosystems and collapse fisheries.",
+        "Disruption of major thermal currents, such as the Atlantic Meridional Overturning Circulation, threatens to radically alter global weather patterns."
+      ]
+    },
+    {
+      "slideNumber": 3,
+      "type": "content",
+      "layout": "stat",
+      "title": "The Thermal Edge",
+      "subtitle": "Quantifying our proximity to irreversible planetary thresholds",
+      "hasImage": false,
+      "statNumber": "+1.2°C",
+      "statLabel": "Global Average Temperature Rise Above Pre-Industrial Levels",
+      "bullets": [
+        "Every fraction of a degree exponentially increases the frequency of extreme heatwaves and agricultural failures.",
+        "The Paris Agreement threshold of 1.5 degrees Celsius is rapidly approaching within the next decade.",
+        "Mitigation efforts require halving global greenhouse gas emissions by 2030 to avoid catastrophic tipping points."
+      ]
+    },
+    {
+      "slideNumber": 4,
+      "type": "content",
+      "layout": "cards",
+      "title": "Ecosystem Vulnerability Index",
+      "subtitle": "Assessing the critical stress points across Earth's major biomes",
+      "hasImage": true,
+      "imagePrompt": "Before and after aerial photograph sequence showing dense Amazonian rainforest canopy on top transitioning into fragmented, burned deforested cattle pastureland on the bottom",
+      "cards": [
+        {
+          "title": "The Amazon Rainforest",
+          "description": "Facing a dangerous feedback loop where deforestation and rising temperatures transform the world's largest carbon sink into an arid savannah emitting more carbon than it absorbs."
+        },
+        {
+          "title": "Arctic Permafrost",
+          "description": "Rapidly thawing sub-surface ground releases massive trapped reserves of methane and carbon dioxide, significantly accelerating the warming trajectory of the global atmosphere."
+        },
+        {
+          "title": "Global Agricultural Belts",
+          "description": "Unpredictable monsoons, severe soil degradation, and chronic water scarcity threaten long-term food security for billions of people living in developing and developed nations alike."
+        }
+      ]
+    },
+    {
+      "slideNumber": 5,
+      "type": "content",
+      "layout": "process",
+      "title": "The Decarbonization Pathway",
+      "subtitle": "Strategic phases required to achieve net-zero global emissions",
+      "hasImage": true,
+      "imagePrompt": "Futuristic urban landscape showing a smog-filled city skyline on the left transitioning into a clean, green, solar-powered eco-city with vertical forests and electric transit on the right",
+      "steps": [
+        {
+          "title": "Phase 1: Energy Transition",
+          "subtitle": "Fossil Fuel Phase-Out",
+          "description": "Rapidly decommission coal and gas power plants while aggressively scaling utility-scale solar, wind, and next-generation geothermal energy grids."
+        },
+        {
+          "title": "Phase 2: Industrial Overhaul",
+          "subtitle": "Green Manufacturing",
+          "description": "Electrify heavy industrial processes, transition to green hydrogen for steel production, and revolutionize global supply chain logistics."
+        },
+        {
+          "title": "Phase 3: Ecosystem Restoration",
+          "subtitle": "Natural Sinks",
+          "description": "Implement massive global reforestation, restore degraded wetlands, and adopt regenerative agricultural practices to draw down atmospheric carbon."
+        },
+        {
+          "title": "Phase 4: Circular Economy",
+          "subtitle": "Resource Efficiency",
+          "description": "Redesign manufacturing for infinite recyclability, eliminate single-use materials, and drastically reduce consumer waste across all economic sectors."
+        }
+      ]
+    },
+    {
+      "slideNumber": 6,
+      "type": "content",
+      "layout": "minimal",
+      "title": "The Final Verdict",
+      "subtitle": "A decisive moment in human history",
+      "statement": "We are the first generation to fully understand climate change, and the last generation with a narrow window to stop its most catastrophic consequences.",
+      "support": "Action is no longer a matter of political choice, but of planetary survival."
+    }
+  ]
+}

@@ -1,0 +1,147 @@
+{
+  "title": "Decoding Artificial Intelligence",
+  "subtitle": "Beyond the Hype: The Architecture of Modern Machine Learning",
+  "theme": {
+    "primaryColor": "FFFFFF",
+    "secondaryColor": "CBD5E1",
+    "accentColor": "38B6FF",
+    "backgroundColor": "0F172A",
+    "cardBgColor": "1E293B",
+    "textColor": "FFFFFF",
+    "fontFamily": "Inter"
+  },
+  "slides": [
+    {
+      "slideNumber": 1,
+      "type": "content",
+      "layout": "quote",
+      "title": "The Paradigm Shift",
+      "subtitle": "Philosophy of Computation",
+      "hasImage": true,
+      "imagePrompt": "Macro close-up detail of microscopic silicon semiconductor traces on a modern multi-core processor illuminated by blue ambient light",
+      "quote": "The question of whether a computer can think is no more interesting than the question of whether a submarine can swim.",
+      "author": "Edsger W. Dijkstra"
+    },
+    {
+      "slideNumber": 2,
+      "type": "content",
+      "layout": "minimal",
+      "title": "Foundational Truth",
+      "statement": "Artificial intelligence does not understand the world; it models the statistical probability of human expression.",
+      "support": "A crucial distinction separating computation from true comprehension."
+    },
+    {
+      "slideNumber": 3,
+      "type": "content",
+      "layout": "comparison",
+      "title": "Cognitive Architecture",
+      "leftSide": {
+        "title": "Classical Programming",
+        "bullets": [
+          "Human engineers explicitly define every rule and conditional branch.",
+          "Deterministic outcomes based on strictly written logical statements.",
+          "Fragile when faced with edge cases outside the programmed parameters.",
+          "Zero capacity to generalize from unforeseen environmental variations."
+        ]
+      },
+      "rightSide": {
+        "title": "Machine Learning",
+        "bullets": [
+          "Algorithms discover underlying patterns independently from massive datasets.",
+          "Probabilistic mapping replaces rigid, hardcoded conditional logic.",
+          "Adaptive behavior scales gracefully when introduced to novel data.",
+          "Continuous optimization improves performance through iterative training."
+        ]
+      }
+    },
+    {
+      "slideNumber": 4,
+      "type": "content",
+      "layout": "split",
+      "title": "Neural Network Anatomy",
+      "subtitle": "The mechanics of artificial perception",
+      "hasImage": true,
+      "imagePrompt": "Detailed abstract visualization of glowing artificial neural network nodes firing electrical impulses across interconnected synaptic pathways",
+      "bullets": [
+        "Input layers ingest raw multi-dimensional vectors such as pixel grids, audio frequencies, or tokenized text streams.",
+        "Hidden processing tiers apply weighted transformations and non-linear activation functions to extract increasingly abstract features.",
+        "Output layers synthesize the propagated mathematical signals into actionable classifications, regressions, or generated token sequences."
+      ]
+    },
+    {
+      "slideNumber": 5,
+      "type": "content",
+      "layout": "cards",
+      "title": "Core Learning Paradigms",
+      "cards": [
+        {
+          "title": "Supervised Learning",
+          "description": "Models train on meticulously labeled input-output pairs, mastering mapping functions by minimizing prediction error against ground truth."
+        },
+        {
+          "title": "Unsupervised Learning",
+          "description": "Algorithms navigate completely unlabeled data spaces, autonomously clustering similarities and discovering latent structural anomalies."
+        },
+        {
+          "title": "Reinforcement Learning",
+          "description": "Autonomous agents interact directly with dynamic environments, maximizing cumulative rewards through trial, error, and policy optimization."
+        }
+      ]
+    },
+    {
+      "slideNumber": 6,
+      "type": "content",
+      "layout": "stat",
+      "title": "Scaling Laws",
+      "statNumber": "1000x",
+      "statLabel": "Parameter Growth",
+      "bullets": [
+        "Compute budgets have expanded exponentially over the last five years.",
+        "Model performance scales predictably as a power law function of compute, data, and parameters.",
+        "Diminishing returns require architectural innovations beyond brute-force scaling."
+      ]
+    },
+    {
+      "slideNumber": 7,
+      "type": "content",
+      "layout": "process",
+      "title": "The Model Lifecycle",
+      "steps": [
+        {
+          "title": "Curation",
+          "subtitle": "Data Engineering",
+          "description": "Gathering, filtering, and tokenizing petabytes of raw textual, visual, or numerical information."
+        },
+        {
+          "title": "Training",
+          "subtitle": "Compute Phase",
+          "description": "Consuming massive GPU clusters to optimize billions of floating-point weight matrices over weeks."
+        },
+        {
+          "title": "Alignment",
+          "subtitle": "Human Guidance",
+          "description": "Refining model outputs using reinforcement learning from human feedback to ensure safety and utility."
+        },
+        {
+          "title": "Deployment",
+          "subtitle": "Inference at Scale",
+          "description": "Serving optimized model weights in production environments for real-time user interactions."
+        }
+      ]
+    },
+    {
+      "slideNumber": 8,
+      "type": "content",
+      "layout": "split",
+      "title": "The Road Ahead",
+      "subtitle": "Navigating the technological horizon",
+      "hasImage": true,
+      "imagePrompt": "Close-up of a high-performance liquid cooling pipe running across an enterprise AI server rack glowing with emerald indicator lights",
+      "bullets": [
+        "Energy constraints demand hardware innovations and highly efficient sparse neural network architectures.",
+        "Synthesizing logical reasoning engines with probabilistic generation will bridge current cognitive gaps.",
+        "Establishing robust global governance frameworks is essential to ensure equitable and safe deployment."
+      ]
+    }
+  ]
+}

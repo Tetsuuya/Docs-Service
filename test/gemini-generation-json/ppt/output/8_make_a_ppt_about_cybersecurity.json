@@ -1,0 +1,142 @@
+{
+  "title": "The Invisible Perimeter",
+  "subtitle": "Navigating the modern threat landscape through precise defense mechanisms",
+  "theme": {
+    "primaryColor": "FFFFFF",
+    "secondaryColor": "94A3B8",
+    "accentColor": "38B6FF",
+    "backgroundColor": "0F172A",
+    "cardBgColor": "1E293B",
+    "textColor": "FFFFFF",
+    "fontFamily": "Inter"
+  },
+  "slides": [
+    {
+      "slideNumber": 1,
+      "type": "content",
+      "layout": "quote",
+      "title": "Opening Perspective",
+      "subtitle": "The core dilemma of digital defense",
+      "hasImage": true,
+      "imagePrompt": "Macro close-up of fiber optic cable connectors plugged into a high-density server rack, glowing blue status lights reflecting on dust motes in the air",
+      "quote": "There are only two types of companies: those that have been hacked and those that will be. Even they are soon to be hacked again.",
+      "author": "Robert Mueller, Former FBI Director"
+    },
+    {
+      "slideNumber": 2,
+      "type": "content",
+      "layout": "minimal",
+      "title": "The Expanding Attack Surface",
+      "statement": "Every connected endpoint is a potential open door in an era where the corporate perimeter has dissolved into remote workforces.",
+      "support": "Traditional firewalls can no longer protect assets distributed across countless residential networks and cloud providers."
+    },
+    {
+      "slideNumber": 3,
+      "type": "content",
+      "layout": "comparison",
+      "title": "Security Paradigms",
+      "leftSide": {
+        "title": "Traditional Castle-and-Moat",
+        "bullets": [
+          "Implicit trust given to internal network users and connected hardware devices.",
+          "Defensive architecture focused strictly on keeping external actors away from servers.",
+          "Perimeter security fails instantly once a single credential is compromised via phishing."
+        ]
+      },
+      "rightSide": {
+        "title": "Modern Zero Trust Architecture",
+        "bullets": [
+          "Continuous verification of every user and device regardless of their network location.",
+          "Micro-segmentation prevents lateral movement even if an initial breach occurs.",
+          "Least-privilege access enforced dynamically based on real-time risk assessment context."
+        ]
+      }
+    },
+    {
+      "slideNumber": 4,
+      "type": "content",
+      "layout": "split",
+      "title": "Anatomy of a Breach",
+      "subtitle": "Understanding the adversary's playbook",
+      "hasImage": true,
+      "imagePrompt": "Extreme close-up of a developer's fingers typing command line prompts on a mechanical keyboard with glowing RGB backlighting, terminal window reflecting complex hexadecimal code",
+      "bullets": [
+        "Reconnaissance phase involves passive scanning of public repositories and employee social media footprints.",
+        "Initial access is frequently achieved through sophisticated spear-phishing or unpatched edge service vulnerabilities.",
+        "Lateral movement relies on credential dumping and exploiting misconfigured active directory permissions silently.",
+        "Exfiltration or ransomware deployment occurs only after attackers establish persistent command and control channels."
+      ]
+    },
+    {
+      "slideNumber": 5,
+      "type": "content",
+      "layout": "process",
+      "title": "Incident Response Lifecycle",
+      "subtitle": "How resilient organizations handle active security events",
+      "hasImage": true,
+      "imagePrompt": "Close-up of a security analyst's hand operating a multi-monitor setup displaying red threat heatmaps and global attack vector node graphs in a dark operations center",
+      "steps": [
+        {
+          "title": "1. Preparation",
+          "subtitle": "Policies & Tools",
+          "description": "Establishing robust logging infrastructure, playbooks, and continuous training programs before incidents strike."
+        },
+        {
+          "title": "2. Containment",
+          "subtitle": "Halting the Spread",
+          "description": "Isolating compromised hosts and revoking session tokens to prevent attackers from expanding their footprint."
+        },
+        {
+          "title": "3. Eradication",
+          "subtitle": "Root Cause Removal",
+          "description": "Purging malware variants, closing exploited pathways, and patching underlying software vulnerabilities."
+        },
+        {
+          "title": "4. Recovery",
+          "subtitle": "Restoring Operations",
+          "description": "Bringing systems back online securely from verified clean backups while monitoring for reinfection indicators."
+        }
+      ]
+    },
+    {
+      "slideNumber": 6,
+      "type": "content",
+      "layout": "stat",
+      "title": "The Cost of Inaction",
+      "statNumber": "$4.45M",
+      "statLabel": "Average global cost of a data breach in 2023",
+      "bullets": [
+        "Direct expenses include incident forensics, legal fees, and mandatory regulatory notification processes.",
+        "Indirect costs encompass long-term brand erosion, loss of customer trust, and plummeting stock valuations.",
+        "Proactive investment in automated threat detection significantly reduces overall remediation timelines and expenses."
+      ]
+    },
+    {
+      "slideNumber": 7,
+      "type": "content",
+      "layout": "cards",
+      "title": "Pillars of Resilience",
+      "cards": [
+        {
+          "title": "Culture & Awareness",
+          "description": "Transforming employees from the weakest link in the security chain into an active human firewall through engaging simulations and clear reporting channels."
+        },
+        {
+          "title": "Automation & AI",
+          "description": "Leveraging machine learning models to analyze millions of telemetry signals per second, catching anomalous behavior before human analysts can react."
+        },
+        {
+          "title": "Resilient Architecture",
+          "description": "Designing systems with built-in redundancy, immutable backups, and fail-safes that ensure business continuity even during catastrophic ransomware events."
+        }
+      ]
+    },
+    {
+      "slideNumber": 8,
+      "type": "content",
+      "layout": "hero",
+      "title": "Secure the Future",
+      "subtitle": "Cybersecurity is not an IT project; it is the foundation of digital trust."
+    }
+  ]
+}

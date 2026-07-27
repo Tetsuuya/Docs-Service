@@ -1,0 +1,867 @@
+{
+  "analysisDate": "2026-07-27T13:19:22.722Z",
+  "totalSlides": 53,
+  "averageScore": 10,
+  "qualityDistribution": {
+    "excellent": 53,
+    "good": 0,
+    "fair": 0,
+    "poor": 0
+  },
+  "detailedAnalyses": [
+    {
+      "presentation": "The Architecture of Sound",
+      "slideNumber": 1,
+      "layout": "quote",
+      "title": "The Power of Audio",
+      "issues": [],
+      "warnings": [],
+      "strengths": [
+        "Substantive quote"
+      ],
+      "score": 10,
+      "details": {
+        "quoteLength": 110
+      },
+      "quality": "🟢 EXCELLENT"
+    },
+    {
+      "presentation": "The Architecture of Sound",
+      "slideNumber": 2,
+      "layout": "comparison",
+      "title": "The Dual Nature of Listening",
+      "issues": [],
+      "warnings": [],
+      "strengths": [
+        "Balanced comparison"
+      ],
+      "score": 10,
+      "details": {
+        "comparisonBalance": "3 vs 3"
+      },
+      "quality": "🟢 EXCELLENT"
+    },
+    {
+      "presentation": "The Architecture of Sound",
+      "slideNumber": 3,
+      "layout": "cards",
+      "title": "The Three Pillars of Sonic Impact",
+      "issues": [],
+      "warnings": [],
+      "strengths": [
+        "Card 1 detailed (158 chars)",
+        "Card 2 detailed (161 chars)",
+        "Card 3 detailed (141 chars)"
+      ],
+      "score": 10,
+      "details": {
+        "cardCount": 3
+      },
+      "quality": "🟢 EXCELLENT"
+    },
+    {
+      "presentation": "The Architecture of Sound",
+      "slideNumber": 4,
+      "layout": "split",
+      "title": "Acoustic Engineering",
+      "issues": [],
+      "warnings": [],
+      "strengths": [
+        "Detailed bullets (avg 163 chars)"
+      ],
+      "score": 10,
+      "details": {
+        "bulletCount": 3,
+        "avgBulletLength": 163
+      },
+      "quality": "🟢 EXCELLENT"
+    },
+    {
+      "presentation": "The Architecture of Sound",
+      "slideNumber": 5,
+      "layout": "stat",
+      "title": "The Neurochemistry of Melody",
+      "issues": [],
+      "warnings": [],
+      "strengths": [
+        "Has stat: 300%"
+      ],
+      "score": 10,
+      "details": {
+        "statNumber": "300%"
+      },
+      "quality": "🟢 EXCELLENT"
+    },
+    {
+      "presentation": "The Architecture of Sound",
+      "slideNumber": 6,
+      "layout": "minimal",
+      "title": "The Universal Language",
+      "issues": [],
+      "warnings": [],
+      "strengths": [],
+      "score": 10,
+      "details": {
+        "statementLength": 138
+      },
+      "quality": "🟢 EXCELLENT"
+    },
+    {
+      "presentation": "The Architecture of Sound",
+      "slideNumber": 7,
+      "layout": "list",
+      "title": "Evolution of Delivery Systems",
+      "issues": [],
+      "warnings": [],
+      "strengths": [
+        "Detailed bullets (avg 138 chars)"
+      ],
+      "score": 10,
+      "details": {
+        "bulletCount": 4,
+        "avgBulletLength": 138
+      },
+      "quality": "🟢 EXCELLENT"
+    },
+    {
+      "presentation": "The Architecture of Sound",
+      "slideNumber": 8,
+      "layout": "process",
+      "title": "From Composition to Master",
+      "issues": [],
+      "warnings": [],
+      "strengths": [
+        "Detailed process (4 steps)"
+      ],
+      "score": 10,
+      "details": {
+        "stepCount": 4
+      },
+      "quality": "🟢 EXCELLENT"
+    },
+    {
+      "presentation": "Beyond the Atmosphere",
+      "slideNumber": 1,
+      "layout": "minimal",
+      "title": "The Infinite Horizon",
+      "issues": [],
+      "warnings": [],
+      "strengths": [],
+      "score": 10,
+      "details": {
+        "statementLength": 102
+      },
+      "quality": "🟢 EXCELLENT"
+    },
+    {
+      "presentation": "Beyond the Atmosphere",
+      "slideNumber": 2,
+      "layout": "stat",
+      "title": "The Scale of the Journey",
+      "issues": [],
+      "warnings": [],
+      "strengths": [
+        "Has stat: 384,400"
+      ],
+      "score": 10,
+      "details": {
+        "statNumber": "384,400"
+      },
+      "quality": "🟢 EXCELLENT"
+    },
+    {
+      "presentation": "Beyond the Atmosphere",
+      "slideNumber": 3,
+      "layout": "split",
+      "title": "Redefining Engineering",
+      "issues": [],
+      "warnings": [],
+      "strengths": [
+        "Detailed bullets (avg 158 chars)"
+      ],
+      "score": 10,
+      "details": {
+        "bulletCount": 3,
+        "avgBulletLength": 158
+      },
+      "quality": "🟢 EXCELLENT"
+    },
+    {
+      "presentation": "Beyond the Atmosphere",
+      "slideNumber": 4,
+      "layout": "comparison",
+      "title": "Paradigm Shift in Exploration",
+      "issues": [],
+      "warnings": [],
+      "strengths": [
+        "Balanced comparison"
+      ],
+      "score": 10,
+      "details": {
+        "comparisonBalance": "3 vs 3"
+      },
+      "quality": "🟢 EXCELLENT"
+    },
+    {
+      "presentation": "Beyond the Atmosphere",
+      "slideNumber": 5,
+      "layout": "cards",
+      "title": "The Three Pillars of Tomorrow",
+      "issues": [],
+      "warnings": [],
+      "strengths": [
+        "Card 1 detailed (161 chars)",
+        "Card 2 detailed (137 chars)",
+        "Card 3 detailed (165 chars)"
+      ],
+      "score": 10,
+      "details": {
+        "cardCount": 3
+      },
+      "quality": "🟢 EXCELLENT"
+    },
+    {
+      "presentation": "Beyond the Atmosphere",
+      "slideNumber": 6,
+      "layout": "quote",
+      "title": "The Long View",
+      "issues": [],
+      "warnings": [],
+      "strengths": [
+        "Substantive quote"
+      ],
+      "score": 10,
+      "details": {
+        "quoteLength": 83
+      },
+      "quality": "🟢 EXCELLENT"
+    },
+    {
+      "presentation": "Decoding Artificial Intelligence",
+      "slideNumber": 1,
+      "layout": "quote",
+      "title": "The Paradigm Shift",
+      "issues": [],
+      "warnings": [],
+      "strengths": [
+        "Substantive quote"
+      ],
+      "score": 10,
+      "details": {
+        "quoteLength": 118
+      },
+      "quality": "🟢 EXCELLENT"
+    },
+    {
+      "presentation": "Decoding Artificial Intelligence",
+      "slideNumber": 2,
+      "layout": "minimal",
+      "title": "Foundational Truth",
+      "issues": [],
+      "warnings": [],
+      "strengths": [],
+      "score": 10,
+      "details": {
+        "statementLength": 113
+      },
+      "quality": "🟢 EXCELLENT"
+    },
+    {
+      "presentation": "Decoding Artificial Intelligence",
+      "slideNumber": 3,
+      "layout": "comparison",
+      "title": "Cognitive Architecture",
+      "issues": [],
+      "warnings": [],
+      "strengths": [
+        "Balanced comparison"
+      ],
+      "score": 10,
+      "details": {
+        "comparisonBalance": "4 vs 4"
+      },
+      "quality": "🟢 EXCELLENT"
+    },
+    {
+      "presentation": "Decoding Artificial Intelligence",
+      "slideNumber": 4,
+      "layout": "split",
+      "title": "Neural Network Anatomy",
+      "issues": [],
+      "warnings": [],
+      "strengths": [
+        "Detailed bullets (avg 128 chars)"
+      ],
+      "score": 10,
+      "details": {
+        "bulletCount": 3,
+        "avgBulletLength": 128
+      },
+      "quality": "🟢 EXCELLENT"
+    },
+    {
+      "presentation": "Decoding Artificial Intelligence",
+      "slideNumber": 5,
+      "layout": "cards",
+      "title": "Core Learning Paradigms",
+      "issues": [],
+      "warnings": [],
+      "strengths": [
+        "Card 1 detailed (137 chars)",
+        "Card 2 detailed (135 chars)",
+        "Card 3 detailed (139 chars)"
+      ],
+      "score": 10,
+      "details": {
+        "cardCount": 3
+      },
+      "quality": "🟢 EXCELLENT"
+    },
+    {
+      "presentation": "Decoding Artificial Intelligence",
+      "slideNumber": 6,
+      "layout": "stat",
+      "title": "Scaling Laws",
+      "issues": [],
+      "warnings": [],
+      "strengths": [
+        "Has stat: 1000x"
+      ],
+      "score": 10,
+      "details": {
+        "statNumber": "1000x"
+      },
+      "quality": "🟢 EXCELLENT"
+    },
+    {
+      "presentation": "Decoding Artificial Intelligence",
+      "slideNumber": 7,
+      "layout": "process",
+      "title": "The Model Lifecycle",
+      "issues": [],
+      "warnings": [],
+      "strengths": [
+        "Detailed process (4 steps)"
+      ],
+      "score": 10,
+      "details": {
+        "stepCount": 4
+      },
+      "quality": "🟢 EXCELLENT"
+    },
+    {
+      "presentation": "Decoding Artificial Intelligence",
+      "slideNumber": 8,
+      "layout": "split",
+      "title": "The Road Ahead",
+      "issues": [],
+      "warnings": [],
+      "strengths": [
+        "Detailed bullets (avg 103 chars)"
+      ],
+      "score": 10,
+      "details": {
+        "bulletCount": 3,
+        "avgBulletLength": 103
+      },
+      "quality": "🟢 EXCELLENT"
+    },
+    {
+      "presentation": "The Art of Healthy Cooking",
+      "slideNumber": 1,
+      "layout": "stat",
+      "title": "Nutrient Preservation",
+      "issues": [],
+      "warnings": [],
+      "strengths": [
+        "Has stat: 40%"
+      ],
+      "score": 10,
+      "details": {
+        "statNumber": "40%"
+      },
+      "quality": "🟢 EXCELLENT"
+    },
+    {
+      "presentation": "The Art of Healthy Cooking",
+      "slideNumber": 2,
+      "layout": "cards",
+      "title": "Pillars of Wholesome Kitchens",
+      "issues": [],
+      "warnings": [],
+      "strengths": [
+        "Card 1 detailed (179 chars)",
+        "Card 2 detailed (180 chars)",
+        "Card 3 detailed (164 chars)"
+      ],
+      "score": 10,
+      "details": {
+        "cardCount": 3
+      },
+      "quality": "🟢 EXCELLENT"
+    },
+    {
+      "presentation": "The Art of Healthy Cooking",
+      "slideNumber": 3,
+      "layout": "comparison",
+      "title": "Cooking Method Face-Off",
+      "issues": [],
+      "warnings": [],
+      "strengths": [
+        "Balanced comparison"
+      ],
+      "score": 10,
+      "details": {
+        "comparisonBalance": "3 vs 3"
+      },
+      "quality": "🟢 EXCELLENT"
+    },
+    {
+      "presentation": "The Art of Healthy Cooking",
+      "slideNumber": 4,
+      "layout": "process",
+      "title": "The Meal Preparation Workflow",
+      "issues": [],
+      "warnings": [],
+      "strengths": [
+        "Detailed process (4 steps)"
+      ],
+      "score": 10,
+      "details": {
+        "stepCount": 4
+      },
+      "quality": "🟢 EXCELLENT"
+    },
+    {
+      "presentation": "The Art of Healthy Cooking",
+      "slideNumber": 5,
+      "layout": "minimal",
+      "title": "The Ultimate Objective",
+      "issues": [],
+      "warnings": [],
+      "strengths": [],
+      "score": 10,
+      "details": {
+        "statementLength": 50
+      },
+      "quality": "🟢 EXCELLENT"
+    },
+    {
+      "presentation": "The Changing Earth",
+      "slideNumber": 1,
+      "layout": "comparison",
+      "title": "The Anthropocene Shift",
+      "issues": [],
+      "warnings": [],
+      "strengths": [
+        "Balanced comparison"
+      ],
+      "score": 10,
+      "details": {
+        "comparisonBalance": "3 vs 3"
+      },
+      "quality": "🟢 EXCELLENT"
+    },
+    {
+      "presentation": "The Changing Earth",
+      "slideNumber": 2,
+      "layout": "split",
+      "title": "Oceanic Consequences",
+      "issues": [],
+      "warnings": [],
+      "strengths": [
+        "Detailed bullets (avg 146 chars)"
+      ],
+      "score": 10,
+      "details": {
+        "bulletCount": 4,
+        "avgBulletLength": 146
+      },
+      "quality": "🟢 EXCELLENT"
+    },
+    {
+      "presentation": "The Changing Earth",
+      "slideNumber": 3,
+      "layout": "stat",
+      "title": "The Thermal Edge",
+      "issues": [],
+      "warnings": [],
+      "strengths": [
+        "Has stat: +1.2°C"
+      ],
+      "score": 10,
+      "details": {
+        "statNumber": "+1.2°C"
+      },
+      "quality": "🟢 EXCELLENT"
+    },
+    {
+      "presentation": "The Changing Earth",
+      "slideNumber": 4,
+      "layout": "cards",
+      "title": "Ecosystem Vulnerability Index",
+      "issues": [],
+      "warnings": [],
+      "strengths": [
+        "Card 1 detailed (178 chars)",
+        "Card 2 detailed (175 chars)",
+        "Card 3 detailed (181 chars)"
+      ],
+      "score": 10,
+      "details": {
+        "cardCount": 3
+      },
+      "quality": "🟢 EXCELLENT"
+    },
+    {
+      "presentation": "The Changing Earth",
+      "slideNumber": 5,
+      "layout": "process",
+      "title": "The Decarbonization Pathway",
+      "issues": [],
+      "warnings": [],
+      "strengths": [
+        "Detailed process (4 steps)"
+      ],
+      "score": 10,
+      "details": {
+        "stepCount": 4
+      },
+      "quality": "🟢 EXCELLENT"
+    },
+    {
+      "presentation": "The Changing Earth",
+      "slideNumber": 6,
+      "layout": "minimal",
+      "title": "The Final Verdict",
+      "issues": [],
+      "warnings": [],
+      "strengths": [],
+      "score": 10,
+      "details": {
+        "statementLength": 152
+      },
+      "quality": "🟢 EXCELLENT"
+    },
+    {
+      "presentation": "The Anatomy of a Venture",
+      "slideNumber": 1,
+      "layout": "quote",
+      "title": "The Spark",
+      "issues": [],
+      "warnings": [],
+      "strengths": [
+        "Substantive quote"
+      ],
+      "score": 10,
+      "details": {
+        "quoteLength": 140
+      },
+      "quality": "🟢 EXCELLENT"
+    },
+    {
+      "presentation": "The Anatomy of a Venture",
+      "slideNumber": 2,
+      "layout": "comparison",
+      "title": "Mental Models: Myth vs. Reality",
+      "issues": [],
+      "warnings": [],
+      "strengths": [
+        "Balanced comparison"
+      ],
+      "score": 10,
+      "details": {
+        "comparisonBalance": "3 vs 3"
+      },
+      "quality": "🟢 EXCELLENT"
+    },
+    {
+      "presentation": "The Anatomy of a Venture",
+      "slideNumber": 3,
+      "layout": "cards",
+      "title": "The Three Pillars of Viability",
+      "issues": [],
+      "warnings": [],
+      "strengths": [
+        "Card 1 detailed (155 chars)",
+        "Card 2 detailed (147 chars)",
+        "Card 3 detailed (142 chars)"
+      ],
+      "score": 10,
+      "details": {
+        "cardCount": 3
+      },
+      "quality": "🟢 EXCELLENT"
+    },
+    {
+      "presentation": "The Anatomy of a Venture",
+      "slideNumber": 4,
+      "layout": "process",
+      "title": "From Hypothesis to Scale",
+      "issues": [],
+      "warnings": [],
+      "strengths": [
+        "Detailed process (4 steps)"
+      ],
+      "score": 10,
+      "details": {
+        "stepCount": 4
+      },
+      "quality": "🟢 EXCELLENT"
+    },
+    {
+      "presentation": "The Anatomy of a Venture",
+      "slideNumber": 5,
+      "layout": "stat",
+      "title": "The Margin of Error",
+      "issues": [],
+      "warnings": [],
+      "strengths": [
+        "Has stat: 42%"
+      ],
+      "score": 10,
+      "details": {
+        "statNumber": "42%"
+      },
+      "quality": "🟢 EXCELLENT"
+    },
+    {
+      "presentation": "The Anatomy of a Venture",
+      "slideNumber": 6,
+      "layout": "minimal",
+      "title": "The Final Rule",
+      "issues": [],
+      "warnings": [],
+      "strengths": [],
+      "score": 10,
+      "details": {
+        "statementLength": 117
+      },
+      "quality": "🟢 EXCELLENT"
+    },
+    {
+      "presentation": "The Sanctuary Within",
+      "slideNumber": 1,
+      "layout": "split",
+      "title": "Foundations of Inner Peace",
+      "issues": [],
+      "warnings": [],
+      "strengths": [
+        "Detailed bullets (avg 142 chars)"
+      ],
+      "score": 10,
+      "details": {
+        "bulletCount": 3,
+        "avgBulletLength": 142
+      },
+      "quality": "🟢 EXCELLENT"
+    },
+    {
+      "presentation": "The Sanctuary Within",
+      "slideNumber": 2,
+      "layout": "stat",
+      "title": "Measurable Transformation",
+      "issues": [],
+      "warnings": [],
+      "strengths": [
+        "Has stat: 83%"
+      ],
+      "score": 10,
+      "details": {
+        "statNumber": "83%"
+      },
+      "quality": "🟢 EXCELLENT"
+    },
+    {
+      "presentation": "The Sanctuary Within",
+      "slideNumber": 3,
+      "layout": "cards",
+      "title": "The Three Pillars of Practice",
+      "issues": [],
+      "warnings": [],
+      "strengths": [
+        "Card 1 detailed (149 chars)",
+        "Card 2 detailed (134 chars)",
+        "Card 3 detailed (142 chars)"
+      ],
+      "score": 10,
+      "details": {
+        "cardCount": 3
+      },
+      "quality": "🟢 EXCELLENT"
+    },
+    {
+      "presentation": "The Sanctuary Within",
+      "slideNumber": 4,
+      "layout": "comparison",
+      "title": "Active Movement vs. Still Awareness",
+      "issues": [],
+      "warnings": [],
+      "strengths": [
+        "Balanced comparison"
+      ],
+      "score": 10,
+      "details": {
+        "comparisonBalance": "3 vs 3"
+      },
+      "quality": "🟢 EXCELLENT"
+    },
+    {
+      "presentation": "The Sanctuary Within",
+      "slideNumber": 5,
+      "layout": "process",
+      "title": "Developing Your Daily Ritual",
+      "issues": [],
+      "warnings": [],
+      "strengths": [
+        "Detailed process (4 steps)"
+      ],
+      "score": 10,
+      "details": {
+        "stepCount": 4
+      },
+      "quality": "🟢 EXCELLENT"
+    },
+    {
+      "presentation": "The Sanctuary Within",
+      "slideNumber": 6,
+      "layout": "minimal",
+      "title": "The Ultimate Destination",
+      "issues": [],
+      "warnings": [],
+      "strengths": [],
+      "score": 10,
+      "details": {
+        "statementLength": 80
+      },
+      "quality": "🟢 EXCELLENT"
+    },
+    {
+      "presentation": "The Invisible Perimeter",
+      "slideNumber": 1,
+      "layout": "quote",
+      "title": "Opening Perspective",
+      "issues": [],
+      "warnings": [],
+      "strengths": [
+        "Substantive quote"
+      ],
+      "score": 10,
+      "details": {
+        "quoteLength": 129
+      },
+      "quality": "🟢 EXCELLENT"
+    },
+    {
+      "presentation": "The Invisible Perimeter",
+      "slideNumber": 2,
+      "layout": "minimal",
+      "title": "The Expanding Attack Surface",
+      "issues": [],
+      "warnings": [],
+      "strengths": [],
+      "score": 10,
+      "details": {
+        "statementLength": 127
+      },
+      "quality": "🟢 EXCELLENT"
+    },
+    {
+      "presentation": "The Invisible Perimeter",
+      "slideNumber": 3,
+      "layout": "comparison",
+      "title": "Security Paradigms",
+      "issues": [],
+      "warnings": [],
+      "strengths": [
+        "Balanced comparison"
+      ],
+      "score": 10,
+      "details": {
+        "comparisonBalance": "3 vs 3"
+      },
+      "quality": "🟢 EXCELLENT"
+    },
+    {
+      "presentation": "The Invisible Perimeter",
+      "slideNumber": 4,
+      "layout": "split",
+      "title": "Anatomy of a Breach",
+      "issues": [],
+      "warnings": [],
+      "strengths": [
+        "Detailed bullets (avg 113 chars)"
+      ],
+      "score": 10,
+      "details": {
+        "bulletCount": 4,
+        "avgBulletLength": 113
+      },
+      "quality": "🟢 EXCELLENT"
+    },
+    {
+      "presentation": "The Invisible Perimeter",
+      "slideNumber": 5,
+      "layout": "process",
+      "title": "Incident Response Lifecycle",
+      "issues": [],
+      "warnings": [],
+      "strengths": [
+        "Detailed process (4 steps)"
+      ],
+      "score": 10,
+      "details": {
+        "stepCount": 4
+      },
+      "quality": "🟢 EXCELLENT"
+    },
+    {
+      "presentation": "The Invisible Perimeter",
+      "slideNumber": 6,
+      "layout": "stat",
+      "title": "The Cost of Inaction",
+      "issues": [],
+      "warnings": [],
+      "strengths": [
+        "Has stat: $4.45M"
+      ],
+      "score": 10,
+      "details": {
+        "statNumber": "$4.45M"
+      },
+      "quality": "🟢 EXCELLENT"
+    },
+    {
+      "presentation": "The Invisible Perimeter",
+      "slideNumber": 7,
+      "layout": "cards",
+      "title": "Pillars of Resilience",
+      "issues": [],
+      "warnings": [],
+      "strengths": [
+        "Card 1 detailed (155 chars)",
+        "Card 2 detailed (148 chars)",
+        "Card 3 detailed (153 chars)"
+      ],
+      "score": 10,
+      "details": {
+        "cardCount": 3
+      },
+      "quality": "🟢 EXCELLENT"
+    },
+    {
+      "presentation": "The Invisible Perimeter",
+      "slideNumber": 8,
+      "layout": "hero",
+      "title": "Secure the Future",
+      "issues": [],
+      "warnings": [],
+      "strengths": [
+        "Hero slide (title-focused)"
+      ],
+      "score": 10,
+      "details": {},
+      "quality": "🟢 EXCELLENT"
+    }
+  ]
+}

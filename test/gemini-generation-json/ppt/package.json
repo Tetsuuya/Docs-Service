@@ -1,0 +1,9 @@
+{
+  "name": "gemini-architecture-test",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Test script to verify Gemini generates varied presentation architectures",
+  "scripts": {
+    "test": "node test-variety.js"
+  }
+}
