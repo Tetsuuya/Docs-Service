@@ -244,9 +244,6 @@
             <option value="pdf">.pdf</option>
           </select>
 
-          <label for="contextFile">Context (Optional):</label>
-          <input type="file" id="contextFile" accept="image/*,.pdf,.txt,.csv,.json,.md">
-
           <label for="promptInput">Prompt:</label>
           <textarea id="promptInput" placeholder="Your instructions here..."></textarea>
           
@@ -350,7 +347,6 @@
       const prompt = document.getElementById("promptInput").value.trim();
       const format = document.getElementById("formatSelect").value;
       const mode = document.querySelector('input[name="mode"]:checked').value;
-      const contextFile = document.getElementById("contextFile").files[0];
       const templateFile = document.getElementById("templateFile").files[0];
       
       if (!prompt) return alert("Please enter a prompt!");
@@ -392,9 +388,7 @@
             prompt: prompt,
             format: format,
             mode: mode,
-            hasContextFile: !!contextFile,
             hasTemplateFile: !!templateFile,
-            contextFileName: contextFile?.name,
             templateFileName: templateFile?.name
           };
 
@@ -411,7 +405,6 @@
           formData.append("prompt", prompt);
           formData.append("format", format);
           formData.append("mode", mode);
-          if (contextFile) formData.append("contextFile", contextFile);
           if (templateFile && (mode === 'fill' || mode === 'reference')) {
             formData.append("contextFile", templateFile);
           }

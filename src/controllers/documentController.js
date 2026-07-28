@@ -18,19 +18,18 @@ export const handleGenerateDocument = async (req, res) => {
   try {
     let { prompt, format = 'docx', mode = 'scratch' } = req.body;
     
-    // Auto-detect format = 'pptx' if uploaded file is a PPTX or if prompt requests PowerPoint / slides
+    // Auto-detect format based on uploaded file extension (if not explicitly set)
+    // Only override format if the file extension clearly indicates a different format
     if (req.file) {
       const origName = (req.file.originalname || '').toLowerCase();
       if (origName.endsWith('.pptx')) {
         format = 'pptx';
-      } else {
-        try {
-          const buffer = fs.readFileSync(req.file.path);
-          if (buffer.length >= 4 && buffer[0] === 0x50 && buffer[1] === 0x4B) { // PK Zip Header
-            format = 'pptx';
-          }
-        } catch (e) {}
+      } else if (origName.endsWith('.docx')) {
+        format = 'docx';
+      } else if (origName.endsWith('.xlsx')) {
+        format = 'xlsx';
       }
+      // Note: Removed ZIP header detection as both .docx and .pptx are ZIP files
     } else if (prompt.toLowerCase().includes('create a ppt') || prompt.toLowerCase().includes('powerpoint')) {
       format = 'pptx';
     }
