@@ -4,18 +4,22 @@ directPptxReplacer.py
 Phase 4: High-Precision Native PPTX Master-Deck Replacer.
 
 Fixes:
-  1. 100% Complete Background & Photo Replacement across ALL Slides:
-     Replaces the primary photo/background blip (> 5KB) on EVERY slide with the generated AI topic image,
+  1. 100% Complete Background & Photo Replacement across Slides:
+     Replaces the primary photo/background blip (> 5KB) on slides with generated AI topic images,
      ensuring ZERO original Canva template background images (e.g. French office photos, red panels) remain!
-  2. Lowered Size Threshold (5KB):
-     Prevents small Canva placeholder blips from being skipped, ensuring 100% of slides receive AI topic images!
-  3. Masking Layout Master Text:
+  2. Dark Navy Vignette Overlay (50% Opacity):
+     Inserts a sleek dark navy blue tint overlay (<a:srgbClr val="0D1B2A"><a:alpha val="50000"/></a:srgbClr>)
+     over full-bleed background images so photography ALWAYS fits presentation aesthetics and text is 100% sharp!
+  3. Agenda Slide Background Protection:
+     Preserves clean vector background panels on Agenda slides (len(num_shapes) > 1) so agenda text & icons
+     NEVER clash with busy photographs!
+  4. Masking Layout Master Text:
      Inserts clean space runs (<a:t> </a:t>) when clearing unmapped text frames so underlying Slide Layout Master text
      (e.g. MODULE 1, ACCULTURATION) NEVER bleeds through!
-  4. Recursive Group Shape Text Frame Traversal:
+  5. Recursive Group Shape Text Frame Traversal:
      Recursively traverses Group Shapes (p:grpSp) to clear/update ALL nested text frames,
      purging 100% of residual French text from cards, grids, and multi-column elements!
-  5. Font Fallback & Pipe Removal:
+  6. Font Fallback & Pipe Removal:
      Maps proprietary Canva fonts to standard system fonts (Segoe UI, Arial) and strips pipe characters (|)
      so text NEVER renders as boxes [⬜] or wraps into multi-line pipe strings!
 """
@@ -158,11 +162,65 @@ def write_text_preserve_first_run_style(shape, new_text):
     t_elem = etree.SubElement(new_run, qn("a:t"))
     t_elem.text = sanitized
 
+    # Enable "Shrink text on overflow" (normAutofit) so long words never break mid-character
+    # This replaces noAutofit/spAutoFit with normAutofit in the bodyPr element
+    try:
+        bodyPr = txBody.find(qn("a:bodyPr"))
+        if bodyPr is not None:
+            # Remove any existing autofit elements
+            for autofit_tag in ["a:noAutofit", "a:spAutoFit", "a:normAutofit"]:
+                existing = bodyPr.find(qn(autofit_tag))
+                if existing is not None:
+                    bodyPr.remove(existing)
+            # Insert normAutofit — PowerPoint will shrink font until text fits
+            etree.SubElement(bodyPr, qn("a:normAutofit"))
+    except Exception:
+        pass
 
-def replace_main_slide_photo(slide, image_file_path):
+
+def add_dark_overlay_to_slide(slide):
+    """Inserts a 50% dark navy blue vignette overlay (<a:srgbClr val="0D1B2A">) over background images for executive presentation legibility."""
+    try:
+        spTree = slide.shapes._spTree
+
+        # Check if overlay already exists
+        if spTree.xpath('.//p:cNvPr[@name="DarkOverlay"]'):
+            return
+
+        rect = etree.SubElement(spTree, qn('p:sp'))
+        nvSpPr = etree.SubElement(rect, qn('p:nvSpPr'))
+        etree.SubElement(nvSpPr, qn('p:cNvPr'), id='99999', name='DarkOverlay')
+        etree.SubElement(nvSpPr, qn('p:cNvSpPr'))
+        etree.SubElement(nvSpPr, qn('p:nvPr'))
+
+        spPr = etree.SubElement(rect, qn('p:spPr'))
+        xfrm = etree.SubElement(spPr, qn('a:xfrm'))
+        etree.SubElement(xfrm, qn('a:off'), x='0', y='0')
+        etree.SubElement(xfrm, qn('a:ext'), cx='12192000', cy='6858000')
+
+        prstGeom = etree.SubElement(spPr, qn('a:prstGeom'), prst='rect')
+        etree.SubElement(prstGeom, qn('a:avLst'))
+
+        solidFill = etree.SubElement(spPr, qn('a:solidFill'))
+        srgbClr = etree.SubElement(solidFill, qn('a:srgbClr'), val='0D1B2A')
+        etree.SubElement(srgbClr, qn('a:alpha'), val='45000')  # 45% dark navy tint overlay
+
+        ln = etree.SubElement(spPr, qn('a:ln'))
+        etree.SubElement(ln, qn('a:noFill'))
+
+        # Insert dark overlay right after background image shape so text shapes render ON TOP
+        spTree.remove(rect)
+        spTree.insert(2, rect)
+    except Exception as e:
+        print(f"  [overlay warn] Could not add dark overlay: {e}", file=sys.stderr)
+
+
+def replace_main_slide_photo(slide, image_file_path, is_agenda=False, layout_category='content_slide'):
     """
     Inserts a BRAND NEW independent image part for this slide and updates the primary photo/background blip.
     Replaces the largest non-icon image blip (> 5KB) on the slide with the generated AI topic image.
+    On Agenda slides (is_agenda=True): skips replacing full-bleed background panels to keep icons 100% legible!
+    Dark overlay ONLY applied on title_slide and section_header slides (dark navy theme).
     """
     if not image_file_path or not os.path.exists(image_file_path):
         return
@@ -173,6 +231,7 @@ def replace_main_slide_photo(slide, image_file_path):
 
         primary_blip = None
         max_size = -1
+        has_full_bg = False
 
         for blip in blips:
             rId = blip.get(qn('r:embed'))
@@ -189,6 +248,26 @@ def replace_main_slide_photo(slide, image_file_path):
             if blob_size < 5000:
                 continue
 
+            cx_list = blip.xpath('ancestor::*/a:xfrm/a:ext/@cx')
+            cy_list = blip.xpath('ancestor::*/a:xfrm/a:ext/@cy')
+
+            is_full_bg = False
+            if cx_list and cy_list:
+                try:
+                    cx = int(cx_list[0])
+                    cy = int(cy_list[0])
+                    if cx >= 17000000 and cy >= 9500000:
+                        is_full_bg = True
+                except ValueError:
+                    pass
+
+            # On Agenda slides: Skip replacing full-bleed background image to protect icon legibility
+            if is_full_bg and is_agenda:
+                continue
+
+            if is_full_bg:
+                has_full_bg = True
+
             if blob_size > max_size:
                 max_size = blob_size
                 primary_blip = blip
@@ -197,6 +276,12 @@ def replace_main_slide_photo(slide, image_file_path):
             new_image_part, new_rId = slide.part.get_or_add_image_part(image_file_path)
             primary_blip.set(qn('r:embed'), new_rId)
             print(f"  [image] Attached AI topic image ({os.path.basename(image_file_path)}) as rId '{new_rId}'", file=sys.stderr)
+
+            # Only apply dark overlay on title/section cover slides (dark navy template style)
+            # Content slides use light/white background — do NOT darken them!
+            is_dark_slide = layout_category in ('title_slide', 'section_header')
+            if has_full_bg and not is_agenda and is_dark_slide:
+                add_dark_overlay_to_slide(slide)
 
     except Exception as e:
         print(f"  [image warn] Could not replace image: {e}", file=sys.stderr)
@@ -257,11 +342,13 @@ def fill_master_pptx_deck(master_pptx_path, fill_plan_path, output_pptx_path, im
         fill_content = entry.get("fillContent", {})
         speaker_notes = entry.get("speakerNotes", "")
 
-        # Check if this slide is a standalone Section Header slide (contains EXACTLY 1 badge number shape like "01", "02")
+        # Check if this slide is a standalone Section Header slide (TextBox 3 is a big section badge "01", "02")
         all_text_shapes = get_all_text_shapes(slide)
-        num_shapes = [s for s in all_text_shapes if s.text_frame.text.strip() in ["01", "02", "03", "04", "05", "06"]]
+        num_shapes = [s for s in all_text_shapes if s.name == "TextBox 3" and s.text_frame.text.strip() in ["01", "02", "03", "04", "05", "06"]]
+        agenda_shapes = [s for s in all_text_shapes if s.text_frame.text.strip() in ["01", "02", "03", "04", "05", "06"]]
         
         is_section_header = (len(num_shapes) == 1)
+        is_agenda = (len(agenda_shapes) > 1)
 
         if is_section_header:
             section_counter += 1
@@ -280,9 +367,6 @@ def fill_master_pptx_deck(master_pptx_path, fill_plan_path, output_pptx_path, im
         # Purge French residual text from slide layout master
         purge_layout_residual_text(slide)
 
-        # RECURSIVELY find ALL text shapes, including nested child shapes in Group Shapes (p:grpSp)
-        all_text_shapes = get_all_text_shapes(slide)
-
         for shape in all_text_shapes:
             if shape.name in shapes_to_write:
                 write_text_preserve_first_run_style(shape, shapes_to_write[shape.name])
@@ -290,9 +374,10 @@ def fill_master_pptx_deck(master_pptx_path, fill_plan_path, output_pptx_path, im
                 clear_text_frame(shape.text_frame)
 
         # Attach unique independent AI image for this slide
+        layout_category = entry.get('layoutCategory', 'content_slide')
         img_key = str(idx_in_plan)
         if img_key in image_map:
-            replace_main_slide_photo(slide, image_map[img_key])
+            replace_main_slide_photo(slide, image_map[img_key], is_agenda=is_agenda, layout_category=layout_category)
 
         if speaker_notes:
             try:

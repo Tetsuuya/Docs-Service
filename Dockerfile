@@ -1,5 +1,12 @@
 FROM node:20-alpine
 
+# Install Python and dependencies for PPTX processing
+RUN apk add --no-cache \
+    python3 \
+    py3-pip \
+    py3-lxml \
+    && pip3 install --no-cache-dir python-pptx
+
 # Set working directory
 WORKDIR /app
 

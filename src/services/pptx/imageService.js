@@ -16,56 +16,49 @@ const ABSTRACT_STOP_WORDS = new Set([
   'risk', 'risks', 'pros', 'cons', 'impact', 'impacts', 'future', 'challenge',
   'challenges', 'issue', 'issues', 'hidden', 'costs', 'analysis', 'guide',
   'understanding', 'exploring', 'mastering', 'learning', 'basics', 'fundamentals',
-  'essential', 'essentials', 'key', 'takeaways', 'summary', 'conclusion', 'modern'
+  'essential', 'essentials', 'key', 'takeaways', 'summary', 'conclusion', 'modern',
+  'evolution', 'history', 'strategic', 'insights', 'concept', 'concepts'
 ]);
 
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 /**
- * Fast, 100% reliable stock image fallback (LoremFlickr) with smart topic keyword extraction
+ * Keyword-based stock photo using Unsplash Source (free, no auth, returns topic-relevant images)
+ * Falls back to Picsum only if Unsplash fails.
  */
 async function downloadStockFallbackImage(prompt, mainTopic, outputPath) {
   return new Promise((resolve) => {
-    let keyword = 'technology';
-    
-    // 1. Try extracting primary subject word from user prompt / main topic
-    if (mainTopic && typeof mainTopic === 'string') {
+    // Extract best keyword from prompt or topic
+    let keyword = '';
+
+    if (prompt && typeof prompt === 'string') {
+      const promptWords = prompt.toLowerCase().replace(/[^a-z ]/g, "").split(" ")
+        .filter(w => w.length > 3 && !ABSTRACT_STOP_WORDS.has(w) && !['photo', 'photography', 'design', 'background', 'lighting', 'sleek', 'dark', 'blue', 'abstract', 'conceptual', 'depiction', 'illustration', 'image', 'symbol', 'matrix', 'scene', 'dramatic', 'glowing', 'neon', 'electric', 'photorealistic', 'cinematic', 'studio', 'ultra', 'resolution', 'watermark', 'clean', 'white', 'professional', 'sharp', 'focus', 'soft', 'accent'].includes(w));
+      if (promptWords.length) keyword = promptWords[0];
+    }
+
+    if (!keyword && mainTopic && typeof mainTopic === 'string') {
       const topicWords = mainTopic.toLowerCase().replace(/[^a-z ]/g, "").split(" ")
         .filter(w => w.length > 2 && !ABSTRACT_STOP_WORDS.has(w));
       if (topicWords.length) keyword = topicWords[0];
     }
-    
-    // 2. If topic keyword is still abstract, extract from specific image prompt
-    if (keyword === 'technology' || ABSTRACT_STOP_WORDS.has(keyword)) {
-      const promptWords = prompt.toLowerCase().replace(/[^a-z ]/g, "").split(" ")
-        .filter(w => w.length > 3 && !ABSTRACT_STOP_WORDS.has(w) && !['photo', 'photography', 'design', 'background', 'lighting', 'sleek', 'dark', 'blue', 'abstract', 'conceptual', 'depiction', 'illustration', 'image'].includes(w));
-      if (promptWords.length) keyword = promptWords[0];
-    }
 
-    const seed = Math.floor(Math.random() * 10000);
-    const url = `https://loremflickr.com/1024/768/${encodeURIComponent(keyword)}?lock=${seed}`;
+    if (!keyword) keyword = 'business';
 
-    logger.info(`  [Stock Fallback] Downloading topic stock photo for "${keyword}"...`);
+    const seed = Math.floor(Math.random() * 1000);
+    // Unsplash Source: keyword-relevant, high-res, free
+    const url = `https://source.unsplash.com/1280x720/?${encodeURIComponent(keyword)}&sig=${seed}`;
 
-    const req = https.get(url, { headers: { 'User-Agent': USER_AGENT } }, (res) => {
+    logger.info(`  [Stock Fallback] Fetching topic photo for "${keyword}" from Unsplash (sig: ${seed})...`);
+
+    const handleStream = (res) => {
       if (res.statusCode === 301 || res.statusCode === 302) {
         const rawLoc = res.headers.location || '';
-        const targetUrl = rawLoc.startsWith('http') ? rawLoc : `https://loremflickr.com${rawLoc}`;
-
-        https.get(targetUrl, { headers: { 'User-Agent': USER_AGENT } }, (redRes) => {
-          const chunks = [];
-          redRes.on('data', (chunk) => chunks.push(chunk));
-          redRes.on('end', () => {
-            const buffer = Buffer.concat(chunks);
-            if (redRes.statusCode === 200 && buffer.length > 5000) {
-              fs.writeFileSync(outputPath, buffer);
-              logger.info(`  [Stock Fallback] ✅ Saved ${Math.round(buffer.length / 1024)}KB → ${outputPath}`);
-              resolve(outputPath);
-            } else {
-              resolve(null);
-            }
-          });
-        }).on('error', () => resolve(null));
+        const targetUrl = rawLoc.startsWith('http') ? rawLoc : `https://source.unsplash.com${rawLoc}`;
+        https.get(targetUrl, { headers: { 'User-Agent': USER_AGENT } }, handleStream).on('error', () => {
+          // Unsplash failed, try Picsum
+          tryPicsum(resolve, outputPath);
+        });
         return;
       }
 
@@ -78,27 +71,59 @@ async function downloadStockFallbackImage(prompt, mainTopic, outputPath) {
           logger.info(`  [Stock Fallback] ✅ Saved ${Math.round(buffer.length / 1024)}KB → ${outputPath}`);
           resolve(outputPath);
         } else {
-          resolve(null);
+          tryPicsum(resolve, outputPath);
         }
       });
-    });
+    };
 
-    req.on('error', () => resolve(null));
+    const req = https.get(url, { headers: { 'User-Agent': USER_AGENT } }, handleStream);
+    req.on('error', () => tryPicsum(resolve, outputPath));
     req.setTimeout(10000, () => {
       req.destroy();
-      resolve(null);
+      tryPicsum(resolve, outputPath);
     });
   });
 }
 
+function tryPicsum(resolve, outputPath) {
+  const seed = Math.floor(Math.random() * 1000000);
+  const url = `https://picsum.photos/1280/720?random=${seed}`;
+  logger.info(`  [Stock Fallback] Picsum fallback (seed: ${seed})...`);
+
+  const handleStream = (res) => {
+    if (res.statusCode === 301 || res.statusCode === 302) {
+      const rawLoc = res.headers.location || '';
+      const targetUrl = rawLoc.startsWith('http') ? rawLoc : `https://picsum.photos${rawLoc}`;
+      https.get(targetUrl, { headers: { 'User-Agent': USER_AGENT } }, handleStream).on('error', () => resolve(null));
+      return;
+    }
+    const chunks = [];
+    res.on('data', (chunk) => chunks.push(chunk));
+    res.on('end', () => {
+      const buffer = Buffer.concat(chunks);
+      if (res.statusCode === 200 && buffer.length > 5000) {
+        fs.writeFileSync(outputPath, buffer);
+        resolve(outputPath);
+      } else {
+        resolve(null);
+      }
+    });
+  };
+  const req = https.get(url, { headers: { 'User-Agent': USER_AGENT } }, handleStream);
+  req.on('error', () => resolve(null));
+  req.setTimeout(8000, () => { req.destroy(); resolve(null); });
+}
+
+
 /**
- * Generate image via Pollinations AI
+ * Generate image via Pollinations AI with 8s timeout
  */
 async function generateImageWithPollinations(prompt, outputPath, retries = 2) {
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
       const result = await new Promise((resolve) => {
-        const encodedPrompt = encodeURIComponent(prompt.substring(0, 180));
+        const styledPrompt = `${prompt.substring(0, 200)}, 16:9 aspect ratio, ultra high resolution, no text, no watermark`;
+        const encodedPrompt = encodeURIComponent(styledPrompt);
         const seed = Math.floor(Math.random() * 1000000);
         const url = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=1024&height=768&nologo=true&seed=${seed}`;
 
@@ -109,24 +134,12 @@ async function generateImageWithPollinations(prompt, outputPath, retries = 2) {
           }
         };
 
-        const req = https.get(url, options, (res) => {
+        const handleStream = (res) => {
           if (res.statusCode === 301 || res.statusCode === 302) {
             const rawLoc = res.headers.location || '';
             const targetUrl = rawLoc.startsWith('http') ? rawLoc : `https://image.pollinations.ai${rawLoc}`;
 
-            https.get(targetUrl, options, (redRes) => {
-              const chunks = [];
-              redRes.on('data', (chunk) => chunks.push(chunk));
-              redRes.on('end', () => {
-                const buffer = Buffer.concat(chunks);
-                if (redRes.statusCode === 200 && buffer.length > 5000) {
-                  fs.writeFileSync(outputPath, buffer);
-                  resolve(outputPath);
-                } else {
-                  resolve(null);
-                }
-              });
-            }).on('error', () => resolve(null));
+            https.get(targetUrl, options, handleStream).on('error', () => resolve(null));
             return;
           }
 
@@ -141,8 +154,9 @@ async function generateImageWithPollinations(prompt, outputPath, retries = 2) {
               resolve(null);
             }
           });
-        });
+        };
 
+        const req = https.get(url, options, handleStream);
         req.on('error', () => resolve(null));
         req.setTimeout(8000, () => {
           req.destroy();
@@ -172,7 +186,8 @@ async function generateImageWithHuggingFace(prompt, outputPath) {
 
   if (!hfToken) return null;
 
-  const body = JSON.stringify({ inputs: prompt });
+  const styledPrompt = `${prompt}, ultra high resolution, no text, no watermark`;
+  const body = JSON.stringify({ inputs: styledPrompt });
   const options = {
     hostname: 'router.huggingface.co',
     path: `/hf-inference/models/${modelId}`,
@@ -218,14 +233,13 @@ async function generateImageWithHuggingFace(prompt, outputPath) {
 
 /**
  * Automatically generates AI topic images for every slide requesting an image.
- * Uses 3-tier fallback (HF -> Pollinations AI -> Stock Topic Photo) for 100% reliability!
+ * Uses 3-tier fallback (HF -> Pollinations AI -> High-Res Stock Photo) for 100% reliability!
  */
 export const generateTopicImages = async (presentationDataOrTopic) => {
   const isObject = typeof presentationDataOrTopic === 'object';
-  // Use raw user prompt / topic first to avoid title verbs like "Understanding"
   const rawTopic = isObject ? (presentationDataOrTopic.topic || presentationDataOrTopic.title || 'presentation') : presentationDataOrTopic;
 
-  logger.info(`🤖 Auto-Generating AI Topic Images for: "${rawTopic}"...`);
+  logger.info(`🤖 Auto-Generating Unique Presentation-Fit AI Images for: "${rawTopic}"...`);
 
   const tempImgDir = path.join(process.cwd(), 'temp', 'images');
   fs.mkdirSync(tempImgDir, { recursive: true });
@@ -260,7 +274,7 @@ export const generateTopicImages = async (presentationDataOrTopic) => {
         result = await generateImageWithPollinations(task.prompt, imgPath);
       }
 
-      // Tier 3: Guaranteed Stock Fallback by Concrete Subject Keyword
+      // Tier 3: Guaranteed Unique High-Res Stock Photo
       if (!result || !fs.existsSync(imgPath) || fs.statSync(imgPath).size < 5000) {
         result = await downloadStockFallbackImage(task.prompt, rawTopic, imgPath);
       }
