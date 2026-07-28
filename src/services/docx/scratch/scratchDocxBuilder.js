@@ -99,7 +99,7 @@ function parseMarkdownToTextRuns(text, baseOptions = {}) {
           text: content,
           font,
           size,
-          color: COLOR_MUTED || '64748B',
+          color: '64748B',
           strike: true
         })
       );
