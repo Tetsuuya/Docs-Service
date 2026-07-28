@@ -5,165 +5,141 @@ import pptxgen from 'pptxgenjs';
 import { logger } from '../../../utils/logger.js';
 
 /**
- * Phase 4: Template Fill Engine & Slide Assembly
- * Uses Direct Run Text Overwriting for native PPTX master decks or High-Fidelity Vector Card Builder for PDF templates
+ * Phase 4 — Template Fill Engine & Slide Assembly
  */
-export const buildFillPptx = async (fillPlan, templateBlueprint, masterFilePath = null) => {
-  logger.info(`Phase 4: Assembling High-Fidelity Presentation for: "${fillPlan.presentationTitle || 'Untitled Presentation'}"`);
+export const buildFillPptx = async (fillPlan, templateBlueprint, masterFilePath = null, autoImages = {}) => {
+  const title = fillPlan.presentationTitle || 'Untitled Presentation';
+  logger.info(`Phase 4: Assembling filled presentation — "${title}"`);
 
-  const isPdfMaster = masterFilePath && path.extname(masterFilePath).toLowerCase() === '.pdf' && fs.existsSync(masterFilePath);
-  const isPptxMaster = masterFilePath && path.extname(masterFilePath).toLowerCase() === '.pptx' && fs.existsSync(masterFilePath);
-
-  // OPTION A: Native PPTX Master Direct Run Overwriting (Preserves 100% of Canva fonts, colors, and layout positions)
-  if (isPptxMaster) {
+  let isPptxMaster = false;
+  if (masterFilePath && fs.existsSync(masterFilePath)) {
     try {
-      logger.info(`Executing Direct PPTX Run Text Overwrite on: "${masterFilePath}"`);
-      const tempDir = path.join(process.cwd(), 'temp');
-      fs.mkdirSync(tempDir, { recursive: true });
-
-      const planJsonPath = path.join(tempDir, `fill_plan_${Date.now()}.json`);
-      fs.writeFileSync(planJsonPath, JSON.stringify(fillPlan, null, 2));
-
-      const outputPptxPath = path.join(tempDir, `filled_direct_${Date.now()}.pptx`);
-      const helperScript = path.join(process.cwd(), 'src', 'services', 'pptx', 'fill', 'directPptxReplacer.py');
-
-      const cmd = `python "${helperScript}" "${masterFilePath}" "${planJsonPath}" "${outputPptxPath}"`;
-      execSync(cmd, { encoding: 'utf8' });
-
-      if (fs.existsSync(outputPptxPath)) {
-        const buffer = fs.readFileSync(outputPptxPath);
-        fs.unlinkSync(outputPptxPath);
-        fs.unlinkSync(planJsonPath);
-
-        logger.info(`✅ Direct PPTX Master overwrite complete (${buffer.length} bytes)`);
-        return buffer;
+      const ext = path.extname(masterFilePath).toLowerCase();
+      if (ext === '.pptx') {
+        isPptxMaster = true;
+      } else {
+        const buf = fs.readFileSync(masterFilePath);
+        if (buf.length >= 4 && buf[0] === 0x50 && buf[1] === 0x4B) {
+          isPptxMaster = true;
+        }
       }
+    } catch (_) {}
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // PRIMARY PATH — Native PPTX Fill (Text + Image Placeholders)
+  // ─────────────────────────────────────────────────────────────────────────
+  if (isPptxMaster) {
+    const tempDir = path.join(process.cwd(), 'temp');
+    fs.mkdirSync(tempDir, { recursive: true });
+
+    const timestamp = Date.now();
+    const planJsonPath = path.join(tempDir, `fill_plan_${timestamp}.json`);
+    const imgJsonPath = path.join(tempDir, `fill_images_${timestamp}.json`);
+    const outputPptxPath = path.join(tempDir, `filled_${timestamp}.pptx`);
+    const helperScript = path.join(
+      process.cwd(), 'src', 'services', 'pptx', 'fill', 'directPptxReplacer.py'
+    );
+
+    const cleanup = () => {
+      [planJsonPath, imgJsonPath, outputPptxPath].forEach(p => {
+        try { if (fs.existsSync(p)) fs.unlinkSync(p); } catch (_) {}
+      });
+    };
+
+    try {
+      fs.writeFileSync(planJsonPath, JSON.stringify(fillPlan, null, 2), 'utf8');
+      fs.writeFileSync(imgJsonPath, JSON.stringify(autoImages, null, 2), 'utf8');
+
+      const pythonBin = getPythonBinary();
+      if (!pythonBin) {
+        throw new Error('Python interpreter not found in PATH');
+      }
+
+      const cmd = `"${pythonBin}" "${helperScript}" "${masterFilePath}" "${planJsonPath}" "${outputPptxPath}" "${imgJsonPath}"`;
+      logger.info(`  Executing: ${pythonBin} directPptxReplacer.py ...`);
+
+      const stdout = execSync(cmd, { encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] });
+      if (stdout) logger.info(`  Python output: ${stdout.trim()}`);
+
+      if (!fs.existsSync(outputPptxPath)) {
+        throw new Error('Python replacer ran but output file was not created');
+      }
+
+      const buffer = fs.readFileSync(outputPptxPath);
+      cleanup();
+
+      logger.info(`✅ Phase 4 Complete (native PPTX fill) — ${Math.round(buffer.length / 1024)} KB`);
+      return buffer;
+
     } catch (err) {
-      logger.warn(`Direct PPTX Processing warning: ${err.message}`);
+      cleanup();
+      logger.warn(`Primary PPTX fill path failed: ${err.message}`);
+      logger.warn('Falling back to pptxgenjs builder...');
     }
   }
 
-  // OPTION B: High-Fidelity Vector Card Builder using Gemini Vision Brand Theme
+  logger.info('Phase 4 Fallback: Building presentation with pptxgenjs...');
+  return buildFallbackPptx(fillPlan, templateBlueprint);
+};
+
+function getPythonBinary() {
+  for (const bin of ['python3', 'python', 'py']) {
+    try {
+      execSync(`"${bin}" --version`, { stdio: 'ignore' });
+      return bin;
+    } catch (_) {}
+  }
+  return null;
+}
+
+async function buildFallbackPptx(fillPlan, templateBlueprint) {
   const pptx = new pptxgen();
   pptx.layout = 'LAYOUT_16x9';
   pptx.title = fillPlan.presentationTitle || 'Filled Presentation';
-  pptx.author = 'Docs-Service AI Template Engine';
+  pptx.author = 'Docs-Service AI';
 
-  const brandTheme = templateBlueprint.brandTheme || {};
-  const primaryColor = (brandTheme.primaryColor || '0F172A').replace('#', '');
-  const secondaryColor = (brandTheme.secondaryColor || '475569').replace('#', '');
-  const accentColor = (brandTheme.accentColor || '2563EB').replace('#', '');
-  const cardBgColor = 'F8FAFC';
-  const fontFamily = brandTheme.fontFamily || 'Montserrat';
+  const brand = templateBlueprint?.brandTheme || {};
+  const primary   = (brand.primaryColor   || '071E3D').replace('#', '');
+  const secondary = (brand.secondaryColor || '1E293B').replace('#', '');
+  const accent    = (brand.accentColor    || '38B6FF').replace('#', '');
+  const bg        = (brand.backgroundColor || 'FFFFFF').replace('#', '');
+  const font      = brand.fontFamily || 'Calibri';
 
-  (fillPlan.selectedSlides || []).forEach((slideData, idx) => {
+  const selectedSlides = fillPlan.selectedSlides || [];
+
+  for (let i = 0; i < selectedSlides.length; i++) {
+    const slideData = selectedSlides[i];
     const slide = pptx.addSlide();
-    
-    // Top Accent Brand Header Line
+    const fill = slideData.fillContent || {};
+
+    slide.background = { color: bg.toUpperCase() !== 'FFFFFF' ? bg : 'F8FAFC' };
+
     slide.addShape(pptx.shapes.RECTANGLE, {
-      x: 0, y: 0, w: 13.333, h: 0.15,
-      fill: { color: accentColor }
+      x: 0, y: 0, w: '100%', h: 0.12,
+      fill: { color: accent }, line: { type: 'none' }
     });
 
-    const fill = slideData.fillContent || {};
-    const isTitleSlide = slideData.layoutCategory === 'title_slide' || idx === 0;
+    const fillValues = Object.values(fill).filter(v => typeof v === 'string' && v.trim());
 
-    if (isTitleSlide) {
-      // Main Cover Card Container
-      slide.addShape(pptx.shapes.ROUNDED_RECTANGLE, {
-        x: 0.8, y: 1.2, w: 11.733, h: 5.2,
-        fill: { color: cardBgColor },
-        line: { color: 'E2E8F0', width: 1 }
+    if (i === 0) {
+      slide.addText(fillPlan.presentationTitle || 'Presentation Title', {
+        x: 0.8, y: 1.8, w: 11.3, h: 2.2,
+        fontSize: 38, bold: true, color: primary, fontFace: font
       });
-
-      const titleText = fill.main_title || fill.title || fillPlan.presentationTitle || 'Presentation Title';
-      slide.addText(titleText, {
-        x: 1.2, y: 2.0, w: 10.9, h: 1.8,
-        fontSize: 38, bold: true, color: primaryColor, fontFace: fontFamily,
-        align: 'left', valign: 'middle'
-      });
-
-      const subtitleText = fill.subtitle || fill.description || fillPlan.topic || '';
-      if (subtitleText) {
-        slide.addText(subtitleText, {
-          x: 1.2, y: 3.9, w: 10.9, h: 1.2,
-          fontSize: 20, color: accentColor, fontFace: fontFamily,
-          align: 'left', valign: 'top'
-        });
-      }
     } else {
-      // Section Header Title
-      const slideTitle = fill.title || fill.heading || slideData.title || `Section ${idx + 1}`;
-      slide.addText(slideTitle, {
-        x: 0.8, y: 0.4, w: 11.733, h: 0.8,
-        fontSize: 26, bold: true, color: primaryColor, fontFace: fontFamily
+      slide.addText(fillValues[0] || `Section ${i + 1}`, {
+        x: 0.8, y: 0.5, w: 11.3, h: 0.8,
+        fontSize: 24, bold: true, color: primary, fontFace: font
       });
-
-      const category = slideData.layoutCategory || '3_column_cards';
-
-      if (category === '3_column_cards' || fill.col1_title || fill.card_1_title) {
-        const cards = [
-          { title: fill.col1_title || fill.card_1_title || 'Pillar 1', body: fill.col1_body || fill.card_1_body || fill.col1 || '' },
-          { title: fill.col2_title || fill.card_2_title || 'Pillar 2', body: fill.col2_body || fill.card_2_body || fill.col2 || '' },
-          { title: fill.col3_title || fill.card_3_title || 'Pillar 3', body: fill.col3_body || fill.card_3_body || fill.col3 || '' }
-        ];
-
-        const cardWidth = 3.6;
-        const gap = 0.45;
-        const topY = 1.4;
-
-        cards.forEach((card, cIdx) => {
-          const cardX = 0.8 + cIdx * (cardWidth + gap);
-
-          slide.addShape(pptx.shapes.ROUNDED_RECTANGLE, {
-            x: cardX, y: topY, w: cardWidth, h: 5.2,
-            fill: { color: cardBgColor },
-            line: { color: 'CBD5E1', width: 1 }
-          });
-
-          slide.addShape(pptx.shapes.RECTANGLE, {
-            x: cardX, y: topY, w: cardWidth, h: 0.08,
-            fill: { color: accentColor }
-          });
-
-          slide.addText(card.title, {
-            x: cardX + 0.2, y: topY + 0.3, w: cardWidth - 0.4, h: 0.6,
-            fontSize: 16, bold: true, color: primaryColor, fontFace: fontFamily
-          });
-
-          slide.addText(card.body, {
-            x: cardX + 0.2, y: topY + 1.0, w: cardWidth - 0.4, h: 3.8,
-            fontSize: 13, color: secondaryColor, fontFace: fontFamily, valign: 'top', wrap: true
-          });
-        });
-      } else {
-        slide.addShape(pptx.shapes.ROUNDED_RECTANGLE, {
-          x: 0.8, y: 1.4, w: 11.733, h: 5.2,
-          fill: { color: cardBgColor },
-          line: { color: 'E2E8F0', width: 1 }
-        });
-
-        const textEntries = Object.entries(fill)
-          .filter(([k]) => k !== 'title' && k !== 'heading' && k !== 'main_title')
-          .map(([, v]) => (typeof v === 'string' ? v : JSON.stringify(v)));
-
-        const bulletItems = (textEntries.length > 0 ? textEntries : ['Key presentation takeaway point']).map(txt => ({
-          text: txt,
-          options: { bullet: true, fontSize: 15, color: primaryColor, spaceAfter: 14, fontFace: fontFamily }
-        }));
-
-        slide.addText(bulletItems, {
-          x: 1.1, y: 1.7, w: 11.1, h: 4.6,
-          valign: 'top', wrap: true
+      if (fillValues.length > 1) {
+        slide.addText(fillValues.slice(1).join('\n\n'), {
+          x: 0.8, y: 1.5, w: 11.3, h: 4.8,
+          fontSize: 14, color: secondary, fontFace: font
         });
       }
     }
+  }
 
-    if (slideData.speakerNotes) {
-      slide.addNotes(slideData.speakerNotes);
-    }
-  });
-
-  const buffer = await pptx.write({ outputType: 'nodebuffer' });
-  return buffer;
-};
+  return await pptx.write({ outputType: 'nodebuffer' });
+}

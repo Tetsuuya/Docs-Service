@@ -7,7 +7,6 @@ import { buildReferenceInspiredPptx } from './reference/referencePptxBuilder.js'
 import { generateTopicImages } from './imageService.js';
 import { logger } from '../../utils/logger.js';
 import fs from 'fs';
-import path from 'path';
 
 /**
  * Master PPTX Service Endpoint
@@ -22,7 +21,6 @@ export const buildPptxFile = async (presentationDataOrPrompt, mode = 'scratch', 
       presentationData = await generatePptxContent(presentationDataOrPrompt);
     }
     
-    // Generate images for scratch mode (like reference does)
     let autoImages = imagePaths;
     if (!autoImages || Object.keys(autoImages).length === 0) {
       autoImages = await generateTopicImages(presentationData);
@@ -36,9 +34,29 @@ export const buildPptxFile = async (presentationDataOrPrompt, mode = 'scratch', 
       throw new Error(`Template file path is required for mode '${mode}'`);
     }
     const userPrompt = typeof presentationDataOrPrompt === 'string' ? presentationDataOrPrompt : (presentationDataOrPrompt.prompt || 'Presentation');
+    
+    // Step 1: Scan master template & build blueprint catalog
     const templateBlueprint = await parsePresentationTemplate(templateFilePath);
+    
+    // Step 2: AI Planner matches prompt topic to template placeholders
     const fillPlan = await generatePptxFillPlan(userPrompt, templateBlueprint);
-    return await buildFillPptx(fillPlan, templateBlueprint, templateFilePath);
+    
+    // Step 3: Auto-generate AI topic images for slides with image prompts
+    let autoImages = imagePaths;
+    const slidesWithImagePrompts = (fillPlan.selectedSlides || []).filter(s => s.imagePrompt);
+    if (slidesWithImagePrompts.length > 0 && (!autoImages || Object.keys(autoImages).length === 0)) {
+      const imagePayload = {
+        title: fillPlan.presentationTitle || userPrompt,
+        slides: fillPlan.selectedSlides.map(s => ({
+          hasImage: !!s.imagePrompt,
+          imagePrompt: s.imagePrompt
+        }))
+      };
+      autoImages = await generateTopicImages(imagePayload);
+    }
+    
+    // Step 4: Inject AI text + AI images into original template slides
+    return await buildFillPptx(fillPlan, templateBlueprint, templateFilePath, autoImages);
   }
 
   if (mode === 'reference') {
@@ -48,16 +66,13 @@ export const buildPptxFile = async (presentationDataOrPrompt, mode = 'scratch', 
       templateBlueprint = await parsePresentationTemplate(templateFilePath);
     }
 
-    // Step 1: Call AI Planner (Gemini) to structure content and plan per-slide imagePrompts
     const presentationData = await generatePptxContent(userPrompt);
 
-    // Step 2: Auto-generate custom AI images using Gemini's planned imagePrompts for each slide
     let autoImages = imagePaths;
     if (!autoImages || Object.keys(autoImages).length === 0) {
       autoImages = await generateTopicImages(presentationData);
     }
 
-    // Inject extracted brand tokens from template reference if available
     if (templateBlueprint && templateBlueprint.brandTheme) {
       presentationData.theme = {
         primaryColor: templateBlueprint.brandTheme.primaryColor || '071E3D',

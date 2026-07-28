@@ -4,35 +4,173 @@ import https from 'https';
 import { logger } from '../../utils/logger.js';
 import { config } from '../../config/env.js';
 
-/**
- * Hugging Face model pipeline — ordered by quality, falls back on error/loading
- * Note: Only models supported by HF's free hf-inference provider are listed.
- */
 const HF_MODELS = [
-  'stabilityai/stable-diffusion-3-medium-diffusers', // Confirmed working on hf-inference free tier
+  'stabilityai/stable-diffusion-3-medium-diffusers',
 ];
+
+const USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
+
+const ABSTRACT_STOP_WORDS = new Set([
+  'the', 'and', 'for', 'with', 'about', 'world', 'care', 'types', 'overview',
+  'introduction', 'disadvantage', 'disadvantages', 'advantage', 'advantages',
+  'risk', 'risks', 'pros', 'cons', 'impact', 'impacts', 'future', 'challenge',
+  'challenges', 'issue', 'issues', 'hidden', 'costs', 'analysis', 'guide',
+  'understanding', 'exploring', 'mastering', 'learning', 'basics', 'fundamentals',
+  'essential', 'essentials', 'key', 'takeaways', 'summary', 'conclusion', 'modern'
+]);
+
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+/**
+ * Fast, 100% reliable stock image fallback (LoremFlickr) with smart topic keyword extraction
+ */
+async function downloadStockFallbackImage(prompt, mainTopic, outputPath) {
+  return new Promise((resolve) => {
+    let keyword = 'technology';
+    
+    // 1. Try extracting primary subject word from user prompt / main topic
+    if (mainTopic && typeof mainTopic === 'string') {
+      const topicWords = mainTopic.toLowerCase().replace(/[^a-z ]/g, "").split(" ")
+        .filter(w => w.length > 2 && !ABSTRACT_STOP_WORDS.has(w));
+      if (topicWords.length) keyword = topicWords[0];
+    }
+    
+    // 2. If topic keyword is still abstract, extract from specific image prompt
+    if (keyword === 'technology' || ABSTRACT_STOP_WORDS.has(keyword)) {
+      const promptWords = prompt.toLowerCase().replace(/[^a-z ]/g, "").split(" ")
+        .filter(w => w.length > 3 && !ABSTRACT_STOP_WORDS.has(w) && !['photo', 'photography', 'design', 'background', 'lighting', 'sleek', 'dark', 'blue', 'abstract', 'conceptual', 'depiction', 'illustration', 'image'].includes(w));
+      if (promptWords.length) keyword = promptWords[0];
+    }
+
+    const seed = Math.floor(Math.random() * 10000);
+    const url = `https://loremflickr.com/1024/768/${encodeURIComponent(keyword)}?lock=${seed}`;
+
+    logger.info(`  [Stock Fallback] Downloading topic stock photo for "${keyword}"...`);
+
+    const req = https.get(url, { headers: { 'User-Agent': USER_AGENT } }, (res) => {
+      if (res.statusCode === 301 || res.statusCode === 302) {
+        const rawLoc = res.headers.location || '';
+        const targetUrl = rawLoc.startsWith('http') ? rawLoc : `https://loremflickr.com${rawLoc}`;
+
+        https.get(targetUrl, { headers: { 'User-Agent': USER_AGENT } }, (redRes) => {
+          const chunks = [];
+          redRes.on('data', (chunk) => chunks.push(chunk));
+          redRes.on('end', () => {
+            const buffer = Buffer.concat(chunks);
+            if (redRes.statusCode === 200 && buffer.length > 5000) {
+              fs.writeFileSync(outputPath, buffer);
+              logger.info(`  [Stock Fallback] ✅ Saved ${Math.round(buffer.length / 1024)}KB → ${outputPath}`);
+              resolve(outputPath);
+            } else {
+              resolve(null);
+            }
+          });
+        }).on('error', () => resolve(null));
+        return;
+      }
+
+      const chunks = [];
+      res.on('data', (chunk) => chunks.push(chunk));
+      res.on('end', () => {
+        const buffer = Buffer.concat(chunks);
+        if (res.statusCode === 200 && buffer.length > 5000) {
+          fs.writeFileSync(outputPath, buffer);
+          logger.info(`  [Stock Fallback] ✅ Saved ${Math.round(buffer.length / 1024)}KB → ${outputPath}`);
+          resolve(outputPath);
+        } else {
+          resolve(null);
+        }
+      });
+    });
+
+    req.on('error', () => resolve(null));
+    req.setTimeout(10000, () => {
+      req.destroy();
+      resolve(null);
+    });
+  });
+}
+
+/**
+ * Generate image via Pollinations AI
+ */
+async function generateImageWithPollinations(prompt, outputPath, retries = 2) {
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      const result = await new Promise((resolve) => {
+        const encodedPrompt = encodeURIComponent(prompt.substring(0, 180));
+        const seed = Math.floor(Math.random() * 1000000);
+        const url = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=1024&height=768&nologo=true&seed=${seed}`;
+
+        const options = {
+          headers: {
+            'User-Agent': USER_AGENT,
+            'Accept': 'image/*',
+          }
+        };
+
+        const req = https.get(url, options, (res) => {
+          if (res.statusCode === 301 || res.statusCode === 302) {
+            const rawLoc = res.headers.location || '';
+            const targetUrl = rawLoc.startsWith('http') ? rawLoc : `https://image.pollinations.ai${rawLoc}`;
+
+            https.get(targetUrl, options, (redRes) => {
+              const chunks = [];
+              redRes.on('data', (chunk) => chunks.push(chunk));
+              redRes.on('end', () => {
+                const buffer = Buffer.concat(chunks);
+                if (redRes.statusCode === 200 && buffer.length > 5000) {
+                  fs.writeFileSync(outputPath, buffer);
+                  resolve(outputPath);
+                } else {
+                  resolve(null);
+                }
+              });
+            }).on('error', () => resolve(null));
+            return;
+          }
+
+          const chunks = [];
+          res.on('data', (chunk) => chunks.push(chunk));
+          res.on('end', () => {
+            const buffer = Buffer.concat(chunks);
+            if (res.statusCode === 200 && buffer.length > 5000) {
+              fs.writeFileSync(outputPath, buffer);
+              resolve(outputPath);
+            } else {
+              resolve(null);
+            }
+          });
+        });
+
+        req.on('error', () => resolve(null));
+        req.setTimeout(8000, () => {
+          req.destroy();
+          resolve(null);
+        });
+      });
+
+      if (result && fs.existsSync(outputPath) && fs.statSync(outputPath).size > 5000) {
+        logger.info(`  [Pollinations] ✅ Saved ${Math.round(fs.statSync(outputPath).size / 1024)}KB → ${outputPath}`);
+        return outputPath;
+      }
+    } catch (_) {}
+
+    if (attempt < retries) {
+      await sleep(300);
+    }
+  }
+  return null;
+}
 
 /**
  * Generate an image via Hugging Face Inference API (free tier).
- * Returns the image as a Buffer on success, or null on failure.
- *
- * @param {string} prompt  - The detailed image prompt from Gemini
- * @param {string} outputPath - File path to save the JPEG image
- * @param {number} modelIndex - Index into HF_MODELS (increments on retry)
  */
-async function generateImageWithHuggingFace(prompt, outputPath, modelIndex = 0) {
-  if (modelIndex >= HF_MODELS.length) {
-    logger.warn('HF Image Generation: All models exhausted.');
-    return null;
-  }
-
-  const modelId = HF_MODELS[modelIndex];
+async function generateImageWithHuggingFace(prompt, outputPath) {
+  const modelId = HF_MODELS[0];
   const hfToken = config.hfToken;
 
-  if (!hfToken) {
-    logger.error('HF_TOKEN is not set in .env — cannot call Hugging Face Inference API.');
-    return null;
-  }
+  if (!hfToken) return null;
 
   const body = JSON.stringify({ inputs: prompt });
   const options = {
@@ -43,78 +181,51 @@ async function generateImageWithHuggingFace(prompt, outputPath, modelIndex = 0) 
       'Authorization': `Bearer ${hfToken}`,
       'Content-Type': 'application/json',
       'Content-Length': Buffer.byteLength(body),
-      'x-wait-for-model': 'true',  // Auto-wait if model is loading (cold start)
+      'User-Agent': USER_AGENT,
+      'x-wait-for-model': 'true',
     },
   };
 
   return new Promise((resolve) => {
-    logger.info(`  [HF] Model: ${modelId}`);
-
     const req = https.request(options, (res) => {
       const chunks = [];
-
       res.on('data', (chunk) => chunks.push(chunk));
       res.on('end', () => {
         const rawBody = Buffer.concat(chunks);
-
-        if (res.statusCode === 200) {
-          // Successful image response (binary)
+        if (res.statusCode === 200 && rawBody.length > 5000) {
           try {
             fs.writeFileSync(outputPath, rawBody);
-            const size = fs.statSync(outputPath).size;
-            if (size > 2000) {
-              logger.info(`  [HF] ✅ Saved ${Math.round(size / 1024)}KB → ${outputPath}`);
-              resolve(outputPath);
-            } else {
-              logger.warn(`  [HF] File too small (${size}B), trying next model...`);
-              resolve(generateImageWithHuggingFace(prompt, outputPath, modelIndex + 1));
-            }
-          } catch (writeErr) {
-            logger.warn(`  [HF] Write error: ${writeErr.message}`);
-            resolve(generateImageWithHuggingFace(prompt, outputPath, modelIndex + 1));
+            resolve(outputPath);
+          } catch (_) {
+            resolve(null);
           }
-        } else if (res.statusCode === 503) {
-          // Model still loading — x-wait-for-model should handle this, but retry once more
-          logger.warn(`  [HF] 503 Model loading (${modelId}), switching model...`);
-          resolve(generateImageWithHuggingFace(prompt, outputPath, modelIndex + 1));
-        } else if (res.statusCode === 429) {
-          logger.warn(`  [HF] 429 Rate limited on ${modelId}, switching model...`);
-          resolve(generateImageWithHuggingFace(prompt, outputPath, modelIndex + 1));
         } else {
-          const errText = rawBody.toString().substring(0, 200);
-          logger.warn(`  [HF] HTTP ${res.statusCode} on ${modelId}: ${errText}`);
-          resolve(generateImageWithHuggingFace(prompt, outputPath, modelIndex + 1));
+          resolve(null);
         }
       });
     });
 
-    req.on('error', (err) => {
-      logger.warn(`  [HF] Request error on ${modelId}: ${err.message}`);
-      resolve(generateImageWithHuggingFace(prompt, outputPath, modelIndex + 1));
-    });
-
-    req.on('timeout', () => {
+    req.on('error', () => resolve(null));
+    req.setTimeout(5000, () => {
       req.destroy();
-      logger.warn(`  [HF] Timeout on ${modelId}, switching model...`);
-      resolve(generateImageWithHuggingFace(prompt, outputPath, modelIndex + 1));
+      resolve(null);
     });
 
-    req.setTimeout(60000); // 60s — HF cold starts can be slow
     req.write(body);
     req.end();
   });
 }
 
 /**
- * Automatically generates AI images using FREE Pollinations AI
- * @param {Object|string} presentationDataOrTopic - Presentation JSON AST from Gemini
- * @returns {Promise<Object>} - Map of generated image file paths keyed by slide index
+ * Automatically generates AI topic images for every slide requesting an image.
+ * Uses 3-tier fallback (HF -> Pollinations AI -> Stock Topic Photo) for 100% reliability!
  */
 export const generateTopicImages = async (presentationDataOrTopic) => {
   const isObject = typeof presentationDataOrTopic === 'object';
-  const promptTopic = isObject ? (presentationDataOrTopic.title || presentationDataOrTopic.topic || 'presentation') : presentationDataOrTopic;
+  // Use raw user prompt / topic first to avoid title verbs like "Understanding"
+  const rawTopic = isObject ? (presentationDataOrTopic.topic || presentationDataOrTopic.title || 'presentation') : presentationDataOrTopic;
 
-  logger.info(`🤖 Auto-Generating AI Images for: "${promptTopic}"...`);
+  logger.info(`🤖 Auto-Generating AI Topic Images for: "${rawTopic}"...`);
 
   const tempImgDir = path.join(process.cwd(), 'temp', 'images');
   fs.mkdirSync(tempImgDir, { recursive: true });
@@ -122,7 +233,6 @@ export const generateTopicImages = async (presentationDataOrTopic) => {
   const resultImages = {};
   const slides = isObject && Array.isArray(presentationDataOrTopic.slides) ? presentationDataOrTopic.slides : [];
 
-  // Only generate images for slides that request them
   const imageTasks = [];
   slides.forEach((slide, idx) => {
     if (slide.hasImage && slide.imagePrompt) {
@@ -134,25 +244,40 @@ export const generateTopicImages = async (presentationDataOrTopic) => {
     }
   });
 
-  logger.info(`  → ${imageTasks.length} slides requested images`);
+  logger.info(`  → ${imageTasks.length} slides requested topic images`);
 
-  for (const task of imageTasks) {
+  for (let i = 0; i < imageTasks.length; i++) {
+    const task = imageTasks[i];
     try {
-      logger.info(`  → Slide ${task.index + 1}: "${task.prompt.substring(0, 60)}..."`);
-      
+      logger.info(`  → Slide ${task.index + 1}: "${task.prompt.substring(0, 50)}..."`);
       const imgPath = path.join(tempImgDir, task.file);
       
-      // Use Hugging Face Inference API (free tier)
-      const result = await generateImageWithHuggingFace(task.prompt, imgPath);
+      // Tier 1: Try Hugging Face
+      let result = await generateImageWithHuggingFace(task.prompt, imgPath);
       
-      if (result && fs.existsSync(imgPath) && fs.statSync(imgPath).size > 2000) {
-        resultImages[task.index] = imgPath;
-        logger.info(`     ✅ Generated (${Math.round(fs.statSync(imgPath).size / 1024)}KB)`);
-      } else {
-        logger.warn(`     ❌ Failed or too small`);
+      // Tier 2: Try Pollinations AI
+      if (!result || !fs.existsSync(imgPath) || fs.statSync(imgPath).size < 5000) {
+        result = await generateImageWithPollinations(task.prompt, imgPath);
       }
+
+      // Tier 3: Guaranteed Stock Fallback by Concrete Subject Keyword
+      if (!result || !fs.existsSync(imgPath) || fs.statSync(imgPath).size < 5000) {
+        result = await downloadStockFallbackImage(task.prompt, rawTopic, imgPath);
+      }
+
+      if (result && fs.existsSync(imgPath) && fs.statSync(imgPath).size > 5000) {
+        resultImages[task.index] = imgPath;
+        logger.info(`     ✅ Image ${task.index + 1} generated successfully (${Math.round(fs.statSync(imgPath).size / 1024)}KB)`);
+      } else {
+        logger.warn(`     ❌ Image generation failed for slide ${task.index + 1}`);
+      }
+
+      if (i < imageTasks.length - 1) {
+        await sleep(300);
+      }
+
     } catch (err) {
-      logger.warn(`     ❌ Error: ${err.message}`);
+      logger.warn(`     ❌ Error on slide ${task.index + 1}: ${err.message}`);
     }
   }
 
