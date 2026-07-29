@@ -298,3 +298,37 @@ export const generateTopicImages = async (presentationDataOrTopic) => {
   logger.info(`📸 Image Generation Complete: ${Object.keys(resultImages).length}/${imageTasks.length} successful`);
   return resultImages;
 };
+
+/**
+ * Automatically generates a topic-specific logo icon.
+ * Uses Pollinations AI or Hugging Face, saving as logo.png in the temp directory.
+ */
+export const generateTopicLogo = async (topic) => {
+  const tempImgDir = path.join(process.cwd(), 'temp', 'images');
+  fs.mkdirSync(tempImgDir, { recursive: true });
+  const logoPath = path.join(tempImgDir, 'logo.png');
+
+  logger.info(`🤖 Auto-Generating Unique Topic Logo for: "${topic}"...`);
+
+  // Prompt style for a clean vector branding icon
+  const prompt = `Simple minimalist flat vector graphic icon logo of ${topic}, solid white on a solid black background, high contrast, clean graphics, branding symbol, no text, no watermark`;
+
+  // Tier 1: Try Hugging Face
+  let result = await generateImageWithHuggingFace(prompt, logoPath);
+
+  // Tier 2: Try Pollinations AI
+  if (!result || !fs.existsSync(logoPath) || fs.statSync(logoPath).size < 5000) {
+    result = await generateImageWithPollinations(prompt, logoPath);
+  }
+
+  // Tier 3: Unsplash Fallback
+  if (!result || !fs.existsSync(logoPath) || fs.statSync(logoPath).size < 5000) {
+    result = await downloadStockFallbackImage(prompt, topic, logoPath);
+  }
+
+  if (result && fs.existsSync(logoPath) && fs.statSync(logoPath).size > 2000) {
+    logger.info(`     ✅ Topic logo generated successfully (${Math.round(fs.statSync(logoPath).size / 1024)}KB)`);
+    return logoPath;
+  }
+  return null;
+};

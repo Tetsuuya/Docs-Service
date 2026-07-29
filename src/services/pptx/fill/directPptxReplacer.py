@@ -34,6 +34,7 @@ try:
     from pptx import Presentation
     from pptx.enum.shapes import MSO_SHAPE_TYPE
     from pptx.oxml.ns import qn
+    from pptx.util import Inches
     from lxml import etree
 except ImportError:
     print("ERROR: python-pptx and lxml are required. Run: pip install python-pptx lxml", file=sys.stderr)
@@ -111,7 +112,7 @@ def get_safe_font_name(original_font_name):
     return SAFE_FONT_MAP.get(lower_name, original_font_name)
 
 
-def write_text_preserve_first_run_style(shape, new_text):
+def write_text_preserve_first_run_style(shape, new_text, should_wrap=True):
     if not shape.has_text_frame:
         return
 
@@ -134,6 +135,9 @@ def write_text_preserve_first_run_style(shape, new_text):
         if first_rPr is not None:
             break
 
+    # Extract original text for scaling comparison
+    orig_text = tf.text.strip()
+
     if first_rPr is not None:
         latin_font = first_rPr.find(qn("a:latin"))
         if latin_font is not None:
@@ -143,6 +147,21 @@ def write_text_preserve_first_run_style(shape, new_text):
         else:
             latin_elem = etree.SubElement(first_rPr, qn("a:latin"))
             latin_elem.set("typeface", "Arial")
+
+        # Scale down font size for single-line labels if the new text is longer than the placeholder
+        if not should_wrap and orig_text:
+            sanitized_len = len(new_text.strip())
+            if sanitized_len > len(orig_text):
+                sz_val = first_rPr.get("sz")
+                if sz_val:
+                    try:
+                        orig_sz = int(sz_val)
+                        scale = max(float(len(orig_text)) / float(sanitized_len), 0.4)
+                        new_sz = int(orig_sz * scale)
+                        first_rPr.set("sz", str(new_sz))
+                        print(f"  [Autofit] Scaled font size of {shape.name} from {orig_sz/100:.1f}pt to {new_sz/100:.1f}pt (scale={scale:.2f})", file=sys.stderr)
+                    except Exception as e:
+                        print(f"  [warn] Could not scale font: {e}", file=sys.stderr)
 
     for para in paras:
         txBody.remove(para)
@@ -155,6 +174,12 @@ def write_text_preserve_first_run_style(shape, new_text):
     if first_pPr is not None:
         new_para.insert(0, first_pPr)
 
+    # Force latinLnBrk="0" to ensure PowerPoint wraps at word boundaries, not mid-character!
+    pPr = new_para.find(qn("a:pPr"))
+    if pPr is None:
+        pPr = etree.SubElement(new_para, qn("a:pPr"))
+    pPr.set("latinLnBrk", "0")
+
     new_run = etree.SubElement(new_para, qn("a:r"))
     if first_rPr is not None:
         new_run.insert(0, first_rPr)
@@ -163,7 +188,6 @@ def write_text_preserve_first_run_style(shape, new_text):
     t_elem.text = sanitized
 
     # Enable "Shrink text on overflow" (normAutofit) so long words never break mid-character
-    # This replaces noAutofit/spAutoFit with normAutofit in the bodyPr element
     try:
         bodyPr = txBody.find(qn("a:bodyPr"))
         if bodyPr is not None:
@@ -172,8 +196,15 @@ def write_text_preserve_first_run_style(shape, new_text):
                 existing = bodyPr.find(qn(autofit_tag))
                 if existing is not None:
                     bodyPr.remove(existing)
-            # Insert normAutofit — PowerPoint will shrink font until text fits
+            
+            # Enable normAutofit — PowerPoint will shrink font until text fits
             etree.SubElement(bodyPr, qn("a:normAutofit"))
+            
+            # Control wrapping property
+            if not should_wrap:
+                bodyPr.set("wrap", "none")
+            else:
+                bodyPr.set("wrap", "square")
     except Exception:
         pass
 
@@ -322,12 +353,11 @@ def fill_master_pptx_deck(master_pptx_path, fill_plan_path, output_pptx_path, im
             pass
 
     selected_slides_data = fill_plan.get("selectedSlides", [])
-    print(f"Selected slide entries in plan: {len(selected_slides_data)}", file=sys.stderr)
-
     selected_indices = set()
+    print(f"DEBUG replacer selected_slides_data: {[e.get('slideIndex') for e in selected_slides_data]}", file=sys.stderr)
     for entry in selected_slides_data:
         raw_idx = entry.get("slideIndex", 1)
-        zero_idx = raw_idx - 1
+        zero_idx = int(raw_idx) - 1
         if 0 <= zero_idx < len(prs.slides):
             selected_indices.add(zero_idx)
 
@@ -369,9 +399,38 @@ def fill_master_pptx_deck(master_pptx_path, fill_plan_path, output_pptx_path, im
 
         for shape in all_text_shapes:
             if shape.name in shapes_to_write:
-                write_text_preserve_first_run_style(shape, shapes_to_write[shape.name])
+                new_text_clean = shapes_to_write[shape.name].strip()
+                should_wrap = True
+                
+                is_short_label = False
+                name_lower = shape.name.lower()
+                if any(kw in name_lower for kw in ["badge", "tag", "number", "date", "footer", "author"]):
+                    is_short_label = True
+                if shape.name in [
+                    "TextBox 6", "TextBox 7", "TextBox 9", "TextBox 10",
+                    "TextBox 31", "TextBox 32", "TextBox 33", "TextBox 34", "TextBox 35", 
+                    "TextBox 36", "TextBox 37", "TextBox 38", "TextBox 39", "TextBox 40"
+                ]:
+                    is_short_label = True
+                    
+                is_section_cover = (entry.get("layoutCategory") == "section_header" or (zero_idx + 1) in [3, 28, 43])
+                if is_section_cover and shape.name in ["TextBox 4", "TextBox 5"]:
+                    is_short_label = True
+
+                is_title_slide = (entry.get("layoutCategory") == "title_slide" or zero_idx == 0)
+                if is_title_slide and shape.name == "TextBox 3":
+                    is_short_label = False
+                elif is_title_slide and shape.name in ["TextBox 4", "TextBox 5"]:
+                    is_short_label = True
+
+                if is_short_label and len(new_text_clean) < 60:
+                    should_wrap = False
+
+                write_text_preserve_first_run_style(shape, shapes_to_write[shape.name], should_wrap=should_wrap)
             else:
                 clear_text_frame(shape.text_frame)
+
+
 
         # Attach unique independent AI image for this slide
         layout_category = entry.get('layoutCategory', 'content_slide')
@@ -387,17 +446,44 @@ def fill_master_pptx_deck(master_pptx_path, fill_plan_path, output_pptx_path, im
 
         print(f"  Slide {zero_idx + 1}: processed {len(all_text_shapes)} recursive text shapes (filled={len(shapes_to_write)})", file=sys.stderr)
 
-    # 2. Prune unselected slides
+    # 2. Prune unselected slides & Reorder to match exact planned sequence
     total_before = len(prs.slides)
-    for i in range(total_before - 1, -1, -1):
-        if i not in selected_indices:
+    original_slides = list(prs.slides)
+    
+    # Map original zero_idx to XML elements
+    sldId_map = {}
+    for idx, slide in enumerate(original_slides):
+        sldId_map[idx] = prs.slides._sldIdLst[idx]
+
+    new_sldId_list = []
+    seen_indices = set()
+    
+    for entry in selected_slides_data:
+        raw_idx = entry.get("slideIndex", 1)
+        zero_idx = int(raw_idx) - 1
+        if 0 <= zero_idx < len(original_slides):
+            if zero_idx not in seen_indices:
+                seen_indices.add(zero_idx)
+                new_sldId_list.append(sldId_map[zero_idx])
+
+    # Drop relationships for unselected slides
+    for idx in range(total_before):
+        if idx not in seen_indices:
             try:
-                delete_slide(prs, i)
-            except Exception as e:
-                print(f"  [warn] Could not remove slide index {i}: {e}", file=sys.stderr)
+                rId = sldId_map[idx].rId
+                prs.part.drop_rel(rId)
+            except Exception:
+                pass
+
+    # Clear and rebuild slide XML sequence in the new ordered sequence
+    sldIdLst = prs.slides._sldIdLst
+    for sldId in list(sldIdLst):
+        sldIdLst.remove(sldId)
+    for sldId in new_sldId_list:
+        sldIdLst.append(sldId)
 
     total_after = len(prs.slides)
-    print(f"Slides: {total_before} (template) → {total_after} (output, {len(selected_indices)} selected)", file=sys.stderr)
+    print(f"Slides: {total_before} (template) → {total_after} (output, {len(seen_indices)} selected, reordered)", file=sys.stderr)
 
     # 3. Save output PPTX
     os.makedirs(os.path.dirname(os.path.abspath(output_pptx_path)), exist_ok=True)

@@ -59,8 +59,19 @@ const SECTION_HEADER_INDICES = new Set([3, 28, 43]);
 function sanitizeSelectedSlides(selectedSlides, slideCatalog) {
   if (!Array.isArray(selectedSlides) || selectedSlides.length === 0) return selectedSlides;
 
-  // Find sample content card slides in template catalog to use as replacement
-  const contentCardCatalogEntry = slideCatalog.find(s => s.layoutCategory === 'split_image_text' || s.layoutCategory === 'three_column_cards' || s.layoutCategory === 'multi_column_grid' || (s.slideIndex !== 1 && s.slideIndex !== 2 && !SECTION_HEADER_INDICES.has(s.slideIndex))) || { slideIndex: 5, layoutCategory: 'split_image_text' };
+  // Find sample content card slides in template catalog to use as replacement (excluding title, agenda, and section cover slides)
+  const contentCardCatalogEntry = slideCatalog.find(s => {
+    const sIdx = parseInt(s.slideIndex, 10);
+    return sIdx !== 1 && 
+      sIdx !== 2 && 
+      s.layoutCategory !== 'agenda' &&
+      !SECTION_HEADER_INDICES.has(sIdx) && 
+      (s.layoutCategory === 'split_image_text' || 
+       s.layoutCategory === 'three_column_cards' || 
+       s.layoutCategory === 'multi_column_grid' || 
+       s.layoutCategory === 'two_column_layout' ||
+       s.layoutCategory === 'content_slide');
+  }) || slideCatalog.find(s => parseInt(s.slideIndex, 10) === 5) || { slideIndex: 5, layoutCategory: 'split_image_text', textShapes: {} };
 
   const sanitized = [];
 
@@ -68,23 +79,71 @@ function sanitizeSelectedSlides(selectedSlides, slideCatalog) {
     const current = selectedSlides[i];
     const prev = sanitized.length > 0 ? sanitized[sanitized.length - 1] : null;
 
-    const isCurrentSection = SECTION_HEADER_INDICES.has(current.slideIndex) || current.layoutCategory === 'section_header';
-    const isPrevSection = prev ? (SECTION_HEADER_INDICES.has(prev.slideIndex) || prev.layoutCategory === 'section_header') : false;
+    const currentIdx = current ? parseInt(current.slideIndex, 10) : null;
+    const prevIdx = prev ? parseInt(prev.slideIndex, 10) : null;
+
+    const isCurrentSection = SECTION_HEADER_INDICES.has(currentIdx) || current.layoutCategory === 'section_header';
+    const isPrevSection = prev ? (SECTION_HEADER_INDICES.has(prevIdx) || prev.layoutCategory === 'section_header') : false;
 
     if (isCurrentSection && isPrevSection) {
       logger.info(`  [Layout Guard] Converted consecutive Section Cover (slideIndex ${current.slideIndex}) to Content Card layout (slideIndex ${contentCardCatalogEntry.slideIndex})`);
       
+      const targetShapeNames = Object.keys(contentCardCatalogEntry.textShapes || {});
+      const newFillContent = {};
+
+      const headline = [
+        current.fillContent?.["TextBox 4"],
+        current.fillContent?.["TextBox 5"]
+      ].filter(Boolean).join(" ") || current.fillContent?.["TextBox 3"] || "Key Takeaways";
+
+      const bodyText = current.speakerNotes || "Strategic overview and operational insights.";
+
+      if (targetShapeNames.length > 0) {
+        let titleKey = targetShapeNames[0];
+        let bodyKey = targetShapeNames.length > 1 ? targetShapeNames[1] : null;
+
+        // Custom template-fit helper for Slide 5 and Slide 10
+        if (targetShapeNames.includes('TextBox 8')) {
+          newFillContent['TextBox 8'] = headline;
+          if (targetShapeNames.includes('TextBox 6')) {
+            newFillContent['TextBox 6'] = "Key Takeaways";
+          }
+          if (targetShapeNames.includes('TextBox 7')) {
+            newFillContent['TextBox 7'] = "Docs-Service AI";
+          }
+          if (targetShapeNames.includes('TextBox 9')) {
+            newFillContent['TextBox 9'] = "OVERVIEW";
+          }
+          targetShapeNames.forEach(name => {
+            if (!['TextBox 6', 'TextBox 7', 'TextBox 8', 'TextBox 9'].includes(name)) {
+              newFillContent[name] = "";
+            }
+          });
+        } else {
+          newFillContent[titleKey] = headline;
+          if (bodyKey) {
+            newFillContent[bodyKey] = bodyText;
+          }
+          for (let j = 0; j < targetShapeNames.length; j++) {
+            const name = targetShapeNames[j];
+            if (name !== titleKey && name !== bodyKey) {
+              newFillContent[name] = "";
+            }
+          }
+        }
+      }
+
       sanitized.push({
         ...current,
-        slideIndex: contentCardCatalogEntry.slideIndex,
+        slideIndex: parseInt(contentCardCatalogEntry.slideIndex, 10),
         layoutCategory: contentCardCatalogEntry.layoutCategory,
-        fillContent: {
-          "TextBox 6": current.fillContent?.["TextBox 4"] || current.fillContent?.["TextBox 3"] || "Key Takeaways",
-          "TextBox 8": current.fillContent?.["TextBox 5"] || "Strategic overview and operational insights."
-        }
+        fillContent: newFillContent
       });
     } else {
-      sanitized.push(current);
+      sanitized.push({
+        ...current,
+        slideIndex: currentIdx
+      });
     }
   }
 
@@ -140,7 +199,14 @@ CRITICAL COPYWRITING & TEMPLATE STRUCTURAL RULES:
 6. STACKED SHAPE DISCIPLINE: On slides with multiple title shapes (e.g. TextBox 3 and TextBox 4):
    - Put the main short headline in TextBox 3 (e.g. "CANCER BIOLOGY")
    - Put a short subtitle or LEAVE BLANK in TextBox 4 (do NOT repeat the headline in TextBox 4!)
-7. TEMPLATE-MATCHED IMAGE PROMPTS PER SLIDE TYPE (CRITICAL):
+7. AGENDA SLIDE (TOC):
+   - If you include Slide 2 (layoutCategory: "agenda"), replace the placeholder French texts with actual presentation section names/topics.
+   - Use TextBox 31 for the slide title (e.g. "AGENDA" or "TABLE OF CONTENTS").
+   - Map Section 1 title to TextBox 32 (prefix) & TextBox 35 (main topic).
+   - Map Section 2 title to TextBox 33 (prefix) & TextBox 36 (main topic).
+   - Map Section 3 title to TextBox 34 (prefix) & TextBox 37 (main topic).
+   - Use TextBox 38, 39, and 40 for numbering ("01", "02", "03").
+8. TEMPLATE-MATCHED IMAGE PROMPTS PER SLIDE TYPE (CRITICAL):
     - The template has TWO distinct slide visual styles. You MUST match the correct image style to each slide type:
 
     STYLE A — Title Cover & Section Header slides (dark background slides):

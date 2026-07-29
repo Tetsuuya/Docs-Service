@@ -48,6 +48,7 @@ export const buildFillPptx = async (fillPlan, templateBlueprint, masterFilePath 
     };
 
     try {
+      logger.info(`[fillPptxBuilder] Sanitized plan sent to Python: ${JSON.stringify(fillPlan.selectedSlides.map(s => ({ idx: s.slideIndex, cat: s.layoutCategory })), null, 2)}`);
       fs.writeFileSync(planJsonPath, JSON.stringify(fillPlan, null, 2), 'utf8');
       fs.writeFileSync(imgJsonPath, JSON.stringify(autoImages, null, 2), 'utf8');
 

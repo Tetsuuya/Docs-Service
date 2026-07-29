@@ -11,7 +11,7 @@ async function runAutoLoop() {
   ];
 
   const templatePath = path.join(process.cwd(), 'AGENCE DÉCLIC 3.pptx');
-  const artifactsDir = `C:\\Users\\Rhenel Jhon Sajol\\.gemini\\antigravity-ide\\brain\\40d82de6-ac2c-4b88-9768-f8948dee2ffc`;
+  const artifactsDir = process.argv[2] || path.join(process.cwd(), 'temp', 'artifacts');
 
   for (let i = 0; i < topics.length; i++) {
     const topic = topics[i];

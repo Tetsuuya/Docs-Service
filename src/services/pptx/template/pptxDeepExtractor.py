@@ -107,6 +107,8 @@ def extract_text_frame(tf):
 def classify_layout(slide_idx, elements, has_blips=False):
     if slide_idx == 0:
         return "title_slide"
+    if slide_idx == 1:
+        return "agenda"
 
     text_shapes = [e for e in elements if e.get("hasText")]
     n_text = len(text_shapes)

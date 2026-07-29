@@ -185,7 +185,7 @@ export const parsePptxTemplate = async (pptxFilePath) => {
         }
       }
 
-      const category = idx === 0 ? 'title_slide' : (textShapeMap.length >= 3 ? '3_column_cards' : 'content_slide');
+      const category = idx === 0 ? 'title_slide' : (idx === 1 ? 'agenda' : (textShapeMap.length >= 3 ? '3_column_cards' : 'content_slide'));
 
       slideMetadata.push({
         slideIndex: idx + 1,
