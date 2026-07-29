@@ -42,12 +42,49 @@ except ImportError:
 
 
 SAFE_FONT_MAP = {
+    # Canva fonts
     "canva sans": "Arial",
     "canva sans bold": "Arial",
+    "canva sans display": "Arial",
+    "canva serif": "Times New Roman",
+    # Aileron family
     "aileron": "Segoe UI",
     "aileron bold": "Segoe UI",
+    "aileron light": "Segoe UI Light",
+    "aileron thin": "Segoe UI Light",
+    "aileron black": "Segoe UI Semibold",
+    # Helvetica variants
     "helvetica now display": "Arial",
     "helvetica now display bold": "Arial",
+    "helvetica neue": "Arial",
+    "helvetica": "Arial",
+    # Other common template fonts that may not be installed
+    "montserrat": "Segoe UI",
+    "montserrat bold": "Segoe UI Semibold",
+    "montserrat light": "Segoe UI Light",
+    "open sans": "Segoe UI",
+    "open sans bold": "Segoe UI Semibold",
+    "lato": "Segoe UI",
+    "lato bold": "Segoe UI Semibold",
+    "roboto": "Segoe UI",
+    "roboto bold": "Segoe UI Semibold",
+    "poppins": "Segoe UI",
+    "poppins bold": "Segoe UI Semibold",
+    "raleway": "Segoe UI",
+    "source sans pro": "Segoe UI",
+    "inter": "Segoe UI",
+    "nunito": "Segoe UI",
+    "playfair display": "Georgia",
+    "merriweather": "Georgia",
+    "oswald": "Arial Narrow",
+    "bebas neue": "Arial Narrow",
+    # Fonts with special characters/glyphs that cause boxes
+    "eternity": "Georgia",
+    "great vibes": "Segoe Script",
+    "pacifico": "Segoe Script",
+    "dancing script": "Segoe Script",
+    "lobster": "Segoe Script",
+    "alex brush": "Segoe Script",
 }
 
 TEMPLATE_RESIDUAL_KEYWORDS = [
@@ -58,24 +95,96 @@ TEMPLATE_RESIDUAL_KEYWORDS = [
 
 
 def sanitize_text(text):
+    """
+    Sanitize text for PPTX compatibility while preserving readable characters.
+    - Converts smart quotes, dashes, bullets to ASCII equivalents
+    - Removes problematic control characters and zero-width characters
+    - Preserves accented Latin characters and common symbols
+    """
     if not text:
         return ""
     text = str(text)
     text = text.replace("|", " ")  # Replace pipe characters with space to prevent title box multi-line wrap
+    
+    # Comprehensive Unicode replacements for common problematic characters
     replacements = {
-        "\u2019": "'",
-        "\u2018": "'",
-        "\u201c": '"',
-        "\u201d": '"',
-        "\u2014": " - ",
-        "\u2013": " - ",
-        "\u00a0": " ",
-        "\u2022": "*",
-        "\u2026": "...",
+        # Smart quotes
+        "\u2019": "'",   # Right single quote
+        "\u2018": "'",   # Left single quote
+        "\u201c": '"',   # Left double quote
+        "\u201d": '"',   # Right double quote
+        "\u201a": ",",   # Single low-9 quote
+        "\u201e": '"',   # Double low-9 quote
+        "\u2039": "'",   # Single left angle quote
+        "\u203a": "'",   # Single right angle quote
+        "\u00ab": '"',   # Left double angle quote
+        "\u00bb": '"',   # Right double angle quote
+        # Dashes and hyphens
+        "\u2014": " - ", # Em dash
+        "\u2013": " - ", # En dash
+        "\u2012": "-",   # Figure dash
+        "\u2010": "-",   # Hyphen
+        "\u2011": "-",   # Non-breaking hyphen
+        # Spaces
+        "\u00a0": " ",   # Non-breaking space
+        "\u2003": " ",   # Em space
+        "\u2002": " ",   # En space
+        "\u2009": " ",   # Thin space
+        "\u200a": " ",   # Hair space
+        "\u200b": "",    # Zero-width space (remove)
+        "\u200c": "",    # Zero-width non-joiner (remove)
+        "\u200d": "",    # Zero-width joiner (remove)
+        "\ufeff": "",    # BOM / zero-width no-break space (remove)
+        # Bullets and symbols
+        "\u2022": "*",   # Bullet
+        "\u2023": ">",   # Triangular bullet
+        "\u2043": "-",   # Hyphen bullet
+        "\u25cf": "*",   # Black circle
+        "\u25cb": "o",   # White circle
+        "\u25a0": "*",   # Black square
+        "\u25a1": "o",   # White square
+        "\u2026": "...", # Horizontal ellipsis
+        "\u22c5": ".",   # Dot operator
+        # Arrows (common in presentations)
+        "\u2192": "->",  # Right arrow
+        "\u2190": "<-",  # Left arrow
+        "\u2194": "<->", # Left right arrow
+        "\u21d2": "=>",  # Double right arrow
+        "\u2713": "[x]", # Check mark
+        "\u2714": "[x]", # Heavy check mark
+        "\u2717": "[ ]", # Ballot X
+        "\u2718": "[ ]", # Heavy ballot X
+        # Other common symbols
+        "\u00ae": "(R)", # Registered trademark
+        "\u2122": "(TM)", # Trademark
+        "\u00a9": "(C)", # Copyright
+        "\u00b0": " deg", # Degree
+        "\u00b1": "+/-", # Plus-minus
+        "\u00d7": "x",   # Multiplication
+        "\u00f7": "/",   # Division
+        "\u2212": "-",   # Minus sign
+        "\u221a": "sqrt", # Square root
+        "\u221e": "inf", # Infinity
+        # Fractions
+        "\u00bc": "1/4",
+        "\u00bd": "1/2",
+        "\u00be": "3/4",
+        # Superscripts/subscripts that may cause issues
+        "\u00b2": "2",   # Superscript 2
+        "\u00b3": "3",   # Superscript 3
+        "\u00b9": "1",   # Superscript 1
     }
     for orig, repl in replacements.items():
         text = text.replace(orig, repl)
-    text = re.sub(r"[^\x00-\x7F\xA0-\xFF]", "", text)
+    
+    # Remove control characters (0x00-0x1F except tab/newline, and 0x7F-0x9F)
+    # But PRESERVE all printable characters including extended Latin (accents, umlauts, etc.)
+    text = re.sub(r'[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x9f]', '', text)
+    
+    # Remove any remaining zero-width or invisible formatting characters
+    text = re.sub(r'[\u200b-\u200f\u2028-\u202f\u2060-\u206f]', '', text)
+    
+    # Normalize multiple whitespace to single space
     return re.sub(r"\s+", " ", text).strip()
 
 
@@ -94,22 +203,72 @@ def get_all_text_shapes(container):
 
 
 def clear_text_frame(tf):
+    """
+    Clears all text content from a text frame while masking underlying layout master placeholder text.
+    Inserts a zero-width space with explicit white/transparent formatting to ensure no bleed-through.
+    """
     txBody = tf._txBody
     paras = txBody.findall(qn("a:p"))
     for para in paras:
         txBody.remove(para)
-    # Add a clean space run so underlying layout master placeholder text is masked
+    
+    # Create a new paragraph with a properly formatted empty run
+    # Using zero-width space with explicit transparent/matching styling to mask layout text
     p = etree.SubElement(txBody, qn("a:p"))
+    
+    # Add paragraph properties to prevent layout master text inheritance
+    pPr = etree.SubElement(p, qn("a:pPr"))
+    
+    # Add run with space character
     r = etree.SubElement(p, qn("a:r"))
+    
+    # Add run properties to ensure the space character renders and masks underlying text
+    rPr = etree.SubElement(r, qn("a:rPr"))
+    rPr.set("lang", "en-US")
+    rPr.set("sz", "100")  # Very small font size (1pt)
+    
+    # Make the masking text transparent so it doesn't show but still masks
+    solidFill = etree.SubElement(rPr, qn("a:solidFill"))
+    srgbClr = etree.SubElement(solidFill, qn("a:srgbClr"), val="FFFFFF")
+    etree.SubElement(srgbClr, qn("a:alpha"), val="0")  # Fully transparent
+    
     t = etree.SubElement(r, qn("a:t"))
     t.text = " "
 
 
 def get_safe_font_name(original_font_name):
+    """
+    Maps potentially unavailable or problematic fonts to safe system fonts.
+    Returns Arial as the ultimate fallback for maximum compatibility.
+    """
     if not original_font_name:
         return "Arial"
+    
     lower_name = original_font_name.lower().strip()
-    return SAFE_FONT_MAP.get(lower_name, original_font_name)
+    
+    # Direct mapping from known problematic fonts
+    if lower_name in SAFE_FONT_MAP:
+        return SAFE_FONT_MAP[lower_name]
+    
+    # Check for partial matches (e.g., "Canva Sans Regular" -> "canva sans")
+    for known_font, safe_font in SAFE_FONT_MAP.items():
+        if known_font in lower_name or lower_name.startswith(known_font.split()[0]):
+            return safe_font
+    
+    # If font name contains suspicious keywords that suggest decorative/display fonts
+    decorative_keywords = ['script', 'brush', 'hand', 'cursive', 'fancy', 'decorative', 
+                           'display', 'poster', 'graffiti', 'calligraphy', 'signature']
+    if any(kw in lower_name for kw in decorative_keywords):
+        return "Segoe Script"
+    
+    # Return original font if it looks like a standard system font
+    standard_fonts = ['arial', 'calibri', 'segoe', 'times', 'georgia', 'tahoma', 
+                      'verdana', 'trebuchet', 'courier', 'consolas', 'cambria']
+    if any(std in lower_name for std in standard_fonts):
+        return original_font_name
+    
+    # Default fallback for unknown fonts
+    return "Arial"
 
 
 def write_text_preserve_first_run_style(shape, new_text, should_wrap=True):
@@ -139,14 +298,41 @@ def write_text_preserve_first_run_style(shape, new_text, should_wrap=True):
     orig_text = tf.text.strip()
 
     if first_rPr is not None:
+        # Fix Latin font (primary Western font)
         latin_font = first_rPr.find(qn("a:latin"))
         if latin_font is not None:
             orig_typeface = latin_font.get("typeface", "")
             safe_typeface = get_safe_font_name(orig_typeface)
             latin_font.set("typeface", safe_typeface)
+            print(f"  [font] {shape.name}: Latin font '{orig_typeface}' -> '{safe_typeface}'", file=sys.stderr)
         else:
             latin_elem = etree.SubElement(first_rPr, qn("a:latin"))
             latin_elem.set("typeface", "Arial")
+        
+        # Fix East Asian font (a:ea) - these can cause box characters
+        ea_font = first_rPr.find(qn("a:ea"))
+        if ea_font is not None:
+            orig_ea = ea_font.get("typeface", "")
+            ea_font.set("typeface", "Arial")  # Replace with safe fallback
+            if orig_ea:
+                print(f"  [font] {shape.name}: EA font '{orig_ea}' -> 'Arial'", file=sys.stderr)
+        
+        # Fix Complex Script font (a:cs) - for RTL languages, can also cause issues
+        cs_font = first_rPr.find(qn("a:cs"))
+        if cs_font is not None:
+            orig_cs = cs_font.get("typeface", "")
+            cs_font.set("typeface", "Arial")  # Replace with safe fallback
+            if orig_cs:
+                print(f"  [font] {shape.name}: CS font '{orig_cs}' -> 'Arial'", file=sys.stderr)
+        
+        # Fix Symbol font (a:sym) - decorative symbols that often render as boxes
+        sym_font = first_rPr.find(qn("a:sym"))
+        if sym_font is not None:
+            orig_sym = sym_font.get("typeface", "")
+            # Remove symbol font to prevent box characters from decorative glyphs
+            first_rPr.remove(sym_font)
+            if orig_sym:
+                print(f"  [font] {shape.name}: Removed symbol font '{orig_sym}'", file=sys.stderr)
 
         # Scale down font size for single-line labels if the new text is longer than the placeholder
         if not should_wrap and orig_text:
@@ -181,8 +367,17 @@ def write_text_preserve_first_run_style(shape, new_text, should_wrap=True):
     pPr.set("latinLnBrk", "0")
 
     new_run = etree.SubElement(new_para, qn("a:r"))
+    
+    # If we have existing run properties, use them; otherwise create safe defaults
     if first_rPr is not None:
         new_run.insert(0, first_rPr)
+    else:
+        # Create minimal safe run properties with explicit Arial font
+        rPr = etree.SubElement(new_run, qn("a:rPr"))
+        rPr.set("lang", "en-US")
+        latin_elem = etree.SubElement(rPr, qn("a:latin"))
+        latin_elem.set("typeface", "Arial")
+        print(f"  [font] {shape.name}: No existing rPr, using Arial default", file=sys.stderr)
 
     t_elem = etree.SubElement(new_run, qn("a:t"))
     t_elem.text = sanitized
@@ -250,11 +445,23 @@ def replace_main_slide_photo(slide, image_file_path, is_agenda=False, layout_cat
     """
     Inserts a BRAND NEW independent image part for this slide and updates the primary photo/background blip.
     Replaces the largest non-icon image blip (> 5KB) on the slide with the generated AI topic image.
-    On Agenda slides (is_agenda=True): skips replacing full-bleed background panels to keep icons 100% legible!
+    
+    SKIP conditions:
+    - On Agenda slides (is_agenda=True): SKIP ALL image replacement to preserve layout integrity
+    - Thin decorative elements: skips images with extreme aspect ratios (divider bars, accent lines)
+    - Small icons and vectors: skips blips < 5KB
+    - Narrow vertical/horizontal strips: skips elements that are clearly decorative dividers
+    
     Dark overlay ONLY applied on title_slide and section_header slides (dark navy theme).
     """
     if not image_file_path or not os.path.exists(image_file_path):
         return
+    
+    # AGENDA SLIDES: Skip ALL image replacement to preserve icons, dividers, and layout
+    if is_agenda:
+        print(f"  [image skip] Agenda slide detected — preserving all original images", file=sys.stderr)
+        return
+    
     try:
         blips = slide.shapes._spTree.xpath('.//a:blip')
         if not blips:
@@ -263,6 +470,10 @@ def replace_main_slide_photo(slide, image_file_path, is_agenda=False, layout_cat
         primary_blip = None
         max_size = -1
         has_full_bg = False
+        
+        # Slide dimensions in EMUs (standard 16:9 slide)
+        SLIDE_WIDTH = 12192000   # ~13.33 inches
+        SLIDE_HEIGHT = 6858000   # ~7.5 inches
 
         for blip in blips:
             rId = blip.get(qn('r:embed'))
@@ -283,18 +494,59 @@ def replace_main_slide_photo(slide, image_file_path, is_agenda=False, layout_cat
             cy_list = blip.xpath('ancestor::*/a:xfrm/a:ext/@cy')
 
             is_full_bg = False
+            is_decorative_element = False
+            
             if cx_list and cy_list:
                 try:
-                    cx = int(cx_list[0])
-                    cy = int(cy_list[0])
+                    cx = int(cx_list[0])  # Width in EMUs
+                    cy = int(cy_list[0])  # Height in EMUs
+                    
+                    # Check for full-bleed background
                     if cx >= 17000000 and cy >= 9500000:
                         is_full_bg = True
+                    
+                    # ─────────────────────────────────────────────────────────────
+                    # DECORATIVE ELEMENT DETECTION (dividers, accent bars, borders)
+                    # ─────────────────────────────────────────────────────────────
+                    
+                    min_dimension = min(cx, cy)
+                    max_dimension = max(cx, cy)
+                    
+                    # Calculate aspect ratio
+                    aspect_ratio = max_dimension / min_dimension if min_dimension > 0 else 999
+                    
+                    # Calculate what percentage of slide each dimension covers
+                    width_percent = (cx / SLIDE_WIDTH) * 100
+                    height_percent = (cy / SLIDE_HEIGHT) * 100
+                    
+                    # RULE 1: Extreme aspect ratio (> 5:1) - definitely a bar/line
+                    if aspect_ratio > 5:
+                        is_decorative_element = True
+                        print(f"  [image skip] Decorative bar (aspect={aspect_ratio:.1f}:1, {cx}x{cy} EMU)", file=sys.stderr)
+                    
+                    # RULE 2: Very narrow in one dimension (< 5% of slide dimension)
+                    # Vertical dividers: narrow width, taller height
+                    # Horizontal dividers: wide width, short height
+                    elif width_percent < 5 or height_percent < 5:
+                        is_decorative_element = True
+                        print(f"  [image skip] Thin strip (w={width_percent:.1f}%, h={height_percent:.1f}% of slide)", file=sys.stderr)
+                    
+                    # RULE 3: Small absolute size - likely an icon or small decorative element
+                    # Skip if BOTH dimensions are small (< 15% of slide)
+                    elif width_percent < 15 and height_percent < 15:
+                        is_decorative_element = True
+                        print(f"  [image skip] Small element (w={width_percent:.1f}%, h={height_percent:.1f}% of slide)", file=sys.stderr)
+                    
+                    # RULE 4: Minimum absolute dimension check (< 500000 EMU = ~0.55 inch)
+                    elif min_dimension < 500000:
+                        is_decorative_element = True
+                        print(f"  [image skip] Narrow element (min_dim={min_dimension} EMU, ~{min_dimension/914400:.2f} inch)", file=sys.stderr)
+                    
+                    if is_decorative_element:
+                        continue
+                            
                 except ValueError:
                     pass
-
-            # On Agenda slides: Skip replacing full-bleed background image to protect icon legibility
-            if is_full_bg and is_agenda:
-                continue
 
             if is_full_bg:
                 has_full_bg = True
@@ -311,7 +563,7 @@ def replace_main_slide_photo(slide, image_file_path, is_agenda=False, layout_cat
             # Only apply dark overlay on title/section cover slides (dark navy template style)
             # Content slides use light/white background — do NOT darken them!
             is_dark_slide = layout_category in ('title_slide', 'section_header')
-            if has_full_bg and not is_agenda and is_dark_slide:
+            if has_full_bg and is_dark_slide:
                 add_dark_overlay_to_slide(slide)
 
     except Exception as e:
